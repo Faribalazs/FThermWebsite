@@ -3,63 +3,38 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\HomepageContent;
 use Illuminate\Http\Request;
 
 class HomepageContentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $contents = HomepageContent::all();
+        return view('admin.homepage.index', compact('contents'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function edit(HomepageContent $homepage)
     {
-        //
+        return view('admin.homepage.edit', compact('homepage'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, HomepageContent $homepage)
     {
-        //
-    }
+        $validated = $request->validate([
+            'value_en' => 'required|string',
+            'value_sr' => 'required|string',
+            'value_hu' => 'required|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $homepage->update([
+            'value' => [
+                'en' => $validated['value_en'],
+                'sr' => $validated['value_sr'],
+                'hu' => $validated['value_hu'],
+            ],
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.homepage.index')->with('success', 'Sadržaj uspešno ažuriran');
     }
 }

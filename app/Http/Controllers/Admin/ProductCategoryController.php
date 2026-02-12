@@ -3,63 +3,77 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $categories = ProductCategory::withCount('products')->paginate(15);
+        return view('admin.categories.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.categories.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name_en' => 'required|string|max:255',
+            'name_sr' => 'required|string|max:255',
+            'name_hu' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:product_categories,slug',
+            'active' => 'boolean',
+        ]);
+
+        ProductCategory::create([
+            'name' => [
+                'en' => $validated['name_en'],
+                'sr' => $validated['name_sr'],
+                'hu' => $validated['name_hu'],
+            ],
+            'slug' => $validated['slug'],
+            'active' => $request->has('active'),
+        ]);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno kreirana');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(ProductCategory $category)
     {
-        //
+        return view('admin.categories.edit', compact('category'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, ProductCategory $category)
     {
-        //
+        $validated = $request->validate([
+            'name_en' => 'required|string|max:255',
+            'name_sr' => 'required|string|max:255',
+            'name_hu' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:product_categories,slug,' . $category->id,
+            'active' => 'boolean',
+        ]);
+
+        $category->update([
+            'name' => [
+                'en' => $validated['name_en'],
+                'sr' => $validated['name_sr'],
+                'hu' => $validated['name_hu'],
+            ],
+            'slug' => $validated['slug'],
+            'active' => $request->has('active'),
+        ]);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno ažurirana');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(ProductCategory $category)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $category->delete();
+        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno obrisana');
     }
 }

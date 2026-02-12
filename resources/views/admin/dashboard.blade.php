@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard')
+@section('title', 'Kontrolna tabla')
 
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -8,7 +8,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 font-medium">Total Products</p>
+                <p class="text-sm text-gray-600 font-medium">Ukupno proizvoda</p>
                 <p class="text-3xl font-bold text-industrial-900 mt-2">{{ $stats['total_products'] }}</p>
             </div>
             <div class="bg-primary-100 p-3 rounded-lg">
@@ -22,7 +22,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 font-medium">Total Services</p>
+                <p class="text-sm text-gray-600 font-medium">Ukupno usluga</p>
                 <p class="text-3xl font-bold text-industrial-900 mt-2">{{ $stats['total_services'] }}</p>
             </div>
             <div class="bg-green-100 p-3 rounded-lg">
@@ -36,7 +36,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 font-medium">Total Inquiries</p>
+                <p class="text-sm text-gray-600 font-medium">Ukupno upita</p>
                 <p class="text-3xl font-bold text-industrial-900 mt-2">{{ $stats['total_inquiries'] }}</p>
             </div>
             <div class="bg-blue-100 p-3 rounded-lg">
@@ -50,7 +50,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm text-gray-600 font-medium">Unread Inquiries</p>
+                <p class="text-sm text-gray-600 font-medium">Nepročitani upiti</p>
                 <p class="text-3xl font-bold text-industrial-900 mt-2">{{ $stats['unread_inquiries'] }}</p>
             </div>
             <div class="bg-orange-100 p-3 rounded-lg">
@@ -65,17 +65,17 @@
 <!-- Recent Inquiries -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-200">
     <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900">Recent Inquiries</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Nedavni upiti</h3>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -83,21 +83,21 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $inquiry->name }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $inquiry->email }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $inquiry->created_at->format('M d, Y') }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $inquiry->created_at->format('d.m.Y') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($inquiry->is_read)
-                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Read</span>
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Pročitano</span>
                         @else
-                            <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">Unread</span>
+                            <span class="px-2 py-1 text-xs rounded-full bg-orange-100 text-orange-800">Novo</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="{{ route('admin.inquiries.show', $inquiry) }}" class="text-primary-600 hover:text-primary-800">View</a>
+                        <a href="{{ route('admin.inquiries.show', $inquiry) }}" class="text-primary-600 hover:text-primary-800">Pregledaj</a>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">No inquiries yet</td>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">Nema upita</td>
                 </tr>
                 @endforelse
             </tbody>
