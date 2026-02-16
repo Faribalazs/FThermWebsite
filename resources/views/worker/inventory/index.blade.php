@@ -3,8 +3,8 @@
 @section('title', 'Dopuna Zaliha')
 
 @section('content')
-<div class="p-3 sm:p-6">
-    <div class="max-w-7xl mx-auto">
+<div class="p-3 sm:p-6 w-full">
+    <div class="max-w-7xl mx-auto w-full">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-4 animate-fade-in">
             <div>
@@ -119,13 +119,12 @@
                         Resetuj
                     </a>
                     <button type="button" 
-                            onclick="document.querySelector('select[name=sort_order]').value = document.querySelector('select[name=sort_order]').value === 'asc' ? 'desc' : 'asc'; this.closest('form').submit();"
+                            onclick="var input = document.querySelector('input[name=sort_order]'); input.value = input.value === 'asc' ? 'desc' : 'asc'; this.closest('form').submit();"
                             class="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                         <svg class="w-4 h-4 sm:w-5 sm:h-5 {{ request('sort_order') == 'desc' ? 'rotate-180' : '' }} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
                         </svg>
-                        <span class="hidden sm:inline">{{ request('sort_order') == 'desc' ? 'Opadajuće' : 'Rastuće' }}</span>
-                        <span class="sm:hidden">{{ request('sort_order') == 'desc' ? '↓' : '↑' }}</span>
+                        <span class="inline">{{ request('sort_order') == 'desc' ? 'Opadajuće' : 'Rastuće' }}</span>
                     </button>
                     <input type="hidden" name="sort_order" value="{{ request('sort_order', 'asc') }}">
                 </div>
@@ -134,62 +133,56 @@
 
         <!-- Products Table -->
         @if($products->count() > 0)
-        <div class="bg-white rounded-xl shadow-enhanced border border-gray-200 overflow-hidden animate-scale-in">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 modern-table">
+        <div class="bg-white rounded-xl shadow-enhanced border border-gray-200 overflow-hidden animate-scale-in w-full">
+            <div class="overflow-x-auto w-full">
+                <table class="min-w-full divide-y divide-gray-200 modern-table w-full">
                     <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Materijal</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Jedinica</th>
-                            <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Cena</th>
-                            <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Stanje</th>
-                            <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Akcije</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Materijal</th>
+                            <th class="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Jedinica</th>
+                            <th class="hidden sm:table-cell px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Cena</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Stanje</th>
+                            <th class="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Akcije</th>
                         </tr>
                     </thead>
                     <tbody id="inventory-table-body" class="divide-y divide-gray-200 bg-white">
                         @foreach($products as $product)
-                        <tr class="hover:bg-gray-50 transition-colors" id="product-{{ $product->id }}">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-lg bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-                                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                        </svg>
-                                    </div>
+                        <tr class="hover:bg-gray-50" id="product-{{ $product->id }}">
+                            <td class="px-3 sm:px-6 py-3 sm:py-4">
+                                <div class="flex items-center gap-2 sm:gap-3">
                                     <div>
-                                        <div class="text-sm font-bold text-gray-900">{{ $product->name }}</div>
-                                        <div class="text-xs text-gray-500">Kreirao: {{ $product->creator->name ?? 'N/A' }}</div>
-                                    </div>
+                                        <div class="text-xs sm:text-sm font-bold text-gray-900">{{ $product->name }}</div>                                    </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="hidden sm:table-cell px-6 py-4">
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     {{ $product->unit }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                            <td class="hidden sm:table-cell px-6 py-4 text-sm font-semibold text-gray-900">
                                 {{ number_format($product->price, 2) }} RSD
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-center">
                                 @php
                                     $quantity = $product->inventory->quantity ?? 0;
                                     $statusClass = $quantity == 0 ? 'bg-red-100 text-red-800' : ($quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800');
                                 @endphp
-                                <span class="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-bold {{ $statusClass }}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span class="inline-flex items-center gap-1 px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-bold {{ $statusClass }}">
+                                    <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
-                                    {{ $quantity }} {{ $product->unit }}
+                                    <span class="hidden sm:inline">{{ $quantity }} {{ $product->unit }}</span>
+                                    <span class="sm:hidden">{{ $quantity }}</span>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-3 sm:px-6 py-3 sm:py-4 text-right">
                                 <div class="flex justify-end gap-2">
                                     <button onclick="openAddModal({{ $product->id }}, '{{ $product->name }}', '{{ $product->unit }}')"
-                                            class="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="inline-flex items-center gap-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md">
+                                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                         </svg>
-                                        Dodaj
+                                        <span class="hidden sm:inline">Dodaj</span>
                                     </button>
                                 </div>
                             </td>

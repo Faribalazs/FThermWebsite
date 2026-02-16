@@ -2,11 +2,6 @@
 <tr class="hover:bg-gray-50 transition-all">
     <td class="px-6 py-4 whitespace-nowrap">
         <div class="flex items-center">
-            <div class="flex-shrink-0 h-10 w-10 product-icon-bg rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-            </div>
             <div class="ml-4">
                 <div class="text-sm font-semibold text-gray-900">{{ $product->name }}</div>
             </div>
