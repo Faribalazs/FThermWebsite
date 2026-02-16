@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Worker\Auth;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+
+class LoginController extends Controller
+{
+    public function create(): View|RedirectResponse
+    {
+        if (Auth::guard('worker')->check()) {
+            return redirect()->route('worker.dashboard');
+        }
+        return view('auth.login', ['heading' => 'Worker Login', 'route' => route('worker.login')]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::guard('worker')->attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            
+            /** @var \App\Models\User $user */
+            $user = Auth::guard('worker')->user();
+
+            if (!$user->is_active) {
+                Auth::guard('worker')->logout();
+                return back()->withErrors(['email' => 'Your account has been deactivated.']);
+            }
+
+            if (!$user->isWorker()) { 
+                 Auth::guard('worker')->logout();
+                 return back()->withErrors(['email' => 'Access denied. Workers only.']);
+            }
+
+            return redirect()->intended(route('worker.dashboard'));
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::guard('worker')->logout();
+        
+        // We do not invalidate session to preserve other guard logins (Admin/User)
+
+        return redirect()->route('worker.login');
+    }
+}

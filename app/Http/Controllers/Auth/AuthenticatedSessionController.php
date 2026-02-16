@@ -16,7 +16,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('auth.login', ['heading' => 'Login']);
     }
 
     /**
@@ -28,7 +28,24 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        $user = $request->user();
+
+        if (!$user->is_active) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->withErrors(['email' => 'Your account has been deactivated.']);
+        }
+
+        if ($user->role === 'worker') {
+            return redirect()->route('worker.dashboard');
+        }
+
+        if ($user->role === 'admin' || $user->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->intended(route('home', absolute: false));
     }
 
     /**
@@ -42,6 +59,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('login');
     }
 }

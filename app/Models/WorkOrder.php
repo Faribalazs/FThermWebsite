@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class WorkOrder extends Model
+{
+    protected $fillable = [
+        'worker_id',
+        'client_name',
+        'location',
+        'status',
+        'invoice_type',
+        'invoice_number',
+        'invoice_company_name',
+        'invoice_pib',
+        'invoice_address',
+        'invoice_email',
+        'invoice_phone',
+        'total_amount',
+        'has_invoice',
+        'hourly_rate',
+    ];
+
+    protected $casts = [
+        'has_invoice' => 'boolean',
+        'total_amount' => 'decimal:2',
+    ];
+
+    public function worker()
+    {
+        return $this->belongsTo(User::class, 'worker_id');
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(WorkOrderSection::class);
+    }
+
+    public function calculateTotal()
+    {
+        $total = 0;
+        foreach ($this->sections as $section) {
+            foreach ($section->items as $item) {
+                $total += $item->quantity * $item->price_at_time;
+            }
+        }
+        return $total;
+    }
+
+    public function calculateTotalHours()
+    {
+        return $this->sections->sum('hours_spent');
+    }
+
+    public function calculateLaborCost()
+    {
+        if (!$this->hourly_rate) {
+            return 0;
+        }
+        return $this->calculateTotalHours() * $this->hourly_rate;
+    }
+
+    public function calculateGrandTotal()
+    {
+        return $this->calculateTotal() + $this->calculateLaborCost();
+    }
+}

@@ -15,10 +15,13 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        /** @var \App\Models\User|null $user */
-        $user = auth()->user();
+        $user = auth('admin')->user();
         
-        if (!auth()->check() || !$user || !$user->is_admin) {
+        if (!$user) {
+             return redirect()->route('admin.login');
+        }
+        
+        if (!$user->isAdmin()) {
             abort(403, 'Unauthorized access');
         }
         

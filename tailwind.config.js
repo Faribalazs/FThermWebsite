@@ -1,5 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import colors from 'tailwindcss/colors';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -44,6 +45,11 @@ export default {
                     600: '#d97706',
                     700: '#b45309',
                 },
+                green: colors.green,
+                indigo: colors.indigo,
+                red: colors.red,
+                yellow: colors.yellow,
+                emerald: colors.emerald,
             },
         },
     },
