@@ -3,12 +3,12 @@
 @section('title', 'Novi Radni Nalog')
 
 @section('content')
-<div class="p-6 max-w-6xl mx-auto">
+<div class="p-3 sm:p-6 max-w-6xl mx-auto">
     <!-- Breadcrumb -->
-    <nav class="mb-6">
-        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+    <nav class="mb-4 sm:mb-6">
+        <ol class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
             <li><a href="{{ route('worker.work-orders.index') }}" class="hover:text-primary-600 transition">Radni Nalozi</a></li>
-            <li><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
+            <li><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
             <li class="text-gray-900 font-medium">Novi Radni Nalog</li>
         </ol>
     </nav>
@@ -16,40 +16,40 @@
     <!-- Form Card -->
     <div class="bg-white rounded-xl shadow-enhanced overflow-hidden border border-gray-100 animate-scale-in">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-8 py-6">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-4 sm:px-8 py-4 sm:py-6">
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="bg-white/20 p-2 sm:p-3 rounded-lg backdrop-blur-sm">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-white">Kreiraj Radni Nalog</h1>
-                    <p class="text-primary-100 text-sm mt-1">Popunite podatke o radnom nalogu i dodajte sekcije</p>
+                    <h1 class="text-lg sm:text-2xl font-bold text-white">Kreiraj Radni Nalog</h1>
+                    <p class="text-primary-100 text-xs sm:text-sm mt-0.5 sm:mt-1">Popunite podatke o radnom nalogu i dodajte sekcije</p>
                 </div>
             </div>
         </div>
 
         @if (session('error'))
-            <div class="m-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+            <div class="m-3 sm:m-6 bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 rounded-lg">
                 <div class="flex items-center">
-                    <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 sm:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                     </svg>
-                    <span class="text-red-800 font-medium">{{ session('error') }}</span>
+                    <span class="text-red-800 font-medium text-sm sm:text-base">{{ session('error') }}</span>
                 </div>
             </div>
         @endif
 
         <!-- Form Body -->
-        <form action="{{ route('worker.work-orders.store') }}" method="POST" class="p-8" id="workOrderForm">
+        <form action="{{ route('worker.work-orders.store') }}" method="POST" class="p-3 sm:p-8" id="workOrderForm">
             @csrf
             
             <!-- Client Info -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="client_name">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <label class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2" for="client_name">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         Ime Klijenta
@@ -60,13 +60,13 @@
                         name="client_name" 
                         id="client_name" 
                         value="{{ old('client_name') }}"
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('client_name') border-red-500 ring-2 ring-red-200 error @enderror"
+                        class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('client_name') border-red-500 ring-2 ring-red-200 error @enderror"
                         placeholder="Unesite ime klijenta"
                         required
                     >
                     @error('client_name')
-                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="mt-1 sm:mt-2 flex items-center gap-1 sm:gap-2 text-red-600 text-xs sm:text-sm">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
                             {{ $message }}
@@ -75,8 +75,8 @@
                 </div>
 
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="location">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <label class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2" for="location">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -88,13 +88,13 @@
                         name="location" 
                         id="location" 
                         value="{{ old('location') }}"
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('location') border-red-500 ring-2 ring-red-200 error @enderror"
+                        class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('location') border-red-500 ring-2 ring-red-200 error @enderror"
                         placeholder="Unesite lokaciju"
                         required
                     >
                     @error('location')
-                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="mt-1 sm:mt-2 flex items-center gap-1 sm:gap-2 text-red-600 text-xs sm:text-sm">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
                             {{ $message }}
@@ -252,23 +252,69 @@ function addItem(sectionId) {
     const itemId = itemCounters[sectionId];
     const container = document.getElementById(`itemsContainer_${sectionId}`);
     
-    let productOptions = '<option value="">Izaberite proizvod</option>';
-    products.forEach(product => {
-        productOptions += `<option value="${product.id}" data-price="${product.price}">${product.name} - ${product.price} RSD/${product.unit}</option>`;
-    });
-    
     const itemHtml = `
         <div class="item-row bg-white border border-gray-300 rounded-lg p-4 flex gap-4 items-start" data-item="${itemId}">
             <div class="flex-1">
-                <label class="block text-xs font-medium text-gray-700 mb-1">Proizvod *</label>
-                <select 
-                    name="sections[${sectionId}][items][${itemId}][product_id]" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
-                    required
-                    onchange="updateItemPrice(${sectionId}, ${itemId})"
-                >
-                    ${productOptions}
-                </select>
+                <label class="block text-xs font-medium text-gray-700 mb-1">Materijal *</label>
+                <div class="custom-select-wrapper" id="selectWrapper_${sectionId}_${itemId}">
+                    <input type="hidden" 
+                        name="sections[${sectionId}][items][${itemId}][product_id]" 
+                        id="productInput_${sectionId}_${itemId}"
+                        required>
+                    <div class="custom-select-trigger" onclick="toggleDropdown(${sectionId}, ${itemId})">
+                        <span class="custom-select-value" id="selectValue_${sectionId}_${itemId}">Izaberite materijal</span>
+                        <svg class="custom-select-arrow w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="custom-select-dropdown" id="dropdown_${sectionId}_${itemId}">
+                        <div class="custom-select-search">
+                            <svg class="search-icon w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" 
+                                class="custom-select-search-input" 
+                                id="searchInput_${sectionId}_${itemId}"
+                                placeholder="Pretraži materijale..."
+                                oninput="filterProducts(${sectionId}, ${itemId})">
+                        </div>
+                        <div class="custom-select-options" id="options_${sectionId}_${itemId}">
+                            ${products.map(product => {
+                                const stock = product.inventory ? product.inventory.quantity : 0;
+                                const stockClass = stock === 0 ? 'text-red-600' : (stock < 10 ? 'text-yellow-600' : 'text-green-600');
+                                const stockBg = stock === 0 ? 'bg-red-100' : (stock < 10 ? 'bg-yellow-100' : 'bg-green-100');
+                                return `
+                                <div class="custom-select-option" 
+                                    data-value="${product.id}" 
+                                    data-price="${product.price}"
+                                    data-stock="${stock}"
+                                    data-text="${product.name} - ${product.price} RSD/${product.unit}"
+                                    data-search="${product.name.toLowerCase()}"
+                                    onclick="selectProduct(${sectionId}, ${itemId}, ${product.id}, \`${product.name} - ${product.price} RSD/${product.unit}\`, ${product.price}, ${stock})">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="font-medium text-gray-900">${product.name}</div>
+                                            <div class="text-xs text-gray-500">${product.price} RSD/${product.unit}</div>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${stockBg} ${stockClass}">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                                </svg>
+                                                ${stock}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `}).join('')}
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="w-32">
                 <label class="block text-xs font-medium text-gray-700 mb-1">Količina *</label>
@@ -279,6 +325,7 @@ function addItem(sectionId) {
                     min="1"
                     value="1"
                     required
+                    oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId})"
                     onchange="updateItemPrice(${sectionId}, ${itemId})"
                 >
             </div>
@@ -309,18 +356,159 @@ function removeItem(sectionId, itemId) {
 }
 
 function updateItemPrice(sectionId, itemId) {
-    const selectElement = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] select`);
+    const hiddenInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
     const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
     const priceDisplay = document.getElementById(`itemPrice_${sectionId}_${itemId}`);
     
-    if (selectElement && quantityInput && priceDisplay) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+    if (hiddenInput && quantityInput && priceDisplay) {
+        const productId = hiddenInput.value;
+        const selectedOption = document.querySelector(`#options_${sectionId}_${itemId} [data-value="${productId}"]`);
+        const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) || 0 : 0;
         const quantity = parseInt(quantityInput.value) || 0;
         const total = price * quantity;
         
         priceDisplay.textContent = total.toFixed(2) + ' RSD';
     }
 }
+
+// Custom dropdown functions
+function toggleDropdown(sectionId, itemId) {
+    const dropdown = document.getElementById(`dropdown_${sectionId}_${itemId}`);
+    const allDropdowns = document.querySelectorAll('.custom-select-dropdown');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(dd => {
+        if (dd.id !== `dropdown_${sectionId}_${itemId}`) {
+            dd.classList.remove('active');
+        }
+    });
+    
+    dropdown.classList.toggle('active');
+    
+    // Focus search input when opening
+    if (dropdown.classList.contains('active')) {
+        setTimeout(() => {
+            document.getElementById(`searchInput_${sectionId}_${itemId}`).focus();
+        }, 100);
+    }
+}
+
+function selectProduct(sectionId, itemId, productId, productText, price, stock) {
+    const hiddenInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+    const valueDisplay = document.getElementById(`selectValue_${sectionId}_${itemId}`);
+    const dropdown = document.getElementById(`dropdown_${sectionId}_${itemId}`);
+    const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
+    
+    hiddenInput.value = productId;
+    valueDisplay.textContent = productText;
+    valueDisplay.classList.add('selected');
+    dropdown.classList.remove('active');
+    
+    // Store stock level as data attribute on quantity input
+    if (quantityInput) {
+        quantityInput.setAttribute('data-stock', stock);
+        quantityInput.setAttribute('max', stock > 0 ? stock : 999999);
+        
+        // Add validation message container if it doesn't exist
+        if (!quantityInput.parentElement.querySelector('.stock-warning')) {
+            const warning = document.createElement('div');
+            warning.className = 'stock-warning text-xs mt-1 hidden';
+            quantityInput.parentElement.appendChild(warning);
+        }
+    }
+    
+    // Update price
+    updateItemPrice(sectionId, itemId);
+}
+
+function validateStock(sectionId, itemId) {
+    const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
+    
+    if (!quantityInput) return;
+    
+    const stock = parseInt(quantityInput.getAttribute('data-stock')) || 0;
+    const quantity = parseInt(quantityInput.value) || 0;
+    let warning = quantityInput.parentElement.querySelector('.stock-warning');
+    
+    if (!warning) {
+        warning = document.createElement('div');
+        warning.className = 'stock-warning text-xs mt-1';
+        quantityInput.parentElement.appendChild(warning);
+    }
+    
+    if (quantity > stock) {
+        warning.className = 'stock-warning text-xs mt-1 text-red-600 font-medium flex items-center gap-1';
+        warning.innerHTML = `
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            Nedovoljno zaliha! (Dostupno: ${stock})
+        `;
+        quantityInput.classList.add('border-red-500');
+    } else if (quantity === stock && stock > 0) {
+        warning.className = 'stock-warning text-xs mt-1 text-yellow-600 font-medium flex items-center gap-1';
+        warning.innerHTML = `
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            Koristi svu dostupnu zalihu
+        `;
+        quantityInput.classList.remove('border-red-500');
+    } else {
+        warning.className = 'stock-warning text-xs mt-1 hidden';
+        warning.innerHTML = '';
+        quantityInput.classList.remove('border-red-500');
+    }
+}
+
+function filterProducts(sectionId, itemId) {
+    const searchInput = document.getElementById(`searchInput_${sectionId}_${itemId}`);
+    const searchTerm = searchInput.value.toLowerCase();
+    const options = document.querySelectorAll(`#options_${sectionId}_${itemId} .custom-select-option`);
+    
+    options.forEach(option => {
+        const searchText = option.getAttribute('data-search');
+        if (searchText.includes(searchTerm)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.custom-select-wrapper')) {
+        document.querySelectorAll('.custom-select-dropdown').forEach(dropdown => {
+            dropdown.classList.remove('active');
+        });
+    }
+});
+
+// Form validation before submit
+document.getElementById('workOrderForm').addEventListener('submit', function(event) {
+    const quantityInputs = document.querySelectorAll('input[type="number"][name*="quantity"]');
+    let hasStockError = false;
+    let errorMessage = '';
+    
+    quantityInputs.forEach(input => {
+        const stock = parseInt(input.getAttribute('data-stock'));
+        const quantity = parseInt(input.value) || 0;
+        
+        if (!isNaN(stock) && quantity > stock) {
+            hasStockError = true;
+            const itemRow = input.closest('.item-row');
+            const productName = itemRow ? itemRow.querySelector('.custom-select-value').textContent : 'Materijal';
+            errorMessage += `${productName}: Traženo ${quantity}, dostupno ${stock}\n`;
+        }
+    });
+    
+    if (hasStockError) {
+        event.preventDefault();
+        alert('Nedovoljno zaliha za sledeće materijale:\n\n' + errorMessage + '\nMolimo prilagodite količine.');
+        return false;
+    }
+});
+
 </script>
 @endsection

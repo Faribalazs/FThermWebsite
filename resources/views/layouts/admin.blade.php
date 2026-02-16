@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
     <title>@yield('title', 'Admin Dashboard') - FTHERM</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -12,7 +13,11 @@
         <!-- Sidebar -->
         <aside class="w-64 bg-industrial-900 text-white flex-shrink-0">
             <div class="p-6">
-                <h1 class="text-2xl font-bold text-primary-400">FTHERM Admin</h1>
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-10 w-10">
+                    <h1 class="text-2xl font-bold text-primary-400">FTHERM</h1>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Admin Panel</p>
             </div>
             <nav class="mt-6">
                 <!-- Dashboard -->

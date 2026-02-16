@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
     <title>@yield('title', 'Home') - FTHERM</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -13,7 +14,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <div class="flex items-center">
-                    <a href="{{ route('home') }}" class="text-2xl font-bold text-primary-400">FTHERM</a>
+                    <a href="{{ route('home') }}" class="flex items-center gap-3">
+                        <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-12 w-12">
+                        <span class="text-2xl font-bold text-primary-400">FTHERM</span>
+                    </a>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{{ route('home') }}" class="hover:text-primary-400 transition {{ request()->routeIs('home') ? 'text-primary-400' : '' }}">

@@ -59,6 +59,14 @@ class InvoiceController extends Controller
             ->pluck('location')
             ->filter();
 
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('worker.invoices.partials.table-rows', compact('invoices'))->render(),
+                'pagination' => $invoices->links()->render()
+            ]);
+        }
+
         return view('worker.invoices.index', compact('invoices', 'locations'));
     }
 }

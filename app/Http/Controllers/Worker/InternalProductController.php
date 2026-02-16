@@ -10,13 +10,21 @@ class InternalProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = InternalProduct::query();
+        $query = InternalProduct::with('inventory');
         
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         $products = $query->paginate(10);
+        
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('worker.products.partials.table-rows', compact('products'))->render(),
+                'pagination' => $products->links()->render()
+            ]);
+        }
         
         return view('worker.products.index', compact('products'));
     }
@@ -43,7 +51,7 @@ class InternalProductController extends Controller
             'created_by' => auth('worker')->id(),
         ]);
 
-        return redirect()->route('worker.products.index')->with('success', 'Product created successfully.');
+        return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno kreiran.');
     }
 
     public function edit(InternalProduct $product)
@@ -62,12 +70,12 @@ class InternalProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('worker.products.index')->with('success', 'Product updated successfully.');
+        return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno ažuriran.');
     }
 
     public function destroy(InternalProduct $product)
     {
         $product->delete();
-        return redirect()->route('worker.products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno obrisan.');
     }
 }

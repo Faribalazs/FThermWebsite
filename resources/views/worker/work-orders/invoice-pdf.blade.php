@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faktura #{{ $workOrder->invoice_number }}</title>
     <style>
@@ -13,272 +13,327 @@
 
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 10pt;
-            color: #1F2937;
-            line-height: 1.4;
+            font-size: 9pt;
+            color: #1a1a1a;
+            line-height: 1.5;
+            background: #ffffff;
         }
 
         .container {
-            padding: 20px;
+            padding: 30px 40px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
+        /* Header Section */
         .header {
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            color: white;
-            padding: 20px 25px;
-            margin: -20px -20px 15px -20px;
-            border-bottom: 3px solid #6366F1;
-        }
-
-        .header-content {
             display: table;
             width: 100%;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #4a4a4a;
         }
 
         .header-left {
             display: table-cell;
-            vertical-align: middle;
+            width: 50%;
+            vertical-align: top;
         }
 
         .header-right {
             display: table-cell;
-            vertical-align: middle;
+            width: 50%;
+            vertical-align: top;
             text-align: right;
         }
 
-        .header h1 {
-            font-size: 24pt;
-            margin-bottom: 3px;
-            letter-spacing: 1px;
+        .logo {
+            max-width: 140px;
+            height: auto;
+            margin-bottom: 12px;
         }
 
-        .header .invoice-number {
-            font-size: 13pt;
-            opacity: 0.95;
+        .company-details {
+            font-size: 8.5pt;
+            line-height: 1.6;
+            color: #4a4a4a;
+        }
+
+        .company-details strong {
+            color: #1a1a1a;
             font-weight: 600;
         }
 
-        .header .invoice-date {
-            font-size: 10pt;
-            opacity: 0.85;
-            margin-top: 2px;
+        .company-name {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
         }
 
-        .company-info {
+        .invoice-title {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .invoice-meta {
+            font-size: 9pt;
+            color: #4a4a4a;
+            line-height: 1.8;
+        }
+
+        .invoice-meta strong {
+            color: #1a1a1a;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        /* Client Info Section */
+        .parties-section {
             display: table;
             width: 100%;
-            margin-bottom: 15px;
-            border: 1px solid #E5E7EB;
-            border-radius: 4px;
-            background: #FAFAFA;
+            margin-bottom: 30px;
+            border: 1px solid #d0d0d0;
+            border-radius: 0;
         }
 
-        .company-col {
+        .party-col {
             display: table-cell;
             width: 50%;
             vertical-align: top;
-            padding: 12px 15px;
+            padding: 15px;
         }
 
-        .company-col:first-child {
-            border-right: 1px solid #E5E7EB;
+        .party-col:first-child {
+            border-right: 1px solid #d0d0d0;
         }
 
-        .company-col h3 {
+        .party-label {
             font-size: 8pt;
             text-transform: uppercase;
-            color: #4F46E5;
-            margin-bottom: 6px;
+            color: #4a4a4a;
             font-weight: 700;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
         }
 
-        .company-col p {
-            margin: 3px 0;
-            font-size: 9pt;
-            line-height: 1.3;
-        }
-
-        .company-col .company-name {
+        .party-name {
             font-size: 11pt;
             font-weight: 700;
-            margin-bottom: 6px;
-            color: #111827;
+            color: #1a1a1a;
+            margin-bottom: 8px;
         }
 
-        .work-order-info {
-            background: #F0F4FF;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border-left: 3px solid #4F46E5;
-            border-radius: 3px;
+        .party-details {
+            font-size: 8.5pt;
+            color: #4a4a4a;
+            line-height: 1.6;
         }
 
-        .work-order-info h3 {
+        .party-details p {
+            margin: 3px 0;
+        }
+
+        /* Work Order Info */
+        .work-order-box {
+            border: 1px solid #d0d0d0;
+            border-left: 2px solid #4a4a4a;
+            padding: 12px 15px;
+            margin-bottom: 30px;
+        }
+
+        .work-order-box h3 {
             font-size: 8pt;
             text-transform: uppercase;
-            color: #4F46E5;
-            margin-bottom: 5px;
+            color: #4a4a4a;
             font-weight: 700;
+            margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
 
-        .work-order-info p {
-            margin: 2px 0;
-            font-size: 9pt;
-            color: #374151;
+        .work-order-box p {
+            font-size: 8.5pt;
+            color: #1a1a1a;
+            margin: 3px 0;
         }
 
-        .section {
-            margin-bottom: 15px;
+        .work-order-box strong {
+            font-weight: 600;
         }
 
-        .section-title {
-            font-size: 11pt;
-            font-weight: 700;
-            color: #4F46E5;
-            margin-bottom: 8px;
-            padding: 6px 10px;
-            background: #F3F4F6;
-            border-left: 3px solid #4F46E5;
-        }
-
-        .section-header {
-            font-size: 10pt;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: #374151;
-            padding: 6px 8px;
-            background: #F9FAFB;
-            border-radius: 3px;
-        }
-
-        table {
+        /* Invoice Table */
+        .invoice-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
-            border: 1px solid #E5E7EB;
+            margin-bottom: 25px;
+            border: 1px solid #d0d0d0;
         }
 
-        table thead {
-            background: linear-gradient(180deg, #4F46E5 0%, #4338CA 100%);
-            color: white;
+        .invoice-table thead {
+            border-bottom: 2px solid #1a1a1a;
         }
 
-        table th {
-            padding: 8px 8px;
+        .invoice-table th {
+            padding: 8px 10px;
             text-align: left;
-            font-size: 8pt;
+            font-size: 7.5pt;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        table th.text-center {
-            text-align: center;
-        }
-
-        table th.text-right {
-            text-align: right;
-        }
-
-        table td {
-            padding: 7px 8px;
-            font-size: 9pt;
-            border-bottom: 1px solid #F3F4F6;
+            letter-spacing: 0.3px;
+            color: #1a1a1a;
             background: white;
         }
 
-        table tbody tr:nth-child(even) td {
-            background: #FAFAFA;
-        }
-
-        table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        table td.text-center {
+        .invoice-table th.center {
             text-align: center;
         }
 
-        table td.text-right {
+        .invoice-table th.right {
             text-align: right;
         }
 
-        .product-name {
+        .invoice-table td {
+            padding: 8px 10px;
+            font-size: 8.5pt;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .invoice-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .invoice-table td.center {
+            text-align: center;
+        }
+
+        .invoice-table td.right {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .item-description {
             font-weight: 600;
-            color: #111827;
+            color: #1a1a1a;
         }
 
-        .product-unit {
-            color: #6B7280;
-            font-size: 8pt;
+        .item-unit {
+            color: #7a7a7a;
+            font-size: 7.5pt;
+            font-style: italic;
         }
 
-        .time-badge {
-            background: #DBEAFE;
-            color: #1E40AF;
-            padding: 3px 8px;
-            border-radius: 10px;
-            font-size: 8pt;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .totals {
-            margin-top: 15px;
-            float: right;
-            width: 320px;
-        }
-
-        .totals table {
-            margin: 0;
-            border: 2px solid #4F46E5;
-        }
-
-        .totals td {
-            padding: 6px 12px;
-            font-size: 9pt;
-        }
-
-        .totals .subtotal-row {
-            background: #FAFAFA;
-        }
-
-        .totals .subtotal-row td {
-            border-bottom: 1px solid #E5E7EB;
-        }
-
-        .totals .total-row {
-            background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%);
-            color: white;
+        .section-row {
+            background: white !important;
             font-weight: 700;
-            font-size: 12pt;
+            color: #1a1a1a;
         }
 
-        .totals .total-row td {
-            padding: 10px 12px;
-            border: none;
+        .section-row td {
+            padding: 8px 10px;
+            font-size: 8.5pt;
+            border-top: 1px solid #4a4a4a;
+            border-bottom: 1px solid #d0d0d0 !important;
         }
 
+        /* Totals Section */
+        .totals-section {
+            float: right;
+            width: 350px;
+            margin-top: 20px;
+        }
+
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #d0d0d0;
+        }
+
+        .totals-table td {
+            padding: 8px 15px;
+            font-size: 9pt;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .totals-table td:first-child {
+            color: #4a4a4a;
+            font-weight: 500;
+        }
+
+        .totals-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .totals-table .total-row {
+            border-top: 2px solid #1a1a1a;
+            background: white;
+            font-weight: 700;
+            font-size: 11pt;
+        }
+
+        .totals-table .total-row td {
+            padding: 10px 15px;
+            border-bottom: none;
+            color: #1a1a1a;
+        }
+
+        /* Footer */
         .footer {
             clear: both;
-            margin-top: 25px;
-            padding-top: 12px;
-            border-top: 2px solid #E5E7EB;
-            text-align: center;
-            font-size: 8pt;
-            color: #6B7280;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #d0d0d0;
         }
 
-        .footer p {
+        .payment-info {
+            margin-bottom: 20px;
+            font-size: 8.5pt;
+            line-height: 1.8;
+        }
+
+        .payment-info h4 {
+            font-size: 9pt;
+            color: #1a1a1a;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .payment-info p {
+            margin: 3px 0;
+            color: #4a4a4a;
+        }
+
+        .payment-info strong {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 8pt;
+            color: #7a7a7a;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer-note p {
             margin: 3px 0;
         }
 
-        .thank-you {
+        .footer-note .thank-you {
             font-weight: 700;
-            color: #4F46E5;
-            font-size: 10pt;
+            color: #1a1a1a;
+            font-size: 9pt;
+            margin-bottom: 5px;
         }
 
         .clearfix {
@@ -288,141 +343,192 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Header Section -->
         <div class="header">
-            <div class="header-content">
-                <div class="header-left">
-                    <h1>FAKTURA</h1>
+            <div class="header-left">
+                <img src="{{ public_path('images/logo.svg') }}" alt="F-Therm Logo" class="logo">
+                <div class="company-name">F-Therm d.o.o.</div>
+                <div class="company-details">
+                    <div>Industrijska 15, Beograd, Srbija</div>
+                    <div><strong>PIB:</strong> 123456789</div>
+                    <div><strong>Mati&#269;ni broj:</strong> 987654321</div>
+                    <div><strong>Email:</strong> info@ftherm.rs</div>
+                    <div><strong>Tel:</strong> +381 11 123 4567</div>
                 </div>
-                <div class="header-right">
-                    <div class="invoice-number">#{{ $workOrder->invoice_number }}</div>
-                    <div class="invoice-date">{{ $workOrder->created_at->format('d.m.Y') }}</div>
+            </div>
+            <div class="header-right">
+                <div class="invoice-title">FAKTURA</div>
+                <div class="company-details">
+                    <div><strong>Broj fakture:</strong> {{ $workOrder->invoice_number }}</div>
+                    <div><strong>Datum izdavanja:</strong> {{ $workOrder->created_at->format('d.m.Y') }}</div>
+                    <div><strong>Datum prometa:</strong> {{ $workOrder->created_at->format('d.m.Y') }}</div>
+                    <div><strong>Valuta pla&#263;anja:</strong> {{ $workOrder->created_at->addDays(15)->format('d.m.Y') }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- Company and Client Info -->
-        <div class="company-info">
-            <div class="company-col">
-                <h3>Izdavalac</h3>
-                <p class="company-name">F-Therm d.o.o.</p>
-                <p>Industrijska 15</p>
-                <p>Beograd, Srbija</p>
-                <p style="margin-top: 5px;"><strong>PIB:</strong> 123456789</p>
-                <p><strong>Mat. br:</strong> 987654321</p>
+        <!-- Client Info Section -->
+        <div class="parties-section">
+            <div class="party-col">
+                <div class="party-label">Izdavalac fakture</div>
+                <div class="party-name">F-Therm d.o.o.</div>
+                <div class="party-details">
+                    <p>Industrijska 15</p>
+                    <p>Beograd, Srbija</p>
+                    <p><strong>PIB:</strong> 123456789</p>
+                    <p><strong>Mati&#269;ni broj:</strong> 987654321</p>
+                </div>
             </div>
-            <div class="company-col">
-                <h3>Kupac</h3>
-                <p class="company-name">{{ $workOrder->invoice_company_name }}</p>
-                @if ($workOrder->invoice_pib)
-                <p><strong>PIB:</strong> {{ $workOrder->invoice_pib }}</p>
-                @endif
-                <p>{{ $workOrder->invoice_address }}</p>
-                @if ($workOrder->invoice_email)
-                <p style="margin-top: 5px;"><strong>Email:</strong> {{ $workOrder->invoice_email }}</p>
-                @endif
-                @if ($workOrder->invoice_phone)
-                <p><strong>Tel:</strong> {{ $workOrder->invoice_phone }}</p>
-                @endif
+            <div class="party-col">
+                <div class="party-label">Kupac</div>
+                <div class="party-name">{{ $workOrder->invoice_company_name }}</div>
+                <div class="party-details">
+                    <p>{{ $workOrder->invoice_address }}</p>
+                    @if ($workOrder->invoice_pib)
+                    <p><strong>PIB:</strong> {{ $workOrder->invoice_pib }}</p>
+                    @endif
+                    @if ($workOrder->invoice_email)
+                    <p><strong>Email:</strong> {{ $workOrder->invoice_email }}</p>
+                    @endif
+                    @if ($workOrder->invoice_phone)
+                    <p><strong>Telefon:</strong> {{ $workOrder->invoice_phone }}</p>
+                    @endif
+                </div>
             </div>
         </div>
 
-        <!-- Work Order Info -->
-        <div class="work-order-info">
-            <h3>Radni Nalog</h3>
+        <!-- Work Order Reference -->
+        <div class="work-order-box">
+            <h3>Referenca radnog naloga</h3>
             <p><strong>Klijent:</strong> {{ $workOrder->client_name }}</p>
             <p><strong>Lokacija:</strong> {{ $workOrder->location }}</p>
+            @if($workOrder->description)
+            <p><strong>Napomena:</strong> {{ $workOrder->description }}</p>
+            @endif
         </div>
 
-        <!-- Items -->
-        <div class="section">
-            <div class="section-title">STAVKE</div>
-
-            @foreach ($workOrder->sections as $section)
-            <div style="margin-bottom: 12px;">
-                <div class="section-header">
-                    {{ $section->title }}
-                    @if($section->hours_spent)
-                    <span class="time-badge" style="float: right;">⏱ {{ number_format($section->hours_spent, 2) }}h</span>
-                    @endif
-                    <div style="clear: both;"></div>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Proizvod</th>
-                            <th class="text-center">Količina</th>
-                            <th class="text-right">Jed. Cena (RSD)</th>
-                            <th class="text-right">Ukupno (RSD)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($section->items as $item)
+        <!-- Invoice Items Table -->
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th style="width: 45%;">Opis</th>
+                    <th class="center" style="width: 10%;">Količina</th>
+                    <th class="center" style="width: 8%;">Jed.</th>
+                    <th class="right" style="width: 12%;">Cena (RSD)</th>
+                    <th class="center" style="width: 10%;">PDV %</th>
+                    <th class="right" style="width: 15%;">Ukupno (RSD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $materialsSubtotal = 0;
+                    $materialsTax = 0;
+                    $sectionNumber = 1;
+                @endphp
+                
+                @foreach ($workOrder->sections as $section)
+                    <tr class="section-row">
+                        <td colspan="6">
+                            {{ $sectionNumber }}. {{ $section->title }}
+                            @if($section->hours_spent)
+                                (Utrošeno vreme: {{ number_format($section->hours_spent, 2) }}h)
+                            @endif
+                        </td>
+                    </tr>
+                    
+                    @foreach ($section->items as $item)
+                        @php
+                            $itemTotal = $item->subtotal;
+                            $itemBase = $itemTotal / 1.2;
+                            $itemTax = $itemTotal - $itemBase;
+                            $materialsSubtotal += $itemBase;
+                            $materialsTax += $itemTax;
+                        @endphp
                         <tr>
                             <td>
-                                <span class="product-name">{{ $item->product->name }}</span>
-                                <span class="product-unit">({{ $item->product->unit }})</span>
+                                <span class="item-description">{{ $item->product->name }}</span>
                             </td>
-                            <td class="text-center">{{ $item->quantity }}</td>
-                            <td class="text-right">{{ number_format($item->price_at_time, 2) }}</td>
-                            <td class="text-right"><strong>{{ number_format($item->subtotal, 2) }}</strong></td>
+                            <td class="center">{{ number_format($item->quantity, 2) }}</td>
+                            <td class="center"><span class="item-unit">{{ $item->product->unit }}</span></td>
+                            <td class="right">{{ number_format($item->price_at_time, 2) }}</td>
+                            <td class="center">20%</td>
+                            <td class="right">{{ number_format($itemTotal, 2) }}</td>
                         </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @endforeach
-        </div>
+                    @endforeach
+                    
+                    @php $sectionNumber++; @endphp
+                @endforeach
 
-        <!-- Totals -->
-        <div class="totals">
-            <table>
-                <tr class="subtotal-row">
-                    <td>Materijal:</td>
-                    <td class="text-right">{{ number_format($workOrder->total_amount, 2) }} RSD</td>
-                </tr>
                 @if($workOrder->hourly_rate && $workOrder->calculateTotalHours() > 0)
-                <tr class="subtotal-row">
-                    <td>Rad ({{ number_format($workOrder->calculateTotalHours(), 2) }}h × {{ number_format($workOrder->hourly_rate, 2) }} RSD):</td>
-                    <td class="text-right">{{ number_format($workOrder->calculateLaborCost(), 2) }} RSD</td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td>Osnova:</td>
-                    <td class="text-right">{{ number_format($workOrder->calculateGrandTotal() / 1.2, 2) }} RSD</td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td>PDV (20%):</td>
-                    <td class="text-right">{{ number_format($workOrder->calculateGrandTotal() - ($workOrder->calculateGrandTotal() / 1.2), 2) }} RSD</td>
-                </tr>
-                <tr class="total-row">
-                    <td>UKUPNO:</td>
-                    <td class="text-right">{{ number_format($workOrder->calculateGrandTotal(), 2) }} RSD</td>
-                </tr>
-                @else
-                <tr class="subtotal-row">
-                    <td>Osnova:</td>
-                    <td class="text-right">{{ number_format($workOrder->total_amount / 1.2, 2) }} RSD</td>
-                </tr>
-                <tr class="subtotal-row">
-                    <td>PDV (20%):</td>
-                    <td class="text-right">{{ number_format($workOrder->total_amount - ($workOrder->total_amount / 1.2), 2) }} RSD</td>
-                </tr>
-                <tr class="total-row">
-                    <td>UKUPNO:</td>
-                    <td class="text-right">{{ number_format($workOrder->total_amount, 2) }} RSD</td>
-                </tr>
+                    @php
+                        $laborTotal = $workOrder->calculateLaborCost();
+                        $laborBase = $laborTotal / 1.2;
+                        $laborTax = $laborTotal - $laborBase;
+                    @endphp
+                    <tr class="section-row">
+                        <td colspan="6">{{ $sectionNumber }}. Usluga rada</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="item-description">Rad na terenu</span>
+                        </td>
+                        <td class="center">{{ number_format($workOrder->calculateTotalHours(), 2) }}</td>
+                        <td class="center"><span class="item-unit">h</span></td>
+                        <td class="right">{{ number_format($workOrder->hourly_rate, 2) }}</td>
+                        <td class="center">20%</td>
+                        <td class="right">{{ number_format($laborTotal, 2) }}</td>
+                    </tr>
                 @endif
+            </tbody>
+        </table>
+
+        <!-- Totals Section -->
+        <div class="totals-section">
+            <table class="totals-table">
+                @php
+                    $baseTotal = $materialsSubtotal;
+                    $taxTotal = $materialsTax;
+                    $grandTotal = $workOrder->total_amount;
+                    
+                    if($workOrder->hourly_rate && $workOrder->calculateTotalHours() > 0) {
+                        $laborTotal = $workOrder->calculateLaborCost();
+                        $baseTotal += $laborTotal / 1.2;
+                        $taxTotal += $laborTotal - ($laborTotal / 1.2);
+                        $grandTotal = $workOrder->calculateGrandTotal();
+                    }
+                @endphp
+                <tr>
+                    <td>Osnovica (bez PDV-a):</td>
+                    <td>{{ number_format($baseTotal, 2) }} RSD</td>
+                </tr>
+                <tr>
+                    <td>PDV 20%:</td>
+                    <td>{{ number_format($taxTotal, 2) }} RSD</td>
+                </tr>
+                <tr class="total-row">
+                    <td>UKUPNO ZA UPLATU:</td>
+                    <td>{{ number_format($grandTotal, 2) }} RSD</td>
+                </tr>
             </table>
         </div>
 
         <div class="clearfix"></div>
 
-        <!-- Footer -->
+        <!-- Footer Section -->
         <div class="footer">
-            <p class="thank-you">Hvala Vam na poverenju!</p>
-            <p style="margin-top: 5px;">Za sva pitanja kontaktirajte nas na:</p>
-            <p><strong>Email:</strong> info@ftherm.rs | <strong>Tel:</strong> +381 11 123 4567</p>
+            <div class="payment-info">
+                <h4>Podaci za pla&#263;anje</h4>
+                <p><strong>Banka:</strong> Komercijalna banka a.d. Beograd</p>
+                <p><strong>Teku&#263;i ra&#269;un:</strong> 205-0000000123456-78</p>
+                <p><strong>IBAN:</strong> RS35205000000012345678</p>
+                <p><strong>Svrha uplate:</strong> Plaćanje po fakturi {{ $workOrder->invoice_number }}</p>
+            </div>
+
+            <div class="footer-note">
+                <p class="thank-you">Hvala Vam na poverenju!</p>
+                <p>Ova faktura je kreirana elektronski i va&#382;e&#263;a je bez pe&#269;ata i potpisa.</p>
+                <p>Za dodatne informacije kontaktirajte nas na info@ftherm.rs ili pozovite +381 11 123 4567</p>
+            </div>
         </div>
     </div>
 </body>

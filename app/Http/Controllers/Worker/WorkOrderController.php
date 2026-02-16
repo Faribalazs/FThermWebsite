@@ -7,6 +7,7 @@ use App\Models\WorkOrder;
 use App\Models\WorkOrderSection;
 use App\Models\WorkOrderItem;
 use App\Models\InternalProduct;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -25,7 +26,7 @@ class WorkOrderController extends Controller
 
     public function create()
     {
-        $products = InternalProduct::orderBy('name')->get();
+        $products = InternalProduct::with('inventory')->orderBy('name')->get();
         return view('worker.work-orders.create', compact('products'));
     }
 
@@ -46,6 +47,19 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
 
         try {
+            // Check inventory availability before creating work order
+            foreach ($validated['sections'] as $sectionData) {
+                foreach ($sectionData['items'] as $itemData) {
+                    $inventory = Inventory::where('internal_product_id', $itemData['product_id'])->first();
+                    $currentStock = $inventory ? $inventory->quantity : 0;
+                    
+                    if ($currentStock < $itemData['quantity']) {
+                        $product = InternalProduct::find($itemData['product_id']);
+                        throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}'. Dostupno: {$currentStock}, Potrebno: {$itemData['quantity']}");
+                    }
+                }
+            }
+
             $workOrder = WorkOrder::create([
                 'worker_id' => auth('worker')->id(),
                 'client_name' => $validated['client_name'],
@@ -67,6 +81,21 @@ class WorkOrderController extends Controller
                         'quantity' => $itemData['quantity'],
                         'price_at_time' => $product->price,
                     ]);
+
+                    // Update inventory - deduct the used quantity
+                    $inventory = Inventory::where('internal_product_id', $itemData['product_id'])->first();
+                    if ($inventory) {
+                        $inventory->quantity -= $itemData['quantity'];
+                        $inventory->updated_by = auth('worker')->id();
+                        $inventory->save();
+                    } else {
+                        // Create inventory record with negative quantity if it doesn't exist
+                        Inventory::create([
+                            'internal_product_id' => $itemData['product_id'],
+                            'quantity' => -$itemData['quantity'],
+                            'updated_by' => auth('worker')->id(),
+                        ]);
+                    }
                 }
             }
 
@@ -159,7 +188,10 @@ class WorkOrderController extends Controller
 
         $workOrder->load(['sections.items.product', 'worker']);
         
-        $pdf = Pdf::loadView('worker.work-orders.invoice-pdf', compact('workOrder'));
+        $pdf = Pdf::loadView('worker.work-orders.invoice-pdf', compact('workOrder'))
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true)
+            ->setOption('defaultFont', 'DejaVu Sans');
         
         return $pdf->download('Faktura-' . $workOrder->invoice_number . '.pdf');
     }

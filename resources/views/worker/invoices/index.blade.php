@@ -32,10 +32,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input type="text" 
+                               id="invoice-search"
                                name="search" 
                                value="{{ request('search') }}"
                                placeholder="Pretražite po imenu klijenta, firme ili broju fakture..." 
-                               class="form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                               class="form-input w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <div id="search-loader" class="absolute right-3 top-1/2 -translate-y-1/2 hidden">
+                            <svg class="animate-spin h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
@@ -146,7 +153,7 @@
                             <th class="px-6 py-4 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">Akcije</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 bg-white">
+                    <tbody id="invoices-table-body" class="divide-y divide-gray-200 bg-white">
                         @foreach($invoices as $invoice)
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -235,7 +242,7 @@
             </div>
 
             <!-- Pagination -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div id="pagination-container" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
                 {{ $invoices->links() }}
             </div>
         </div>
@@ -258,4 +265,67 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+let searchTimeout;
+const searchInput = document.getElementById('invoice-search');
+const tableBody = document.getElementById('invoices-table-body');
+const paginationContainer = document.getElementById('pagination-container');
+const searchLoader = document.getElementById('search-loader');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            performSearch();
+        }, 300);
+    });
+}
+
+// Handle pagination clicks
+document.addEventListener('click', function(e) {
+    if (e.target.closest('#pagination-container a')) {
+        e.preventDefault();
+        const url = e.target.closest('a').href;
+        fetchResults(url);
+    }
+});
+
+function performSearch() {
+    const searchValue = searchInput.value;
+    const form = document.querySelector('form');
+    const formData = new FormData(form);
+    formData.set('search', searchValue);
+    
+    const params = new URLSearchParams(formData);
+    const url = `{{ route('worker.invoices.index') }}?${params.toString()}`;
+    
+    fetchResults(url);
+}
+
+function fetchResults(url) {
+    searchLoader.classList.remove('hidden');
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        tableBody.innerHTML = data.html;
+        paginationContainer.innerHTML = data.pagination;
+        searchLoader.classList.add('hidden');
+    })
+    .catch(error => {
+        console.error('Search error:', error);
+        searchLoader.classList.add('hidden');
+    });
+}
+</script>
+@endpush
+
 @endsection

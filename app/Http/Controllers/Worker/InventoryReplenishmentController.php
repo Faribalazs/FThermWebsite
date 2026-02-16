@@ -37,6 +37,14 @@ class InventoryReplenishmentController extends Controller
 
         $products = $query->paginate(15)->withQueryString();
 
+        // Return JSON for AJAX requests
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('worker.inventory.partials.table-rows', compact('products'))->render(),
+                'pagination' => $products->links()->render()
+            ]);
+        }
+
         return view('worker.inventory.index', compact('products'));
     }
 

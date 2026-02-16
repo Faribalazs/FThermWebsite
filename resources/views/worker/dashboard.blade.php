@@ -19,7 +19,7 @@
             <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 animate-scale-in hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-semibold text-gray-600 uppercase">Ukupno Proizvoda</p>
+                        <p class="text-sm font-semibold text-gray-600 uppercase">Ukupno Materijala</p>
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $totalProducts }}</p>
                     </div>
                     <div class="h-14 w-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
@@ -131,7 +131,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         <p class="text-gray-600 font-medium">Sve zalihe su u redu!</p>
-                        <p class="text-sm text-gray-500 mt-1">Nema proizvoda sa niskim zalihama</p>
+                        <p class="text-sm text-gray-500 mt-1">Nema materijala sa niskim zalihama</p>
                     </div>
                     @endif
                 </div>
@@ -237,8 +237,8 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="font-bold text-gray-900 group-hover:text-blue-700">Novi Proizvod</p>
-                        <p class="text-xs text-gray-500">Dodaj proizvod</p>
+                        <p class="font-bold text-gray-900 group-hover:text-blue-700">Novi Materijal</p>
+                        <p class="text-xs text-gray-500">Dodaj materijal</p>
                     </div>
                 </a>
 
@@ -261,7 +261,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="font-bold text-gray-900 group-hover:text-indigo-700">Svi Proizvodi</p>
+                        <p class="font-bold text-gray-900 group-hover:text-indigo-700">Svi Materijali</p>
                         <p class="text-xs text-gray-500">Pregledaj sve</p>
                     </div>
                 </a>

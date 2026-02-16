@@ -5,8 +5,9 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('admin.dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
+                        <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-9 w-9">
+                        <span class="text-lg font-bold text-gray-800 dark:text-gray-200">FTHERM</span>
                     </a>
                 </div>
 
