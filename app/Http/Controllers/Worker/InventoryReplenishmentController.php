@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Worker;
 use App\Http\Controllers\Controller;
 use App\Models\InternalProduct;
 use App\Models\Inventory;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,9 +63,25 @@ class InventoryReplenishmentController extends Controller
                 ['quantity' => 0, 'updated_by' => auth('worker')->id()]
             );
 
+            $oldQuantity = $inventory->quantity;
             $inventory->quantity += $validated['quantity_to_add'];
             $inventory->updated_by = auth('worker')->id();
             $inventory->save();
+
+            // Log activity
+            ActivityLog::log(
+                auth('worker')->id(),
+                'replenish',
+                'inventory',
+                $product->id,
+                "Dopunio zalihe za: {$product->name} ({$validated['quantity_to_add']} {$product->unit})",
+                [
+                    'product_name' => $product->name,
+                    'old_quantity' => $oldQuantity,
+                    'added' => $validated['quantity_to_add'],
+                    'new_quantity' => $inventory->quantity
+                ]
+            );
 
             DB::commit();
 
@@ -85,11 +102,27 @@ class InventoryReplenishmentController extends Controller
         DB::beginTransaction();
 
         try {
+            $oldQuantity = Inventory::where('internal_product_id', $product->id)->value('quantity') ?? 0;
+            
             $inventory = Inventory::updateOrCreate(
                 ['internal_product_id' => $product->id],
                 [
                     'quantity' => $validated['quantity'],
                     'updated_by' => auth('worker')->id()
+                ]
+            );
+
+            // Log activity
+            ActivityLog::log(
+                auth('worker')->id(),
+                'set',
+                'inventory',
+                $product->id,
+                "Postavio količinu zaliha za: {$product->name} ({$validated['quantity']} {$product->unit})",
+                [
+                    'product_name' => $product->name,
+                    'old_quantity' => $oldQuantity,
+                    'new_quantity' => $validated['quantity']
                 ]
             );
 

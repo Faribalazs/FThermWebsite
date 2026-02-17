@@ -29,52 +29,84 @@
             </div>
             <nav class="mt-4 lg:mt-6 sidebar-nav flex-1">
                 <!-- Dashboard -->
+                @if(Auth::guard('worker')->user()->hasPermission('dashboard'))
                 <a href="{{ route('worker.dashboard') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.dashboard') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Kontrolna tabla</span>
                 </a>
+                @endif
 
                 <!-- Production Section -->
+                @if(Auth::guard('worker')->user()->hasPermission('products') || Auth::guard('worker')->user()->hasPermission('work_orders'))
                 <div class="px-4 lg:px-6 mt-6 mb-2 section-header">
                     <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         Materijal & Nalozi
                     </div>
                 </div>
+                @endif
+                
+                @if(Auth::guard('worker')->user()->hasPermission('products'))
                 <a href="{{ route('worker.products.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.products.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Interni Materijali</span>
                 </a>
+                @endif
                 
+                @if(Auth::guard('worker')->user()->hasPermission('work_orders'))
                 <a href="{{ route('worker.work-orders.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.work-orders.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Radni Nalozi</span>
                 </a>
+                @endif
 
                 <!-- Inventory Section -->
+                @if(Auth::guard('worker')->user()->hasPermission('inventory') || Auth::guard('worker')->user()->hasPermission('invoices'))
                 <div class="px-4 lg:px-6 mt-6 mb-2 section-header">
                     <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
                         Inventar & Finansije
                     </div>
                 </div>
+                @endif
+                
+                @if(Auth::guard('worker')->user()->hasPermission('inventory'))
                 <a href="{{ route('worker.inventory.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.inventory.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Dopuna Zaliha</span>
                 </a>
+                @endif
                 
+                @if(Auth::guard('worker')->user()->hasPermission('invoices'))
                 <a href="{{ route('worker.invoices.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.invoices.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Fakture</span>
                 </a>
+                @endif
+
+                <!-- Activity Logs Section -->
+                @if(Auth::guard('worker')->user()->hasPermission('activity_logs'))
+                <div class="px-4 lg:px-6 mt-6 mb-2 section-header">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Sistem
+                    </div>
+                </div>
+                
+                <a href="{{ route('worker.activity-logs.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.activity-logs.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    <span class="text-sm lg:text-base">Dnevnik Aktivnosti</span>
+                </a>
+                @endif
             </nav>
             
             <!-- User Info & Logout at Bottom -->

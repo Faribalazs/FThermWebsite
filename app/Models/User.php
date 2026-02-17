@@ -24,6 +24,7 @@ class User extends Authenticatable
         'is_admin',
         'role',
         'is_active',
+        'permissions',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
+            'permissions' => 'array',
         ];
     }
     
@@ -59,5 +61,39 @@ class User extends Authenticatable
     public function isWorker(): bool
     {
         return $this->role === 'worker';
+    }
+    
+    /**
+     * Check if worker has a specific permission
+     */
+    public function hasPermission(string $permission): bool
+    {
+        // Admins have all permissions
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        // Workers check their permissions array
+        if ($this->isWorker()) {
+            $permissions = $this->permissions ?? [];
+            return in_array($permission, $permissions);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get all available permissions for workers
+     */
+    public static function getAvailablePermissions(): array
+    {
+        return [
+            'dashboard' => 'Kontrolna tabla',
+            'products' => 'Interni Materijali',
+            'work_orders' => 'Radni Nalozi',
+            'inventory' => 'Dopuna Zaliha',
+            'invoices' => 'Fakture',
+            'activity_logs' => 'Dnevnik Aktivnosti',
+        ];
     }
 }

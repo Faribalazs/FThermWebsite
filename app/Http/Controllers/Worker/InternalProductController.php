@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Models\InternalProduct;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class InternalProductController extends Controller
@@ -43,13 +44,23 @@ class InternalProductController extends Controller
             'low_stock_threshold' => 'required|integer|min:0',
         ]);
 
-        InternalProduct::create([
+        $product = InternalProduct::create([
             'name' => $validated['name'],
             'unit' => $validated['unit'],
             'price' => $validated['price'],
             'low_stock_threshold' => $validated['low_stock_threshold'],
             'created_by' => auth('worker')->id(),
         ]);
+
+        // Log activity
+        ActivityLog::log(
+            auth('worker')->id(),
+            'create',
+            'product',
+            $product->id,
+            "Kreirao novi materijal: {$product->name}",
+            $validated
+        );
 
         return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno kreiran.');
     }
@@ -68,13 +79,37 @@ class InternalProductController extends Controller
             'low_stock_threshold' => 'required|integer|min:0',
         ]);
 
+        $oldData = $product->toArray();
         $product->update($validated);
+
+        // Log activity
+        ActivityLog::log(
+            auth('worker')->id(),
+            'update',
+            'product',
+            $product->id,
+            "Ažurirao materijal: {$product->name}",
+            ['old' => $oldData, 'new' => $validated]
+        );
 
         return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno ažuriran.');
     }
 
     public function destroy(InternalProduct $product)
     {
+        $productName = $product->name;
+        $productId = $product->id;
+        
+        // Log activity before deletion
+        ActivityLog::log(
+            auth('worker')->id(),
+            'delete',
+            'product',
+            $productId,
+            "Obrisao materijal: {$productName}",
+            $product->toArray()
+        );
+        
         $product->delete();
         return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno obrisan.');
     }

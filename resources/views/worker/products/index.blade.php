@@ -69,7 +69,7 @@
                                 Naziv
                             </div>
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th class="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
@@ -77,7 +77,7 @@
                                 Jedinica
                             </div>
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th class="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -85,7 +85,7 @@
                                 Cena (RSD)
                             </div>
                         </th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th class="hidden md:table-cell px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                             <div class="flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
@@ -93,7 +93,7 @@
                                 Stanje
                             </div>
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <th class="hidden md:table-cell px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                             <div class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -114,15 +114,15 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
                                 {{ $product->unit }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-bold text-gray-900">{{ number_format($product->price, 2) }} RSD</div>
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="hidden md:table-cell px-6 py-4 text-center">
                             @php
                                 $quantity = $product->inventory->quantity ?? 0;
                                 $statusClass = $quantity == 0 ? 'bg-red-100 text-red-800' : ($quantity < 10 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800');
@@ -134,7 +134,7 @@
                                 {{ $quantity }} {{ $product->unit }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                        <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium {{ $product->low_stock_threshold <= 10 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
@@ -150,10 +150,10 @@
                                     </svg>
                                     Izmeni
                                 </a>
-                                <form action="{{ route('worker.products.destroy', $product) }}" method="POST" class="inline" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovaj materijal?')">
+                                <form action="{{ route('worker.products.destroy', $product) }}" method="POST" class="inline delete-form" data-product-name="{{ $product->name }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-all action-btn">
+                                    <button type="button" class="delete-btn inline-flex items-center gap-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-all action-btn">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                         </svg>
@@ -165,7 +165,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center">
+                        <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center empty-state">
                                 <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
@@ -240,12 +240,63 @@ function fetchResults(url) {
         tableBody.innerHTML = data.html;
         paginationContainer.innerHTML = data.pagination;
         searchLoader.classList.add('hidden');
+        
+        // Re-attach delete handlers for newly loaded content
+        attachDeleteHandlers();
     })
     .catch(error => {
         console.error('Search error:', error);
         searchLoader.classList.add('hidden');
     });
 }
+
+// Delete confirmation with SweetAlert2
+function attachDeleteHandlers() {
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.delete-form');
+            const productName = form.dataset.productName;
+            
+            Swal.fire({
+                title: 'Da li ste sigurni?',
+                html: `<p class="text-gray-600 mt-2">Želite da obrišete materijal <strong class="text-gray-900">"${productName}"</strong>?</p>`,
+                icon: 'warning',
+                iconColor: '#3b82f6',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#9ca3af',
+                confirmButtonText: '<span class="px-2">Da, obriši!</span>',
+                cancelButtonText: '<span class="px-2">Otkaži</span>',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl',
+                    title: 'text-2xl font-bold text-gray-900',
+                    htmlContainer: 'text-base',
+                    confirmButton: 'rounded-lg px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5',
+                    cancelButton: 'rounded-lg px-6 py-3 font-semibold hover:bg-gray-300 transition-all duration-200',
+                    actions: 'gap-3',
+                    icon: 'border-4 border-blue-100'
+                },
+                buttonsStyling: true,
+                backdrop: 'rgba(0, 0, 0, 0.4)',
+                showClass: {
+                    popup: 'animate__animated animate__fadeIn animate__faster'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOut animate__faster'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+}
+
+// Initial attachment
+attachDeleteHandlers();
 </script>
 @endpush
 

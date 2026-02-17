@@ -65,24 +65,46 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
 // Worker Routes
 Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')->group(function () {
     Route::post('logout', [App\Http\Controllers\Worker\Auth\LoginController::class, 'destroy'])->name('logout');
-    Route::get('/dashboard', [App\Http\Controllers\Worker\DashboardController::class, 'index'])->name('dashboard');
+    
+    // No permissions page (accessible to all workers)
+    Route::get('/no-permissions', function () {
+        return view('worker.no-permissions');
+    })->name('no-permissions');
+    
+    // Dashboard - requires dashboard permission
+    Route::middleware('worker.permission:dashboard')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Worker\DashboardController::class, 'index'])->name('dashboard');
+    });
 
-    // Internal Products (Worker Only)
-    Route::resource('products', App\Http\Controllers\Worker\InternalProductController::class);
+    // Internal Products (Worker Only) - requires products permission
+    Route::middleware('worker.permission:products')->group(function () {
+        Route::resource('products', App\Http\Controllers\Worker\InternalProductController::class);
+    });
 
-    // Work Orders (Radni Nalozi)
-    Route::resource('work-orders', App\Http\Controllers\Worker\WorkOrderController::class)->except(['edit', 'update']);
-    Route::post('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'generateInvoice'])->name('work-orders.invoice.generate');
-    Route::get('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'showInvoice'])->name('work-orders.invoice');
-    Route::get('work-orders/{workOrder}/invoice/download', [App\Http\Controllers\Worker\WorkOrderController::class, 'downloadInvoice'])->name('work-orders.invoice.download');
+    // Work Orders (Radni Nalozi) - requires work_orders permission
+    Route::middleware('worker.permission:work_orders')->group(function () {
+        Route::resource('work-orders', App\Http\Controllers\Worker\WorkOrderController::class)->except(['edit', 'update']);
+        Route::post('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'generateInvoice'])->name('work-orders.invoice.generate');
+        Route::get('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'showInvoice'])->name('work-orders.invoice');
+        Route::get('work-orders/{workOrder}/invoice/download', [App\Http\Controllers\Worker\WorkOrderController::class, 'downloadInvoice'])->name('work-orders.invoice.download');
+    });
 
-    // Inventory Replenishment (Dopuna Zaliha)
-    Route::get('inventory', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'index'])->name('inventory.index');
-    Route::post('inventory/{product}/add', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'update'])->name('inventory.add');
-    Route::post('inventory/{product}/set', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'set'])->name('inventory.set');
+    // Inventory Replenishment (Dopuna Zaliha) - requires inventory permission
+    Route::middleware('worker.permission:inventory')->group(function () {
+        Route::get('inventory', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'index'])->name('inventory.index');
+        Route::post('inventory/{product}/add', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'update'])->name('inventory.add');
+        Route::post('inventory/{product}/set', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'set'])->name('inventory.set');
+    });
 
-    // Invoices
-    Route::get('invoices', [App\Http\Controllers\Worker\InvoiceController::class, 'index'])->name('invoices.index');
+    // Invoices - requires invoices permission
+    Route::middleware('worker.permission:invoices')->group(function () {
+        Route::get('invoices', [App\Http\Controllers\Worker\InvoiceController::class, 'index'])->name('invoices.index');
+    });
+
+    // Activity Logs - requires activity_logs permission
+    Route::middleware('worker.permission:activity_logs')->group(function () {
+        Route::get('activity-logs', [App\Http\Controllers\Worker\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    });
 });
 
 // Auth Routes for Admin/Worker

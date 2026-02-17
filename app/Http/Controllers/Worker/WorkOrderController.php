@@ -8,6 +8,7 @@ use App\Models\WorkOrderSection;
 use App\Models\WorkOrderItem;
 use App\Models\InternalProduct;
 use App\Models\Inventory;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -102,6 +103,27 @@ class WorkOrderController extends Controller
             $total = $workOrder->calculateTotal();
             $workOrder->update(['total_amount' => $total]);
 
+            // Log activity
+            $itemCount = 0;
+            foreach ($validated['sections'] as $section) {
+                $itemCount += count($section['items']);
+            }
+            
+            ActivityLog::log(
+                auth('worker')->id(),
+                'create',
+                'work_order',
+                $workOrder->id,
+                "Kreirao radni nalog za: {$validated['client_name']}",
+                [
+                    'client_name' => $validated['client_name'],
+                    'location' => $validated['location'],
+                    'sections_count' => count($validated['sections']),
+                    'items_count' => $itemCount,
+                    'total_amount' => $total
+                ]
+            );
+
             DB::commit();
 
             return redirect()->route('worker.work-orders.show', $workOrder)
@@ -156,6 +178,21 @@ class WorkOrderController extends Controller
             'invoice_phone' => $validated['invoice_phone'] ?? null,
             'has_invoice' => true,
         ]);
+
+        // Log activity
+        ActivityLog::log(
+            auth('worker')->id(),
+            'create',
+            'invoice',
+            $workOrder->id,
+            "Generisao fakturu: {$invoiceNumber} za {$validated['invoice_company_name']}",
+            [
+                'invoice_number' => $invoiceNumber,
+                'invoice_type' => $validated['invoice_type'],
+                'company_name' => $validated['invoice_company_name'],
+                'work_order_id' => $workOrder->id
+            ]
+        );
 
         return redirect()->route('worker.work-orders.invoice', $workOrder)
             ->with('success', 'Faktura uspešno kreirana.');

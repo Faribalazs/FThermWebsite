@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'worker' => \App\Http\Middleware\WorkerMiddleware::class,
+            'worker.permission' => \App\Http\Middleware\CheckWorkerPermission::class,
         ]);
 
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
@@ -32,14 +33,45 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
-            $user = $request->user();
+            // Check session flag for which guard was used to login
+            $authGuard = $request->session()->get('auth_guard', null);
             
-            // Check which guard the user is authenticated with
-            if (auth('admin')->check()) {
+            if ($authGuard === 'worker' && auth('worker')->check()) {
+                $user = auth('worker')->user();
+                // Check if worker has any permissions
+                if (empty($user->permissions)) {
+                    return route('worker.no-permissions');
+                }
+                // Redirect to dashboard if they have dashboard permission, otherwise to no-permissions
+                if ($user->hasPermission('dashboard')) {
+                    return route('worker.dashboard');
+                }
+                return route('worker.no-permissions');
+            }
+            
+            if ($authGuard === 'admin' && auth('admin')->check()) {
                 return route('admin.dashboard');
             }
-            if (auth('worker')->check()) {
-                return route('worker.dashboard');
+            
+            // Fallback: get user and check their role
+            $user = auth('worker')->user() ?? auth('admin')->user() ?? auth('web')->user();
+            
+            if ($user) {
+                if ($user->role === 'worker') {
+                    // Check if worker has any permissions
+                    if (empty($user->permissions)) {
+                        return route('worker.no-permissions');
+                    }
+                    // Redirect to dashboard if they have dashboard permission
+                    if ($user->hasPermission('dashboard')) {
+                        return route('worker.dashboard');
+                    }
+                    return route('worker.no-permissions');
+                }
+                
+                if ($user->role === 'admin' || $user->is_admin) {
+                    return route('admin.dashboard');
+                }
             }
             
             return route('home');

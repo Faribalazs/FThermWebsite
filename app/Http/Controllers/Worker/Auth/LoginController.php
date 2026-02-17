@@ -41,7 +41,20 @@ class LoginController extends Controller
                  return back()->withErrors(['email' => 'Access denied. Workers only.']);
             }
 
-            return redirect()->intended(route('worker.dashboard'));
+            // Store a flag to indicate which guard this user should use
+            $request->session()->put('auth_guard', 'worker');
+            
+            // Determine where to redirect based on permissions
+            if (empty($user->permissions)) {
+                return redirect()->route('worker.no-permissions');
+            }
+            
+            if ($user->hasPermission('dashboard')) {
+                return redirect()->intended(route('worker.dashboard'));
+            }
+            
+            // If no dashboard permission, redirect to no-permissions page
+            return redirect()->route('worker.no-permissions');
         }
 
         return back()->withErrors([
@@ -52,6 +65,9 @@ class LoginController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('worker')->logout();
+        
+        // Clear the auth guard flag
+        $request->session()->forget('auth_guard');
         
         // We do not invalidate session to preserve other guard logins (Admin/User)
 

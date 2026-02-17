@@ -24,7 +24,8 @@ class WorkerController extends Controller
      */
     public function create()
     {
-        return view('admin.workers.create');
+        $availablePermissions = User::getAvailablePermissions();
+        return view('admin.workers.create', compact('availablePermissions'));
     }
 
     /**
@@ -36,6 +37,7 @@ class WorkerController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'permissions' => ['nullable', 'array'],
         ]);
 
         User::create([
@@ -44,6 +46,7 @@ class WorkerController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'worker',
             'is_active' => true,
+            'permissions' => $request->permissions ?? [],
         ]);
 
         return redirect()->route('admin.workers.index')->with('success', 'Worker created successfully.');
@@ -59,7 +62,8 @@ class WorkerController extends Controller
             abort(404);
         }
         
-        return view('admin.workers.edit', compact('worker'));
+        $availablePermissions = User::getAvailablePermissions();
+        return view('admin.workers.edit', compact('worker', 'availablePermissions'));
     }
 
     /**
@@ -75,6 +79,7 @@ class WorkerController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$worker->id],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'permissions' => ['nullable', 'array'],
         ]);
 
         $worker->name = $request->name;
@@ -82,6 +87,7 @@ class WorkerController extends Controller
         if ($request->filled('password')) {
             $worker->password = Hash::make($request->password);
         }
+        $worker->permissions = $request->permissions ?? [];
         $worker->save();
 
         return redirect()->route('admin.workers.index')->with('success', 'Worker updated successfully.');

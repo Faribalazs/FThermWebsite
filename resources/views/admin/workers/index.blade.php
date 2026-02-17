@@ -18,6 +18,21 @@
         </a>
     </div>
 
+    <!-- Info Box about Permissions -->
+    <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm">
+        <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h3 class="text-sm font-semibold text-blue-800 mb-1">Upravljanje Dozvolama</h3>
+                <p class="text-sm text-blue-700">
+                    Kliknite na ikonu <strong>Izmeni</strong> pored svakog radnika da biste podesili njihove dozvole pristupa. Radnici će videti samo stranice za koje imaju dodeljene dozvole.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Table Card -->
     <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
@@ -26,6 +41,7 @@
                     <tr class="bg-gray-50 border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Radnik</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kontakt</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Dozvole</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status Naloga</th>
                         <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Upravljanje</th>
                     </tr>
@@ -50,6 +66,30 @@
                                 <span class="font-medium">{{ $worker->email }}</span>
                             </div>
                         </td>
+                        <td class="px-6 py-4">
+                            @php
+                                $permissions = $worker->permissions ?? [];
+                                $permissionCount = count($permissions);
+                            @endphp
+                            @if($permissionCount > 0)
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach(array_slice($permissions, 0, 2) as $permission)
+                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                            {{ \App\Models\User::getAvailablePermissions()[$permission] ?? $permission }}
+                                        </span>
+                                    @endforeach
+                                    @if($permissionCount > 2)
+                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                            +{{ $permissionCount - 2 }} još
+                                        </span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                                    Nema dozvola
+                                </span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($worker->is_active)
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
@@ -63,7 +103,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                             <div class="flex items-center justify-center gap-2">
-                                <a href="{{ route('admin.workers.edit', $worker) }}" class="text-gray-500 hover:text-primary-600 font-medium transition-colors" title="Izmeni">
+                                <a href="{{ route('admin.workers.edit', $worker) }}" class="text-gray-500 hover:text-primary-600 font-medium transition-colors" title="Izmeni radnika i dozvole">
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
@@ -81,7 +121,7 @@
                                     </form>
                                 @else
                                     <form action="{{ route('admin.workers.unban', $worker) }}" method="POST" class="inline" onsubmit="return confirm('Da li ste sigurni da želite da aktivirate ovog korisnika?')">
-                                        @csrf
+                                     5  @csrf
                                         @method('PATCH')
                                         <button type="submit" class="text-gray-500 hover:text-green-600 transition-colors" title="Aktiviraj">
                                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

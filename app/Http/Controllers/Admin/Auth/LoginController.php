@@ -41,6 +41,9 @@ class LoginController extends Controller
                  return back()->withErrors(['email' => 'Access denied. Admins only.']);
             }
 
+            // Store a flag to indicate which guard this user should use
+            $request->session()->put('auth_guard', 'admin');
+            
             return redirect()->intended(route('admin.dashboard'));
         }
 
@@ -52,6 +55,9 @@ class LoginController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
+        
+        // Clear the auth guard flag
+        $request->session()->forget('auth_guard');
         
         // We do not invalidate session to preserve other guard logins (Worker/User)
         // $request->session()->invalidate(); 

@@ -178,10 +178,10 @@
                 </a>
                 @endif
 
-                <form action="{{ route('worker.work-orders.destroy', $workOrder) }}" method="POST" class="sm:ml-auto" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovaj radni nalog?')">
+                <form action="{{ route('worker.work-orders.destroy', $workOrder) }}" method="POST" class="sm:ml-auto delete-work-order-form" data-work-order-client="{{ $workOrder->client_name }}">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
+                    <button type="button" class="delete-work-order-btn inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
@@ -281,6 +281,50 @@ function togglePIBField(show) {
     } else {
         pibField.classList.add('hidden');
     }
+}
+
+// Delete work order confirmation with SweetAlert2
+const deleteBtn = document.querySelector('.delete-work-order-btn');
+if (deleteBtn) {
+    deleteBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const form = this.closest('.delete-work-order-form');
+        const clientName = form.dataset.workOrderClient;
+        
+        Swal.fire({
+            title: 'Da li ste sigurni?',
+            html: `<p class="text-gray-600 mt-2">Želite da obrišete radni nalog za klijenta <strong class="text-gray-900">"${clientName}"</strong>?</p><p class="text-red-600 text-sm mt-2">Ova akcija je nepovratna!</p>`,
+            icon: 'warning',
+            iconColor: '#3b82f6',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#9ca3af',
+            confirmButtonText: '<span class="px-2">Da, obriši!</span>',
+            cancelButtonText: '<span class="px-2">Otkaži</span>',
+            reverseButtons: true,
+            customClass: {
+                popup: 'rounded-2xl shadow-2xl',
+                title: 'text-2xl font-bold text-gray-900',
+                htmlContainer: 'text-base',
+                confirmButton: 'rounded-lg px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5',
+                cancelButton: 'rounded-lg px-6 py-3 font-semibold hover:bg-gray-300 transition-all duration-200',
+                actions: 'gap-3',
+                icon: 'border-4 border-blue-100'
+            },
+            buttonsStyling: true,
+            backdrop: 'rgba(0, 0, 0, 0.4)',
+            showClass: {
+                popup: 'animate__animated animate__fadeIn animate__faster'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOut animate__faster'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
 }
 </script>
 @endsection
