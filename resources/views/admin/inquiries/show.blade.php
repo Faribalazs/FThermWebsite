@@ -61,15 +61,15 @@
         </div>
 
         <div class="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
-            <form action="{{ route('admin.inquiries.destroy', $inquiry) }}" method="POST" onsubmit="return confirm('Da li ste sigurni?')">
+            <form action="{{ route('admin.inquiries.destroy', $inquiry) }}" method="POST" data-confirm="Da li ste sigurni da želite da obrišete ovaj upit?" data-type="delete">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="px-6 py-2 border border-red-300 rounded-lg text-red-600 hover:bg-red-50 transition">
+                <button type="submit" class="px-6 py-3 border-2 border-red-300 rounded-xl text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 transition-all duration-200 font-bold shadow-sm hover:shadow-md hover:border-red-400">
                     Obriši upit
                 </button>
             </form>
             
-            <a href="{{ route('admin.inquiries.index') }}" class="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition">
+            <a href="{{ route('admin.inquiries.index') }}" class="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                 Nazad na listu
             </a>
         </div>

@@ -83,7 +83,8 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
 
     // Work Orders (Radni Nalozi) - requires work_orders permission
     Route::middleware('worker.permission:work_orders')->group(function () {
-        Route::resource('work-orders', App\Http\Controllers\Worker\WorkOrderController::class)->except(['edit', 'update']);
+        Route::resource('work-orders', App\Http\Controllers\Worker\WorkOrderController::class);
+        Route::get('work-orders/{workOrder}/export-pdf', [App\Http\Controllers\Worker\WorkOrderController::class, 'exportPdf'])->name('work-orders.export-pdf');
         Route::post('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'generateInvoice'])->name('work-orders.invoice.generate');
         Route::get('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'showInvoice'])->name('work-orders.invoice');
         Route::get('work-orders/{workOrder}/invoice/download', [App\Http\Controllers\Worker\WorkOrderController::class, 'downloadInvoice'])->name('work-orders.invoice.download');
@@ -105,6 +106,10 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
     Route::middleware('worker.permission:activity_logs')->group(function () {
         Route::get('activity-logs', [App\Http\Controllers\Worker\ActivityLogController::class, 'index'])->name('activity-logs.index');
     });
+
+    // Settings
+    Route::get('settings', [App\Http\Controllers\Worker\SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [App\Http\Controllers\Worker\SettingController::class, 'update'])->name('settings.update');
 });
 
 // Auth Routes for Admin/Worker

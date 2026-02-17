@@ -51,7 +51,7 @@
                         :selected="request('location')"
                         :selectedText="request('location') ?: ''"
                         :options="collect(['' => 'Sve lokacije'])->merge($locations->mapWithKeys(fn($loc) => [$loc => $loc]))->toArray()"
-                        label="Lokacija"
+                        label="Mesto"
                     />
 
                     <!-- Date From -->
@@ -188,7 +188,13 @@
                 <div class="flex justify-between items-start">
                     <div class="text-white">
                         <p class="text-sm opacity-90">Klijent</p>
-                        <h3 class="text-lg font-bold mt-1">{{ $workOrder->client_name }}</h3>
+                        <h3 class="text-lg font-bold mt-1">
+                            @if($workOrder->client_type === 'pravno_lice')
+                                {{ $workOrder->company_name }}
+                            @else
+                                {{ $workOrder->client_name }}
+                            @endif
+                        </h3>
                     </div>
                     @if ($workOrder->has_invoice)
                     <span class="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
@@ -223,7 +229,7 @@
                         <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
-                        <span class="text-sm">{{ $workOrder->sections->count() }} {{ $workOrder->sections->count() == 1 ? 'sekcija' : 'sekcija' }}</span>
+                        <span class="text-sm">{{ $workOrder->sections->count() }} {{ $workOrder->sections->count() == 1 ? 'usluga' : 'usluga' }}</span>
                     </div>
 
                     <div class="pt-3 border-t border-gray-200">

@@ -1,6 +1,6 @@
 @extends('layouts.worker')
 
-@section('title', 'Novi Radni Nalog')
+@section('title', 'Uredi Radni Nalog')
 
 @section('content')
 <div class="p-3 sm:p-6 max-w-6xl mx-auto">
@@ -9,7 +9,7 @@
         <ol class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
             <li><a href="{{ route('worker.work-orders.index') }}" class="hover:text-primary-600 transition">Radni Nalozi</a></li>
             <li><svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
-            <li class="text-gray-900 font-medium">Novi Radni Nalog</li>
+            <li class="text-gray-900 font-medium">Uredi Radni Nalog</li>
         </ol>
     </nav>
 
@@ -24,8 +24,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-2xl font-bold text-white">Kreiraj Radni Nalog</h1>
-                    <p class="text-primary-100 text-xs sm:text-sm mt-0.5 sm:mt-1">Popunite podatke o radnom nalogu i dodajte usluge</p>
+                    <h1 class="text-lg sm:text-2xl font-bold text-white">Uredi Radni Nalog</h1>
+                    <p class="text-primary-100 text-xs sm:text-sm mt-0.5 sm:mt-1">Ažurirajte podatke o radnom nalogu i uslugama</p>
                 </div>
             </div>
         </div>
@@ -42,8 +42,9 @@
         @endif
 
         <!-- Form Body -->
-        <form action="{{ route('worker.work-orders.store') }}" method="POST" class="p-3 sm:p-8" id="workOrderForm">
+        <form action="{{ route('worker.work-orders.update', $workOrder) }}" method="POST" class="p-3 sm:p-8" id="workOrderForm">
             @csrf
+            @method('PUT')
             
             <!-- Client Type Selection -->
             <div class="mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
@@ -62,7 +63,7 @@
                             value="fizicko_lice" 
                             class="sr-only peer"
                             onchange="toggleClientFields()"
-                            {{ old('client_type', 'fizicko_lice') == 'fizicko_lice' ? 'checked' : '' }}
+                            {{ old('client_type', $workOrder->client_type) == 'fizicko_lice' ? 'checked' : '' }}
                         >
                         <div class="text-center">
                             <svg class="w-8 h-8 mx-auto mb-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +79,7 @@
                             value="pravno_lice" 
                             class="sr-only peer"
                             onchange="toggleClientFields()"
-                            {{ old('client_type') == 'pravno_lice' ? 'checked' : '' }}
+                            {{ old('client_type', $workOrder->client_type) == 'pravno_lice' ? 'checked' : '' }}
                         >
                         <div class="text-center">
                             <svg class="w-8 h-8 mx-auto mb-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +108,7 @@
                                 type="text" 
                                 name="client_name" 
                                 id="client_name" 
-                                value="{{ old('client_name') }}"
+                                value="{{ old('client_name', $workOrder->client_name) }}"
                                 class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('client_name') border-red-500 ring-2 ring-red-200 error @enderror"
                                 placeholder="Unesite ime i prezime"
                             >
@@ -132,7 +133,7 @@
                                 type="text" 
                                 name="client_address" 
                                 id="client_address" 
-                                value="{{ old('client_address') }}"
+                                value="{{ old('client_address', $workOrder->client_address) }}"
                                 class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('client_address') border-red-500 ring-2 ring-red-200 error @enderror"
                                 placeholder="Unesite adresu"
                             >
@@ -163,7 +164,7 @@
                                 type="text" 
                                 name="company_name" 
                                 id="company_name" 
-                                value="{{ old('company_name') }}"
+                                value="{{ old('company_name', $workOrder->company_name) }}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="Unesite naziv kompanije"
                             >
@@ -179,7 +180,7 @@
                                 type="text" 
                                 name="pib" 
                                 id="pib" 
-                                value="{{ old('pib') }}"
+                                value="{{ old('pib', $workOrder->pib) }}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="Unesite PIB"
                             >
@@ -195,7 +196,7 @@
                                 type="text" 
                                 name="maticni_broj" 
                                 id="maticni_broj" 
-                                value="{{ old('maticni_broj') }}"
+                                value="{{ old('maticni_broj', $workOrder->maticni_broj) }}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="Unesite matični broj"
                             >
@@ -212,7 +213,7 @@
                                 type="text" 
                                 name="company_address" 
                                 id="company_address" 
-                                value="{{ old('company_address') }}"
+                                value="{{ old('company_address', $workOrder->company_address) }}"
                                 class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                                 placeholder="Unesite adresu kompanije"
                             >
@@ -233,7 +234,7 @@
                             type="text" 
                             name="client_phone" 
                             id="client_phone" 
-                            value="{{ old('client_phone') }}"
+                            value="{{ old('client_phone', $workOrder->client_phone) }}"
                             class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                             placeholder="Broj telefona"
                         >
@@ -249,7 +250,7 @@
                             type="email" 
                             name="client_email" 
                             id="client_email" 
-                            value="{{ old('client_email') }}"
+                            value="{{ old('client_email', $workOrder->client_email) }}"
                             class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
                             placeholder="Email adresa"
                         >
@@ -269,7 +270,7 @@
                         type="text" 
                         name="location" 
                         id="location" 
-                        value="{{ old('location') }}"
+                        value="{{ old('location', $workOrder->location) }}"
                         class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('location') border-red-500 ring-2 ring-red-200 error @enderror"
                         placeholder="Unesite lokaciju"
                         required
@@ -295,7 +296,7 @@
                         type="number" 
                         name="km_to_destination" 
                         id="km_to_destination" 
-                        value="{{ old('km_to_destination') }}"
+                        value="{{ old('km_to_destination', $workOrder->km_to_destination) }}"
                         class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('km_to_destination') border-red-500 ring-2 ring-red-200 error @enderror"
                         placeholder="npr. 25"
                         step="0.01"
@@ -332,7 +333,7 @@
 
             <!-- Form Actions -->
             <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
-                <a href="{{ route('worker.work-orders.index') }}" class="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                <a href="{{ route('worker.work-orders.show', $workOrder) }}" class="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -342,7 +343,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    Sačuvaj Radni Nalog
+                    Ažuriraj Radni Nalog
                 </button>
             </div>
         </form>
@@ -352,10 +353,73 @@
 <script>
 let sectionIndex = 0;
 const products = @json($products);
+const existingSections = @json($workOrder->sections);
 
-// Add first section on page load
+// Initialize on page load with existing sections
 document.addEventListener('DOMContentLoaded', function() {
-    addSection();
+    toggleClientFields();
+    
+    // Populate existing sections
+    if (existingSections && existingSections.length > 0) {
+        existingSections.forEach(section => {
+            const newSectionIndex = addSection();
+            
+            // Set section title
+            const titleInput = document.querySelector(`[data-section="${newSectionIndex}"] input[name="sections[${newSectionIndex}][title]"]`);
+            if (titleInput) {
+                titleInput.value = section.title || '';
+            }
+            
+            // Set hours spent
+            const hoursInput = document.querySelector(`[data-section="${newSectionIndex}"] input[name="sections[${newSectionIndex}][hours_spent]"]`);
+            if (hoursInput && section.hours_spent) {
+                hoursInput.value = section.hours_spent;
+            }
+            
+            // Set service price
+            const priceInput = document.querySelector(`[data-section="${newSectionIndex}"] input[name="sections[${newSectionIndex}][service_price]"]`);
+            if (priceInput && section.service_price) {
+                priceInput.value = section.service_price;
+            }
+            
+            // Clear the automatically added first item
+            const itemsContainer = document.getElementById(`itemsContainer_${newSectionIndex}`);
+            if (itemsContainer) {
+                itemsContainer.innerHTML = '';
+            }
+            
+            // Add existing items
+            if (section.items && section.items.length > 0) {
+                section.items.forEach(item => {
+                    const newItemId = addItem(newSectionIndex);
+                    
+                    // Set product
+                    const product = products.find(p => p.id === item.product_id);
+                    if (product) {
+                        const stock = product.inventory ? product.inventory.quantity : 0;
+                        const productName = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        const productUnit = product.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        const displayText = `${productName} - ${product.price} RSD/${productUnit}`;
+                        
+                        setTimeout(() => {
+                            selectProduct(newSectionIndex, newItemId, product.id, displayText, product.price, stock);
+                            
+                            // Set quantity
+                            const quantityInput = document.querySelector(`[data-section="${newSectionIndex}"] [data-item="${newItemId}"] input[type="number"]`);
+                            if (quantityInput && item.quantity) {
+                                quantityInput.value = item.quantity;
+                                validateStock(newSectionIndex, newItemId);
+                                updateItemPrice(newSectionIndex, newItemId);
+                            }
+                        }, 50);
+                    }
+                });
+            }
+        });
+    } else {
+        // If no existing sections, add one empty section
+        addSection();
+    }
 });
 
 function addSection() {
@@ -440,7 +504,7 @@ function addSection() {
     `;
     
     container.insertAdjacentHTML('beforeend', sectionHtml);
-    addItem(sectionIndex); // Add first item automatically
+    return sectionIndex; // Return the section index for populating existing data
 }
 
 function removeSection(sectionId) {
@@ -560,6 +624,7 @@ function addItem(sectionId) {
     `;
     
     container.insertAdjacentHTML('beforeend', itemHtml);
+    return itemId; // Return the item ID for populating existing data
 }
 
 function removeItem(sectionId, itemId) {
@@ -744,11 +809,6 @@ function toggleClientFields() {
         companyNameInput.required = true;
     }
 }
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    toggleClientFields();
-});
 
 </script>
 @endsection

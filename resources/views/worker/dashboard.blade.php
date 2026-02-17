@@ -170,7 +170,7 @@
                                             {{ $order->created_at->diffForHumans() }}
                                         </span>
                                         <span class="text-xs font-semibold text-gray-700">
-                                            {{ $order->sections->count() }} sekcija
+                                            {{ $order->sections->count() }} usluga
                                         </span>
                                     </div>
                                 </div>

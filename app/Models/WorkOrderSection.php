@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkOrderSection extends Model
 {
-    protected $fillable = ['work_order_id', 'title', 'hours_spent'];
+    protected $fillable = ['work_order_id', 'title', 'hours_spent', 'service_price'];
 
     public function workOrder()
     {
