@@ -23,9 +23,9 @@
 
         <!-- Success/Error Messages -->
         @if (session('success'))
-            <div class="mb-6 bg-gradient-to-r from-blue-50 to-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm animate-fade-in alert-success">
+            <div class="mb-6 bg-gradient-to-r from-light-100 to-light-100 border-l-4 border-secondary-500 p-4 rounded-lg shadow-sm animate-fade-in alert-success">
                 <div class="flex items-center">
-                    <svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 text-secondary-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span class="text-blue-800 font-medium">{{ session('success') }}</span>
@@ -178,7 +178,7 @@
                             <td class="px-3 sm:px-6 py-3 sm:py-4 text-right">
                                 <div class="flex justify-end gap-2">
                                     <button onclick="openAddModal({{ $product->id }}, '{{ $product->name }}', '{{ $product->unit }}')"
-                                            class="inline-flex items-center gap-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md">
+                                            class="inline-flex items-center gap-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md">
                                         <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                         </svg>
@@ -212,7 +212,7 @@
 <!-- Add Quantity Modal -->
 <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" onclick="if(event.target === this) closeAddModal()">
     <div class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-scale-in" onclick="event.stopPropagation()">
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 rounded-t-xl">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 rounded-t-xl">
             <h2 class="text-2xl font-bold text-white">Dodaj Zalihe</h2>
         </div>
 
@@ -237,7 +237,7 @@
                 <button type="button" onclick="closeAddModal()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     Otkaži
                 </button>
-                <button type="submit" class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
                     Dodaj
                 </button>
             </div>
@@ -248,7 +248,7 @@
 <!-- Set Quantity Modal -->
 <div id="setModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" onclick="if(event.target === this) closeSetModal()">
     <div class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-scale-in" onclick="event.stopPropagation()">
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 rounded-t-xl">
+        <div class="bg-gradient-to-r from-secondary-600 to-secondary-700 px-6 py-4 rounded-t-xl">
             <h2 class="text-2xl font-bold text-white">Postavi Količinu</h2>
         </div>
 
@@ -268,7 +268,7 @@
                            name="quantity" 
                            min="0" 
                            required
-                           class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg font-semibold"
+                           class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 text-lg font-semibold"
                            placeholder="Unesite novu količinu">
                     <span id="setProductUnit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"></span>
                 </div>
@@ -278,7 +278,7 @@
                 <button type="button" onclick="closeSetModal()" class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     Otkaži
                 </button>
-                <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
                     Postavi
                 </button>
             </div>

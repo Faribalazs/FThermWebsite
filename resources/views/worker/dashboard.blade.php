@@ -10,7 +10,7 @@
             <h1 class="text-3xl font-bold text-gray-900">
                 Dobrodošli, {{ auth('worker')->user()->name }}!
             </h1>
-            <p class="text-gray-600 mt-1">{{ now()->isoFormat('dddd, D MMMM YYYY') }}</p>
+            <p class="text-gray-600 mt-1">{{ now()->locale('sr')->isoFormat('dddd, D MMMM YYYY') }}</p>
         </div>
 
         <!-- Statistics Cards -->
@@ -23,7 +23,7 @@
                         <p class="text-3xl font-bold text-gray-900 mt-2">{{ $totalProducts }}</p>
                     </div>
                     <div class="h-14 w-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                     </div>
@@ -230,9 +230,9 @@
                     </div>
                 </a>
 
-                <a href="{{ route('worker.products.create') }}" class="group flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
+                <a href="{{ route('worker.products.create') }}" class="group flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-light-50 transition-all">
                     <div class="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
                     </div>
@@ -254,14 +254,14 @@
                     </div>
                 </a>
 
-                <a href="{{ route('worker.products.index') }}" class="group flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all">
-                    <div class="h-12 w-12 rounded-lg bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('worker.products.index') }}" class="group flex items-center gap-4 p-4 border-2 border-gray-200 rounded-lg hover:border-secondary-500 hover:bg-light-50 transition-all">
+                    <div class="h-12 w-12 rounded-lg bg-gradient-to-br from-light-100 to-light-200 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                         </svg>
                     </div>
                     <div>
-                        <p class="font-bold text-gray-900 group-hover:text-indigo-700">Svi Materijali</p>
+                        <p class="font-bold text-gray-900 group-hover:text-secondary-700">Svi Materijali</p>
                         <p class="text-xs text-gray-500">Pregledaj sve</p>
                     </div>
                 </a>

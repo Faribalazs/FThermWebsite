@@ -28,7 +28,7 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($inquiries as $inquiry)
-                <tr class="hover:bg-gray-50 {{ !$inquiry->is_read ? 'bg-blue-50' : '' }}">
+                <tr class="hover:bg-gray-50 {{ !$inquiry->is_read ? 'bg-light-50' : '' }}">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                         {{ $inquiry->created_at->format('d.m.Y H:i') }}
                     </td>
@@ -53,7 +53,7 @@
                         @if($inquiry->is_read)
                             <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Pročitano</span>
                         @else
-                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Novo</span>
+                            <span class="px-2 py-1 text-xs rounded-full bg-light-100 text-secondary-800">Novo</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">

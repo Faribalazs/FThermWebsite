@@ -10,9 +10,14 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ActivityLog::where('user_id', auth('worker')->id())
-            ->with('user')
+        // Show all activity logs, not just current user's
+        $query = ActivityLog::with('user')
             ->latest();
+
+        // Filter by user
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
 
         // Filter by action type
         if ($request->filled('action_type')) {
@@ -50,6 +55,11 @@ class ActivityLogController extends Controller
             'inventory' => 'Zalihe',
         ];
 
-        return view('worker.activity-logs.index', compact('logs', 'actionTypes', 'entityTypes'));
+        // Get all users who have activity logs for the filter
+        $users = \App\Models\User::whereIn('id', 
+            \App\Models\ActivityLog::distinct('user_id')->pluck('user_id')
+        )->orderBy('name')->get();
+
+        return view('worker.activity-logs.index', compact('logs', 'actionTypes', 'entityTypes', 'users'));
     }
 }

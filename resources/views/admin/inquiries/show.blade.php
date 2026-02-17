@@ -16,7 +16,7 @@
             @if($inquiry->is_read)
                 <span class="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-800">Pročitano</span>
             @else
-                <span class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">Novo</span>
+                <span class="px-3 py-1 text-sm rounded-full bg-light-100 text-secondary-800">Novo</span>
             @endif
         </div>
 

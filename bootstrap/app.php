@@ -20,62 +20,24 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'worker' => \App\Http\Middleware\WorkerMiddleware::class,
             'worker.permission' => \App\Http\Middleware\CheckWorkerPermission::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
 
         $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
-            if ($request->is('admin') || $request->is('admin/*')) {
+            // Check which area the user is trying to access based on URL pattern
+            if ($request->is('admin*')) {
                 return route('admin.login');
             }
-            if ($request->is('worker') || $request->is('worker/*')) {
+            
+            if ($request->is('worker*')) {
                 return route('worker.login');
             }
+            
             return route('login');
         });
 
-        $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
-            // Check session flag for which guard was used to login
-            $authGuard = $request->session()->get('auth_guard', null);
-            
-            if ($authGuard === 'worker' && auth('worker')->check()) {
-                $user = auth('worker')->user();
-                // Check if worker has any permissions
-                if (empty($user->permissions)) {
-                    return route('worker.no-permissions');
-                }
-                // Redirect to dashboard if they have dashboard permission, otherwise to no-permissions
-                if ($user->hasPermission('dashboard')) {
-                    return route('worker.dashboard');
-                }
-                return route('worker.no-permissions');
-            }
-            
-            if ($authGuard === 'admin' && auth('admin')->check()) {
-                return route('admin.dashboard');
-            }
-            
-            // Fallback: get user and check their role
-            $user = auth('worker')->user() ?? auth('admin')->user() ?? auth('web')->user();
-            
-            if ($user) {
-                if ($user->role === 'worker') {
-                    // Check if worker has any permissions
-                    if (empty($user->permissions)) {
-                        return route('worker.no-permissions');
-                    }
-                    // Redirect to dashboard if they have dashboard permission
-                    if ($user->hasPermission('dashboard')) {
-                        return route('worker.dashboard');
-                    }
-                    return route('worker.no-permissions');
-                }
-                
-                if ($user->role === 'admin' || $user->is_admin) {
-                    return route('admin.dashboard');
-                }
-            }
-            
-            return route('home');
-        });
+        // Don't use redirectUsersTo - it interferes with multi-guard authentication
+        // Each guard will handle its own redirects via the login controllers
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

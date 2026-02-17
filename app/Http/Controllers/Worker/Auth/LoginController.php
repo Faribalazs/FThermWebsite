@@ -26,8 +26,6 @@ class LoginController extends Controller
         ]);
 
         if (Auth::guard('worker')->attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            
             /** @var \App\Models\User $user */
             $user = Auth::guard('worker')->user();
 
@@ -41,8 +39,14 @@ class LoginController extends Controller
                  return back()->withErrors(['email' => 'Access denied. Workers only.']);
             }
 
+            // Regenerate session AFTER validation to prevent session fixation
+            $request->session()->regenerate();
+            
             // Store a flag to indicate which guard this user should use
             $request->session()->put('auth_guard', 'worker');
+            
+            // Save session immediately to ensure it persists
+            $request->session()->save();
             
             // Determine where to redirect based on permissions
             if (empty($user->permissions)) {
@@ -50,7 +54,7 @@ class LoginController extends Controller
             }
             
             if ($user->hasPermission('dashboard')) {
-                return redirect()->intended(route('worker.dashboard'));
+                return redirect()->route('worker.dashboard');
             }
             
             // If no dashboard permission, redirect to no-permissions page
@@ -69,7 +73,8 @@ class LoginController extends Controller
         // Clear the auth guard flag
         $request->session()->forget('auth_guard');
         
-        // We do not invalidate session to preserve other guard logins (Admin/User)
+        // Regenerate session to prevent fixation attacks
+        $request->session()->regenerateToken();
 
         return redirect()->route('worker.login');
     }

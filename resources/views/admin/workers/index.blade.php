@@ -19,7 +19,7 @@
     </div>
 
     <!-- Info Box about Permissions -->
-    <div class="mb-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm">
+    <div class="mb-6 bg-light-50 border-l-4 border-secondary-500 p-4 rounded-r-lg shadow-sm">
         <div class="flex items-start">
             <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -74,7 +74,7 @@
                             @if($permissionCount > 0)
                                 <div class="flex flex-wrap gap-1">
                                     @foreach(array_slice($permissions, 0, 2) as $permission)
-                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-light-100 text-secondary-800 border border-light-200">
                                             {{ \App\Models\User::getAvailablePermissions()[$permission] ?? $permission }}
                                         </span>
                                     @endforeach

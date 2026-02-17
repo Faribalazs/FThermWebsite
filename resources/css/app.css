@@ -1,4 +1,5 @@
 @import './worker.scss';
+@import 'flatpickr/dist/flatpickr.min.css';
 
 @tailwind base;
 @tailwind components;

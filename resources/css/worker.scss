@@ -1,5 +1,54 @@
 // Worker Panel Custom Styles
 
+// Mobile App Navigation Styles
+.mobile-bottom-nav {
+    -webkit-tap-highlight-color: transparent;
+    
+    a, button {
+        position: relative;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        user-select: none;
+        
+        &:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+        
+        svg {
+            transition: all 0.2s ease;
+        }
+        
+        &.text-primary-600 svg {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.mobile-header {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+// Mobile More Menu Modal Animation
+#mobile-more-menu {
+    -webkit-tap-highlight-color: transparent;
+    
+    #mobile-more-menu-content {
+        max-height: 80vh;
+        
+        a, button {
+            -webkit-tap-highlight-color: transparent;
+            
+            &:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+        }
+    }
+}
+
 // Animations
 @keyframes fadeIn {
     from {
@@ -144,7 +193,7 @@
             transform: translateY(-50%);
             width: 3px;
             height: 50%;
-            background: linear-gradient(180deg, transparent, #0ea5e9, transparent);
+            background: linear-gradient(180deg, transparent, #09539A, transparent);
             border-radius: 2px;
         }
     }
@@ -221,18 +270,18 @@ aside > div:first-of-type {
 }
 
 .bg-gradient-to-r.from-primary-600 {
-    background: linear-gradient(to right, #0284c7, #0369a1) !important;
+    background: linear-gradient(to right, #09539A, #0d4d8b) !important;
     
     &:hover {
-        background: linear-gradient(to right, #0369a1, #075985) !important;
+        background: linear-gradient(to right, #0d4d8b, #114173) !important;
     }
 }
 
 .bg-gradient-to-r.from-indigo-600 {
-    background: linear-gradient(to right, #4f46e5, #4338ca) !important;
+    background: linear-gradient(to right, #DD2131, #c31d2b) !important;
     
     &:hover {
-        background: linear-gradient(to right, #4338ca, #3730a3) !important;
+        background: linear-gradient(to right, #c31d2b, #a31a26) !important;
     }
 }
 
@@ -273,7 +322,7 @@ aside > div:first-of-type {
     font-weight: 500;
     
     &.badge-primary {
-        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        background: linear-gradient(135deg, #09539A 0%, #0d4d8b 100%);
         color: white;
     }
     
@@ -545,5 +594,193 @@ input[type=number] {
     
     &:active {
         background: #e5e7eb;
+    }
+}
+
+// Flatpickr Custom Styling
+.flatpickr-calendar {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    font-family: inherit;
+    
+    &.arrowTop:before {
+        border-bottom-color: #e5e7eb;
+    }
+    
+    &.arrowTop:after {
+        border-bottom-color: white;
+    }
+}
+
+.flatpickr-months {
+    background: linear-gradient(135deg, #09539A 0%, #DD2131 100%);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    padding: 12px 0;
+    
+    .flatpickr-month {
+        height: auto;
+    }
+    
+    .flatpickr-current-month {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0;
+        
+        .flatpickr-monthDropdown-months {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: white;
+            font-weight: 600;
+            appearance: none;
+            
+            &:hover {
+                background: rgba(255, 255, 255, 0.25);
+            }
+        }
+        
+        .numInputWrapper {
+            input.cur-year {
+                color: white;
+                font-weight: 600;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 6px;
+                padding: 4px 8px;
+                
+                &:hover {
+                    background: rgba(255, 255, 255, 0.25);
+                }
+            }
+        }
+    }
+    
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        fill: white;
+        padding: 8px;
+        
+        &:hover svg {
+            fill: rgba(255, 255, 255, 0.8);
+        }
+    }
+}
+
+.flatpickr-weekdays {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px 0;
+}
+
+.flatpickr-weekday {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.flatpickr-days {
+    padding: 8px;
+}
+
+.flatpickr-day {
+    color: #374151;
+    border-radius: 8px;
+    border: none;
+    margin: 2px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover:not(.flatpickr-disabled):not(.selected) {
+        background: #f3f4f6;
+        border-color: #e5e7eb;
+        transform: scale(1.05);
+    }
+    
+    &.today {
+        background: #EEF2F9;
+        color: #09539A;
+        border-color: #CBDAEA;
+        font-weight: 600;
+        
+        &:hover {
+            background: #CBDAEA;
+            color: #09539A;
+        }
+    }
+    
+    &.selected {
+        background: linear-gradient(135deg, #09539A 0%, #0d4d8b 100%);
+        border-color: #09539A;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(9, 83, 154, 0.4);
+        
+        &:hover {
+            background: linear-gradient(135deg, #0d4d8b 0%, #114173 100%);
+        }
+    }
+    
+    &.prevMonthDay,
+    &.nextMonthDay {
+        color: #d1d5db;
+    }
+    
+    &.flatpickr-disabled {
+        color: #d1d5db;
+        
+        &:hover {
+            background: transparent;
+            transform: none;
+            cursor: not-allowed;
+        }
+    }
+    
+    &.inRange {
+        background: #EEF2F9;
+        border-color: #CBDAEA;
+        box-shadow: none;
+    }
+}
+
+// Time picker styling (if needed in future)
+.flatpickr-time {
+    border-top: 1px solid #e5e7eb;
+    padding: 10px;
+    
+    input {
+        font-weight: 600;
+        color: #374151;
+        
+        &:hover {
+            background: #f3f4f6;
+        }
+    }
+}
+
+// Animation for opening
+@keyframes fpFadeInDown {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -10px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+.flatpickr-calendar.open {
+    animation: fpFadeInDown 0.2s ease;
+}
+
+// Mobile responsiveness
+@media (max-width: 640px) {
+    .flatpickr-calendar {
+        width: 90vw !important;
+        max-width: 320px;
     }
 }

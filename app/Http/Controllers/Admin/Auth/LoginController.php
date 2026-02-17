@@ -26,8 +26,6 @@ class LoginController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-
             /** @var \App\Models\User $user */
             $user = Auth::guard('admin')->user();
 
@@ -36,15 +34,21 @@ class LoginController extends Controller
                 return back()->withErrors(['email' => 'Your account has been deactivated.']);
             }
 
-            if (!$user->isAdmin()) { // Assuming isAdmin() checks role or is_admin flag
+            if (!$user->isAdmin()) {
                  Auth::guard('admin')->logout();
                  return back()->withErrors(['email' => 'Access denied. Admins only.']);
             }
 
+            // Regenerate session AFTER validation
+            $request->session()->regenerate();
+            
             // Store a flag to indicate which guard this user should use
             $request->session()->put('auth_guard', 'admin');
             
-            return redirect()->intended(route('admin.dashboard'));
+            // Save session immediately to ensure it persists
+            $request->session()->save();
+            
+            return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors([
@@ -59,9 +63,8 @@ class LoginController extends Controller
         // Clear the auth guard flag
         $request->session()->forget('auth_guard');
         
-        // We do not invalidate session to preserve other guard logins (Worker/User)
-        // $request->session()->invalidate(); 
-        // $request->session()->regenerateToken();
+        // Regenerate session to prevent fixation attacks
+        $request->session()->regenerateToken();
 
         return redirect()->route('admin.login');
     }

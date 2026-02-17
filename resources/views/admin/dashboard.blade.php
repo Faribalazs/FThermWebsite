@@ -39,7 +39,7 @@
                 <p class="text-sm text-gray-600 font-medium">Ukupno upita</p>
                 <p class="text-3xl font-bold text-industrial-900 mt-2">{{ $stats['total_inquiries'] }}</p>
             </div>
-            <div class="bg-blue-100 p-3 rounded-lg">
+            <div class="bg-light-100 p-3 rounded-lg">
                 <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                 </svg>
@@ -137,7 +137,7 @@
 
     <a href="{{ route('admin.inquiries.index') }}" class="bg-white rounded-xl shadow-sm p-6 border border-gray-200 hover:shadow-md transition group">
         <div class="flex items-center">
-            <div class="bg-blue-100 p-3 rounded-lg group-hover:bg-blue-200 transition">
+            <div class="bg-light-100 p-3 rounded-lg group-hover:bg-light-200 transition">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>

@@ -15,14 +15,61 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class WorkOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $workOrders = WorkOrder::where('worker_id', auth('worker')->id())
-            ->with(['sections.items.product'])
-            ->latest()
-            ->paginate(15);
+        $query = WorkOrder::where('worker_id', auth('worker')->id())
+            ->with(['sections.items.product']);
 
-        return view('worker.work-orders.index', compact('workOrders'));
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('client_name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%");
+            });
+        }
+
+        // Location filter
+        if ($request->filled('location')) {
+            $query->where('location', $request->location);
+        }
+
+        // Date range filter
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Status filter (has_invoice)
+        if ($request->filled('status')) {
+            $query->where('has_invoice', $request->status === 'invoiced');
+        }
+
+        // Price range filter
+        if ($request->filled('price_from')) {
+            $query->where('total_amount', '>=', $request->price_from);
+        }
+        if ($request->filled('price_to')) {
+            $query->where('total_amount', '<=', $request->price_to);
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $workOrders = $query->paginate(15)->withQueryString();
+
+        // Get unique locations for filter dropdown
+        $locations = WorkOrder::where('worker_id', auth('worker')->id())
+            ->distinct()
+            ->pluck('location')
+            ->sort()
+            ->values();
+
+        return view('worker.work-orders.index', compact('workOrders', 'locations'));
     }
 
     public function create()

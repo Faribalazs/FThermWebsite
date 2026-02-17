@@ -16,7 +16,7 @@
     <!-- Form Card -->
     <div class="bg-white rounded-xl shadow-enhanced overflow-hidden border border-gray-100 animate-scale-in">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-8 py-6">
+        <div class="bg-gradient-to-r from-secondary-600 to-secondary-700 px-8 py-6">
             <div class="flex items-center gap-3">
                 <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-white">Izmeni Materijal</h1>
-                    <p class="text-indigo-100 text-sm mt-1">{{ $product->name }}</p>
+                    <p class="text-secondary-100 text-sm mt-1">{{ $product->name }}</p>
                 </div>
             </div>
         </div>
@@ -39,14 +39,14 @@
                 <!-- Product Name -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="name">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
                         Naziv Materijala
                         <span class="text-red-500">*</span>
                     </label>
                     <input 
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all @error('name') border-red-500 ring-2 ring-red-200 error @enderror" 
+                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('name') border-red-500 ring-2 ring-red-200 error @enderror" 
                         id="name" 
                         type="text" 
                         name="name" 
@@ -68,14 +68,14 @@
                     <!-- Unit -->
                     <div>
                         <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="unit">
-                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path>
                             </svg>
                             Jedinica Mere
                             <span class="text-red-500">*</span>
                         </label>
                         <input 
-                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all @error('unit') border-red-500 ring-2 ring-red-200 error @enderror" 
+                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('unit') border-red-500 ring-2 ring-red-200 error @enderror" 
                             id="unit" 
                             type="text" 
                             name="unit" 
@@ -95,7 +95,7 @@
                     <!-- Price -->
                     <div>
                         <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="price">
-                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Cena (RSD)
@@ -103,7 +103,7 @@
                         </label>
                         <div class="relative">
                             <input 
-                                class="form-input w-full pl-4 pr-16 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all @error('price') border-red-500 ring-2 ring-red-200 error @enderror" 
+                                class="form-input w-full pl-4 pr-16 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('price') border-red-500 ring-2 ring-red-200 error @enderror" 
                                 id="price" 
                                 type="number" 
                                 step="0.01" 
@@ -157,9 +157,9 @@
                 </div>
 
                 <!-- Info Box -->
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <div class="bg-light-50 border-l-4 border-secondary-500 p-4 rounded-r-lg">
                     <div class="flex items-start">
-                        <svg class="w-5 h-5 text-blue-500 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-secondary-500 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                         </svg>
                         <div>
@@ -178,7 +178,7 @@
                     </svg>
                     Otkaži
                 </a>
-                <button type="submit" class="btn-gradient inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                <button type="submit" class="btn-gradient inline-flex items-center justify-center gap-2 bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
