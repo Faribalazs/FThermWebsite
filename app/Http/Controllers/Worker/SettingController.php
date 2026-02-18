@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Worker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\Warehouse;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
@@ -20,6 +23,10 @@ class SettingController extends Controller
         $companyAddress = Setting::where('key', 'company_address')->value('value') ?? '';
         $companyBankAccount = Setting::where('key', 'company_bank_account')->value('value') ?? '';
         
+        // Load active warehouses
+        $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
+        $currentUser = Auth::guard('worker')->user();
+        
         return view('worker.settings.index', compact(
             'kmPrice',
             'companyName',
@@ -29,7 +36,9 @@ class SettingController extends Controller
             'companyPhone',
             'companyEmail',
             'companyAddress',
-            'companyBankAccount'
+            'companyBankAccount',
+            'warehouses',
+            'currentUser'
         ));
     }
 
@@ -45,6 +54,7 @@ class SettingController extends Controller
             'company_email' => 'required|email|max:255',
             'company_address' => 'required|string|max:500',
             'company_bank_account' => 'required|string|max:100',
+            'primary_warehouse_id' => 'nullable|exists:warehouses,id',
         ]);
 
         $settings = [
@@ -64,6 +74,12 @@ class SettingController extends Controller
                 ['key' => $key],
                 ['value' => $value]
             );
+        }
+        
+        // Update user's primary warehouse
+        $userId = Auth::guard('worker')->id();
+        if ($userId) {
+            User::where('id', $userId)->update(['primary_warehouse_id' => $validated['primary_warehouse_id']]);
         }
 
         return back()->with('success', 'Podešavanja uspešno ažurirana!');

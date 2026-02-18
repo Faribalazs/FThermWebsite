@@ -314,6 +314,62 @@
                 </div>
             </div>
 
+            <!-- Warehouse Selection -->
+            <div class="mb-6 sm:mb-8">
+                <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                    </svg>
+                    Skladište
+                    <span class="text-red-500">*</span>
+                </label>
+                <div class="custom-select-wrapper">
+                    <input type="hidden" name="warehouse_id" id="warehouse_value" value="{{ old('warehouse_id', $workOrder->warehouse_id) }}">
+                    <div class="custom-select-trigger" onclick="toggleWarehouseDropdown()">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                            </svg>
+                            <span class="custom-select-value text-sm sm:text-base" id="warehouse_selected_text">
+                                @php
+                                    $selectedWarehouseId = old('warehouse_id', $workOrder->warehouse_id);
+                                    $selectedWarehouse = $warehouses->firstWhere('id', $selectedWarehouseId);
+                                @endphp
+                                {{ $selectedWarehouse ? $selectedWarehouse->name : 'Izaberite skladište' }}
+                            </span>
+                        </div>
+                        <svg class="custom-select-arrow w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="custom-select-dropdown" id="warehouse-dropdown">
+                        <div class="custom-select-options">
+                            @foreach($warehouses as $warehouse)
+                                <div class="custom-select-option {{ $selectedWarehouseId == $warehouse->id ? 'selected' : '' }}" onclick="selectWarehouseOption({{ $warehouse->id }}, '{{ $warehouse->name }}')">
+                                    <div class="flex items-center justify-between">
+                                        <span>{{ $warehouse->name }}</span>
+                                        @if($selectedWarehouseId == $warehouse->id)
+                                            <svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-2 text-xs text-gray-500">Materijali će biti oduzeti iz izabranog skladišta</p>
+                @error('warehouse_id')
+                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
             <!-- Sections -->
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -354,6 +410,119 @@
 let sectionIndex = 0;
 const products = @json($products);
 const existingSections = @json($workOrder->sections);
+let currentWarehouseId = {{ $workOrder->warehouse_id ?? 'null' }};
+
+// Get warehouse-specific quantity for a product
+function getWarehouseStock(productId, warehouseId) {
+    const product = products.find(p => p.id === productId);
+    if (!product || !product.inventories) return 0;
+    
+    const inventory = product.inventories.find(inv => inv.warehouse_id === warehouseId);
+    return inventory ? inventory.quantity : 0;
+}
+
+// Calculate available quantity (warehouse stock - already used in form)
+function getAvailableQuantity(productId, warehouseId, excludeSectionId = null, excludeItemId = null) {
+    let warehouseStock = getWarehouseStock(productId, warehouseId);
+    
+    // Subtract quantities already selected in the form
+    const allQuantityInputs = document.querySelectorAll('input[name*="[product_id]"]');
+    allQuantityInputs.forEach(input => {
+        if (parseInt(input.value) === productId) {
+            // Find the section and item for this input
+            const match = input.name.match(/sections\[(\d+)\]\[items\]\[(\d+)\]/);
+            if (match) {
+                const sectionId = parseInt(match[1]);
+                const itemId = parseInt(match[2]);
+                
+                // Skip if this is the item we're currently editing
+                if (sectionId === excludeSectionId && itemId === excludeItemId) {
+                    return;
+                }
+                
+                // Find the quantity input for this item
+                const quantityInput = document.querySelector(`input[name="sections[${sectionId}][items][${itemId}][quantity]"]`);
+                if (quantityInput) {
+                    const usedQuantity = parseInt(quantityInput.value) || 0;
+                    warehouseStock -= usedQuantity;
+                }
+            }
+        }
+    });
+    
+    return Math.max(0, warehouseStock);
+}
+
+// Update all material dropdowns when warehouse changes
+function updateAllMaterialQuantities() {
+    document.querySelectorAll('.custom-select-options').forEach(optionsContainer => {
+        const options = optionsContainer.querySelectorAll('.custom-select-option[data-value]');
+        options.forEach(option => {
+            const productId = parseInt(option.getAttribute('data-value'));
+            
+            // Get section and item IDs from the container
+            const match = optionsContainer.id.match(/options_(\d+)_(\d+)/);
+            if (match) {
+                const sectionId = parseInt(match[1]);
+                const itemId = parseInt(match[2]);
+                
+                // Check if this item already has this product selected
+                const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+                const isCurrentProduct = productInput && parseInt(productInput.value) === productId;
+                
+                const availableStock = isCurrentProduct 
+                    ? getAvailableQuantity(productId, currentWarehouseId, sectionId, itemId)
+                    : getAvailableQuantity(productId, currentWarehouseId);
+                
+                // Update the stock display
+                const stockBadge = option.querySelector('span.inline-flex');
+                if (stockBadge) {
+                    stockBadge.innerHTML = `
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        ${availableStock}
+                    `;
+                    
+                    // Update colors based on stock
+                    stockBadge.className = 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ';
+                    if (availableStock === 0) {
+                        stockBadge.className += 'bg-red-100 text-red-600';
+                    } else if (availableStock < 10) {
+                        stockBadge.className += 'bg-yellow-100 text-yellow-600';
+                    } else {
+                        stockBadge.className += 'bg-green-100 text-green-600';
+                    }
+                }
+                
+                // Update data-stock attribute
+                option.setAttribute('data-stock', availableStock);
+            }
+        });
+    });
+    
+    // Update quantity input constraints for already selected products
+    document.querySelectorAll('input[name*="[quantity]"]').forEach(quantityInput => {
+        const match = quantityInput.name.match(/sections\[(\d+)\]\[items\]\[(\d+)\]/);
+        if (match) {
+            const sectionId = parseInt(match[1]);
+            const itemId = parseInt(match[2]);
+            const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+            
+            if (productInput && productInput.value) {
+                const productId = parseInt(productInput.value);
+                const availableStock = getAvailableQuantity(productId, currentWarehouseId, sectionId, itemId);
+                
+                quantityInput.setAttribute('data-stock', availableStock);
+                quantityInput.setAttribute('max', availableStock > 0 ? availableStock : 999999);
+                
+                // Revalidate the current quantity
+                validateStock(sectionId, itemId);
+            }
+        }
+    });
+}
+
 
 // Initialize on page load with existing sections
 document.addEventListener('DOMContentLoaded', function() {
@@ -419,6 +588,18 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         // If no existing sections, add one empty section
         addSection();
+    }
+});
+
+// Close warehouse dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const warehouseDropdown = document.getElementById('warehouse-dropdown');
+    const warehouseTrigger = document.getElementById('warehouse-select-trigger');
+    
+    if (warehouseDropdown && warehouseTrigger) {
+        if (!warehouseDropdown.contains(event.target) && !warehouseTrigger.contains(event.target)) {
+            warehouseDropdown.classList.remove('active');
+        }
     }
 });
 
@@ -511,6 +692,8 @@ function removeSection(sectionId) {
     const section = document.querySelector(`[data-section="${sectionId}"]`);
     if (section) {
         section.remove();
+        // Update all material quantities after removing a section
+        updateAllMaterialQuantities();
     }
 }
 
@@ -553,7 +736,7 @@ function addItem(sectionId) {
                         </div>
                         <div class="custom-select-options" id="options_${sectionId}_${itemId}">
                             ${products.map(product => {
-                                const stock = product.inventory ? product.inventory.quantity : 0;
+                                const stock = getAvailableQuantity(product.id, currentWarehouseId);
                                 const stockClass = stock === 0 ? 'text-red-600' : (stock < 10 ? 'text-yellow-600' : 'text-green-600');
                                 const stockBg = stock === 0 ? 'bg-red-100' : (stock < 10 ? 'bg-yellow-100' : 'bg-green-100');
                                 const productName = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -603,7 +786,7 @@ function addItem(sectionId) {
                     min="1"
                     value="1"
                     required
-                    oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId})"
+                    oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId}); updateAllMaterialQuantities();"
                     onchange="updateItemPrice(${sectionId}, ${itemId})"
                 >
             </div>
@@ -631,6 +814,8 @@ function removeItem(sectionId, itemId) {
     const item = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"]`);
     if (item) {
         item.remove();
+        // Update all material quantities after removing an item
+        updateAllMaterialQuantities();
     }
 }
 
@@ -683,10 +868,13 @@ function selectProduct(sectionId, itemId, productId, productText, price, stock) 
     valueDisplay.classList.add('selected');
     dropdown.classList.remove('active');
     
+    // Get available stock for this product
+    const availableStock = getAvailableQuantity(productId, currentWarehouseId, sectionId, itemId);
+    
     // Store stock level as data attribute on quantity input
     if (quantityInput) {
-        quantityInput.setAttribute('data-stock', stock);
-        quantityInput.setAttribute('max', stock > 0 ? stock : 999999);
+        quantityInput.setAttribute('data-stock', availableStock);
+        quantityInput.setAttribute('max', availableStock > 0 ? availableStock : 999999);
         
         // Add validation message container if it doesn't exist
         if (!quantityInput.parentElement.querySelector('.stock-warning')) {
@@ -694,10 +882,16 @@ function selectProduct(sectionId, itemId, productId, productText, price, stock) 
             warning.className = 'stock-warning text-xs mt-1 hidden';
             quantityInput.parentElement.appendChild(warning);
         }
+        
+        // Validate immediately
+        validateStock(sectionId, itemId);
     }
     
     // Update price
     updateItemPrice(sectionId, itemId);
+    
+    // Update all material dropdowns to reflect the new selection
+    updateAllMaterialQuantities();
 }
 
 function validateStock(sectionId, itemId) {
@@ -808,6 +1002,39 @@ function toggleClientFields() {
         clientNameInput.required = false;
         companyNameInput.required = true;
     }
+}
+
+// Warehouse Dropdown Functions
+function toggleWarehouseDropdown() {
+    const dropdown = document.getElementById('warehouse-dropdown');
+    dropdown.classList.toggle('active');
+}
+
+function selectWarehouseOption(value, text) {
+    document.getElementById('warehouse_value').value = value;
+    document.getElementById('warehouse_selected_text').textContent = text;
+    
+    // Remove selected class from all options
+    document.querySelectorAll('#warehouse-dropdown .custom-select-option').forEach(opt => {
+        opt.classList.remove('selected');
+        // Remove checkmark
+        const checkmark = opt.querySelector('svg');
+        if (checkmark) checkmark.remove();
+    });
+    
+    // Add selected class and checkmark to clicked option
+    const clickedOption = event.target.closest('.custom-select-option');
+    clickedOption.classList.add('selected');
+    clickedOption.querySelector('div').insertAdjacentHTML('beforeend', '<svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>');
+    
+    // Close dropdown
+    document.getElementById('warehouse-dropdown').classList.remove('active');
+    
+    // Update current warehouse ID
+    currentWarehouseId = value;
+    
+    // Update all material quantities for the new warehouse
+    updateAllMaterialQuantities();
 }
 
 </script>

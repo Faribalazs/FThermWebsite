@@ -8,6 +8,7 @@ use App\Models\WorkOrderSection;
 use App\Models\WorkOrderItem;
 use App\Models\InternalProduct;
 use App\Models\Inventory;
+use App\Models\Warehouse;
 use App\Models\ActivityLog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -75,13 +76,16 @@ class WorkOrderController extends Controller
 
     public function create()
     {
-        $products = InternalProduct::with('inventory')->orderBy('name')->get();
-        return view('worker.work-orders.create', compact('products'));
+        $products = InternalProduct::with(['inventories.warehouse'])->orderBy('name')->get();
+        $warehouses = Warehouse::active()->orderBy('name')->get();
+        $primaryWarehouseId = auth('worker')->user()->primary_warehouse_id;
+        return view('worker.work-orders.create', compact('products', 'warehouses', 'primaryWarehouseId'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'warehouse_id' => 'required|exists:warehouses,id',
             'client_type' => 'required|in:fizicko_lice,pravno_lice',
             'client_name' => 'required_if:client_type,fizicko_lice|nullable|string|max:255',
             'client_address' => 'nullable|string|max:255',
@@ -110,12 +114,15 @@ class WorkOrderController extends Controller
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])->first();
+                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
+                            ->where('warehouse_id', $validated['warehouse_id'])
+                            ->first();
                         $currentStock = $inventory ? $inventory->quantity : 0;
                         
                         if ($currentStock < $itemData['quantity']) {
                             $product = InternalProduct::find($itemData['product_id']);
-                            throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}'. Dostupno: {$currentStock}, Potrebno: {$itemData['quantity']}");
+                            $warehouse = Warehouse::find($validated['warehouse_id']);
+                            throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno: {$itemData['quantity']}");
                         }
                     }
                 }
@@ -123,6 +130,7 @@ class WorkOrderController extends Controller
 
             $workOrder = WorkOrder::create([
                 'worker_id' => auth('worker')->id(),
+                'warehouse_id' => $validated['warehouse_id'],
                 'client_type' => $validated['client_type'],
                 'client_name' => $validated['client_name'] ?? null,
                 'client_address' => $validated['client_address'] ?? null,
@@ -155,7 +163,9 @@ class WorkOrderController extends Controller
                         ]);
 
                         // Update inventory - deduct the used quantity
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])->first();
+                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
+                            ->where('warehouse_id', $validated['warehouse_id'])
+                            ->first();
                         if ($inventory) {
                             $inventory->quantity -= $itemData['quantity'];
                             $inventory->updated_by = auth('worker')->id();
@@ -164,6 +174,7 @@ class WorkOrderController extends Controller
                             // Create inventory record with negative quantity if it doesn't exist
                             Inventory::create([
                                 'internal_product_id' => $itemData['product_id'],
+                                'warehouse_id' => $validated['warehouse_id'],
                                 'quantity' => -$itemData['quantity'],
                                 'updated_by' => auth('worker')->id(),
                             ]);
@@ -231,7 +242,7 @@ class WorkOrderController extends Controller
         }
 
         // Load relationships
-        $workOrder->load(['sections.items.product']);
+        $workOrder->load(['sections.items.product', 'warehouse']);
         
         // Calculate quantities currently used in this work order
         $usedQuantities = [];
@@ -241,18 +252,27 @@ class WorkOrderController extends Controller
             }
         }
         
-        // Get all internal products with inventory
-        $products = InternalProduct::with('inventory')->orderBy('name')->get();
+        // Get all internal products with all warehouse inventories
+        $products = InternalProduct::with(['inventories.warehouse'])->orderBy('name')->get();
         
         // Adjust inventory quantities to include what's used in this work order
         // This shows the "available" stock as if this work order didn't exist yet
         foreach ($products as $product) {
-            if (isset($usedQuantities[$product->id]) && $product->inventory) {
-                $product->inventory->quantity += $usedQuantities[$product->id];
+            if (isset($usedQuantities[$product->id]) && $product->inventories) {
+                // Add back the used quantity to the warehouse this work order is using
+                foreach ($product->inventories as $inventory) {
+                    if ($inventory->warehouse_id == $workOrder->warehouse_id) {
+                        $inventory->quantity += $usedQuantities[$product->id];
+                    }
+                }
             }
         }
         
-        return view('worker.work-orders.edit', compact('workOrder', 'products'));
+        // Get warehouses
+        $warehouses = Warehouse::active()->orderBy('name')->get();
+        $primaryWarehouseId = auth('worker')->user()->primary_warehouse_id;
+        
+        return view('worker.work-orders.edit', compact('workOrder', 'products', 'warehouses', 'primaryWarehouseId'));
     }
 
     public function update(Request $request, WorkOrder $workOrder)
@@ -263,6 +283,7 @@ class WorkOrderController extends Controller
         }
 
         $validated = $request->validate([
+            'warehouse_id' => 'required|exists:warehouses,id',
             'client_type' => 'required|in:fizicko_lice,pravno_lice',
             'client_name' => 'required_if:client_type,fizicko_lice|nullable|string|max:255',
             'client_address' => 'nullable|string|max:255',
@@ -309,19 +330,24 @@ class WorkOrderController extends Controller
                 $difference = $newQty - $oldQty;
                 
                 if ($difference > 0) {
-                    $inventory = Inventory::where('internal_product_id', $productId)->first();
+                    $inventory = Inventory::where('internal_product_id', $productId)
+                        ->where('warehouse_id', $validated['warehouse_id'])
+                        ->first();
                     $currentStock = $inventory ? $inventory->quantity : 0;
                     
                     if ($currentStock < $difference) {
                         $product = InternalProduct::find($productId);
-                        throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}'. Dostupno: {$currentStock}, Potrebno dodatno: {$difference}");
+                        $warehouse = Warehouse::find($validated['warehouse_id']);
+                        throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno dodatno: {$difference}");
                     }
                 }
             }
 
-            // Return old items to inventory
+            // Return old items to inventory (original warehouse)
             foreach ($oldItems as $productId => $quantity) {
-                $inventory = Inventory::where('internal_product_id', $productId)->first();
+                $inventory = Inventory::where('internal_product_id', $productId)
+                    ->where('warehouse_id', $workOrder->warehouse_id)
+                    ->first();
                 if ($inventory) {
                     $inventory->quantity += $quantity;
                     $inventory->updated_by = auth('worker')->id();
@@ -331,6 +357,7 @@ class WorkOrderController extends Controller
 
             // Update work order basic info
             $workOrder->update([
+                'warehouse_id' => $validated['warehouse_id'],
                 'client_type' => $validated['client_type'],
                 'client_name' => $validated['client_name'] ?? null,
                 'client_address' => $validated['client_address'] ?? null,
@@ -365,7 +392,9 @@ class WorkOrderController extends Controller
                         ]);
 
                         // Deduct from inventory
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])->first();
+                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
+                            ->where('warehouse_id', $validated['warehouse_id'])
+                            ->first();
                         if ($inventory) {
                             $inventory->quantity -= $itemData['quantity'];
                             $inventory->updated_by = auth('worker')->id();
@@ -373,6 +402,7 @@ class WorkOrderController extends Controller
                         } else {
                             Inventory::create([
                                 'internal_product_id' => $itemData['product_id'],
+                                'warehouse_id' => $validated['warehouse_id'],
                                 'quantity' => -$itemData['quantity'],
                                 'updated_by' => auth('worker')->id(),
                             ]);

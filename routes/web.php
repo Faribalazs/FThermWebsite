@@ -79,6 +79,8 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
     // Internal Products (Worker Only) - requires products permission
     Route::middleware('worker.permission:products')->group(function () {
         Route::resource('products', App\Http\Controllers\Worker\InternalProductController::class);
+        Route::get('products-export', [App\Http\Controllers\Worker\InternalProductController::class, 'export'])->name('products.export');
+        Route::post('products-import', [App\Http\Controllers\Worker\InternalProductController::class, 'import'])->name('products.import');
     });
 
     // Work Orders (Radni Nalozi) - requires work_orders permission
@@ -93,8 +95,13 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
     // Inventory Replenishment (Dopuna Zaliha) - requires inventory permission
     Route::middleware('worker.permission:inventory')->group(function () {
         Route::get('inventory', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'index'])->name('inventory.index');
+        Route::get('inventory/quantity/{product}/{warehouse}', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'getQuantity'])->name('inventory.get-quantity');
         Route::post('inventory/{product}/add', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'update'])->name('inventory.add');
         Route::post('inventory/{product}/set', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'set'])->name('inventory.set');
+        
+        // Warehouses Management
+        Route::get('warehouses/{warehouse}/export', [App\Http\Controllers\Worker\WarehouseController::class, 'export'])->name('warehouses.export');
+        Route::resource('warehouses', App\Http\Controllers\Worker\WarehouseController::class);
     });
 
     // Invoices - requires invoices permission

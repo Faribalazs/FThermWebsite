@@ -25,6 +25,7 @@ class User extends Authenticatable
         'role',
         'is_active',
         'permissions',
+        'primary_warehouse_id',
     ];
 
     /**
@@ -95,5 +96,13 @@ class User extends Authenticatable
             'invoices' => 'Fakture',
             'activity_logs' => 'Dnevnik Aktivnosti',
         ];
+    }
+    
+    /**
+     * Get the primary warehouse for this user
+     */
+    public function primaryWarehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'primary_warehouse_id');
     }
 }

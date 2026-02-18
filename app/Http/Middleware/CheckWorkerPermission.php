@@ -18,11 +18,23 @@ class CheckWorkerPermission
         $user = auth('worker')->user();
         
         if (!$user) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => 'Morate biti prijavljeni.'
+                ], 401);
+            }
             return redirect()->route('worker.login');
         }
         
         // Check if worker has the required permission
         if (!$user->hasPermission($permission)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Forbidden',
+                    'message' => 'Nemate dozvolu za pristup ovoj stranici.'
+                ], 403);
+            }
             abort(403, 'Nemate dozvolu za pristup ovoj stranici.');
         }
         

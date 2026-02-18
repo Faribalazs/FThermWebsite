@@ -97,6 +97,13 @@
                     </svg>
                     <span class="text-sm lg:text-base">Dopuna Zaliha</span>
                 </a>
+                
+                <a href="{{ route('worker.warehouses.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('worker.warehouses.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500 active' : '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                    </svg>
+                    <span class="text-sm lg:text-base">Skladišta</span>
+                </a>
                 @endif
                 
                 @if(Auth::guard('worker')->user()->hasPermission('invoices'))

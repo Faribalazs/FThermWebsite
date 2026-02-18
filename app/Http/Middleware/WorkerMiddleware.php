@@ -18,16 +18,34 @@ class WorkerMiddleware
         $user = auth('worker')->user();
 
         if (!$user) {
-             return redirect()->route('worker.login');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => 'Morate biti prijavljeni.'
+                ], 401);
+            }
+            return redirect()->route('worker.login');
         }
 
         if (!$user->is_active) {
             auth('worker')->logout();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Forbidden',
+                    'message' => 'Vaš nalog je deaktiviran.'
+                ], 403);
+            }
             return redirect()->route('worker.login')->withErrors(['email' => 'Your account has been deactivated.']);
         }
 
         if (!$user->isWorker()) {
-             abort(403, 'Unauthorized access');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Forbidden',
+                    'message' => 'Nemate dozvolu za pristup.'
+                ], 403);
+            }
+            abort(403, 'Unauthorized access');
         }
         
         return $next($request);

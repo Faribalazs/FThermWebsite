@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Worker;
 use App\Http\Controllers\Controller;
 use App\Models\InternalProduct;
 use App\Models\ActivityLog;
+use App\Exports\InternalProductsExport;
+use App\Imports\InternalProductsImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class InternalProductController extends Controller
 {
@@ -17,7 +21,15 @@ class InternalProductController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $products = $query->paginate(10);
+        // Get per_page value from request, default to 10
+        $perPage = $request->get('per_page', 10);
+        // Validate it's one of the allowed values
+        $allowedPerPage = [10, 20, 30, 40, 50, 100];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+
+        $products = $query->paginate($perPage)->appends(['per_page' => $perPage]);
         
         // Return JSON for AJAX requests
         if ($request->ajax() || $request->wantsJson()) {
@@ -112,5 +124,57 @@ class InternalProductController extends Controller
         
         $product->delete();
         return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno obrisan.');
+    }
+
+    /**
+     * Export products to Excel
+     */
+    public function export()
+    {
+        return Excel::download(new InternalProductsExport, 'materijali_' . date('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    /**
+     * Import products from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ], [
+            'file.required' => 'Molimo odaberite fajl za uvoz.',
+            'file.mimes' => 'Fajl mora biti Excel (xlsx, xls) ili CSV format.',
+            'file.max' => 'Fajl ne sme biti veći od 2MB.',
+        ]);
+
+        try {
+            Excel::import(new InternalProductsImport, $request->file('file'));
+
+            // Log activity
+            ActivityLog::log(
+                auth('worker')->id(),
+                'import',
+                'product',
+                null,
+                'Uvezao materijale iz Excel fajla',
+                ['file' => $request->file('file')->getClientOriginalName()]
+            );
+
+            return redirect()->route('worker.products.index')
+                ->with('success', 'Materijali uspešno uvezeni!');
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            
+            foreach ($failures as $failure) {
+                $errorMessages[] = "Red {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+            
+            return redirect()->route('worker.products.index')
+                ->with('error', 'Greške pri uvozu: ' . implode(' | ', $errorMessages));
+        } catch (\Exception $e) {
+            return redirect()->route('worker.products.index')
+                ->with('error', 'Greška pri uvozu fajla: ' . $e->getMessage());
+        }
     }
 }

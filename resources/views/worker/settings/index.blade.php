@@ -3,7 +3,7 @@
 @section('title', 'Podešavanja')
 
 @section('content')
-<div class="p-3 sm:p-6 max-w-4xl mx-auto">
+<div class="p-3 sm:p-6 max-w-6xl mx-auto">
     <!-- Breadcrumb -->
     <nav class="mb-4 sm:mb-6">
         <ol class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-600">
@@ -53,79 +53,164 @@
         @endif
 
         <!-- Settings Form -->
-        <form action="{{ route('worker.settings.update') }}" method="POST" class="p-3 sm:p-8">
+        <form action="{{ route('worker.settings.update') }}" method="POST" class="p-4 sm:p-6 lg:p-8">
             @csrf
 
-            <!-- KM Price Setting -->
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6 mb-6">
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="bg-blue-500 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-gray-900 mb-1">Cena Po Kilometru</h3>
-                        <p class="text-sm text-gray-600">Podesite cenu po kilometru koja će se koristiti za obračun putnih troškova na fakturama</p>
-                    </div>
-                </div>
+            <!-- Personal Settings Section -->
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Lična Podešavanja
+                </h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <!-- KM Price Setting -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-blue-500 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-900">Cena Po Kilometru</h3>
+                            </div>
+                        </div>
 
-                <div class="max-w-md">
-                    <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="km_price">
-                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Cena (RSD)
-                        <span class="text-red-500">*</span>
-                    </label>
-                    <div class="relative">
-                        <input 
-                            type="number" 
-                            name="km_price" 
-                            id="km_price" 
-                            value="{{ old('km_price', $kmPrice) }}"
-                            class="form-input w-full px-4 py-3 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('km_price') border-red-500 ring-2 ring-red-200 @enderror"
-                            placeholder="Npr. 50"
-                            step="0.01"
-                            min="0"
-                            required
-                        >
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span class="text-gray-500 text-sm font-medium">RSD/km</span>
+                        <div>
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block" for="km_price">
+                                Cena (RSD) <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="number" 
+                                    name="km_price" 
+                                    id="km_price" 
+                                    value="{{ old('km_price', $kmPrice) }}"
+                                    class="form-input w-full px-4 py-2.5 pr-20 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all @error('km_price') border-red-500 ring-2 ring-red-200 @enderror"
+                                    placeholder="50"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                >
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <span class="text-gray-500 text-sm font-medium">RSD/km</span>
+                                </div>
+                            </div>
+                            @error('km_price')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-xs sm:text-sm">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                            <p class="mt-2 text-xs text-gray-600">
+                                💡 Za obračun putnih troškova na fakturama
+                            </p>
                         </div>
                     </div>
-                    @error('km_price')
-                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                            <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                            </svg>
-                            {{ $message }}
+
+                    <!-- Primary Warehouse Setting -->
+                    <div class="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-200 rounded-xl p-4 sm:p-5">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-purple-500 p-2 rounded-lg">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-900">Primarno Skladište</h3>
+                            </div>
                         </div>
-                    @enderror
-                    <p class="mt-2 text-xs text-gray-500">
-                        <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                        </svg>
-                        Ova cena će biti korišćena za obračun putnih troškova
-                    </p>
+
+                        <div>
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block" for="primary_warehouse_id">
+                                Skladište
+                            </label>
+                            
+                            <!-- Custom Dropdown -->
+                            <div class="relative">
+                                <input type="hidden" name="primary_warehouse_id" id="primary_warehouse_value" value="{{ old('primary_warehouse_id', $currentUser->primary_warehouse_id) }}">
+                                
+                                <button type="button" id="primary-warehouse-select-trigger" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-left flex items-center justify-between bg-white hover:bg-gray-50 @error('primary_warehouse_id') border-red-500 ring-2 ring-red-200 @enderror">
+                                    <span id="primary_warehouse_selected_text" class="text-gray-900 text-sm">
+                                        @if($currentUser->primary_warehouse_id && $warehouses->firstWhere('id', $currentUser->primary_warehouse_id))
+                                            {{ $warehouses->firstWhere('id', $currentUser->primary_warehouse_id)->name }}
+                                        @else
+                                            Izaberite skladište
+                                        @endif
+                                    </span>
+                                    <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                
+                                <div id="primary-warehouse-dropdown" class="hidden absolute z-[100] w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                                    <div class="py-1">
+                                        <div class="warehouse-option px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors border-b border-gray-100 {{ !$currentUser->primary_warehouse_id ? 'bg-purple-50' : '' }}" data-value="" data-text="Izaberite skladište">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-gray-700 font-medium text-sm">Izaberite skladište</span>
+                                                @if(!$currentUser->primary_warehouse_id)
+                                                    <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @foreach($warehouses as $warehouse)
+                                            <div class="warehouse-option px-4 py-2.5 hover:bg-purple-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0 {{ $currentUser->primary_warehouse_id == $warehouse->id ? 'bg-purple-50' : '' }}" data-value="{{ $warehouse->id }}" data-text="{{ $warehouse->name }}">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <span class="text-gray-900 font-medium block text-sm">{{ $warehouse->name }}</span>
+                                                        @if($warehouse->description)
+                                                            <span class="text-xs text-gray-500">{{ $warehouse->description }}</span>
+                                                        @endif
+                                                    </div>
+                                                    @if($currentUser->primary_warehouse_id == $warehouse->id)
+                                                        <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            @error('primary_warehouse_id')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-xs sm:text-sm">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                            
+                            <p class="mt-2 text-xs text-gray-600">
+                                💡 Automatski odabrano za radne naloge i zalihe
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Company Data Settings -->
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 sm:p-6 mb-6">
-                <div class="flex items-start gap-3 mb-4">
-                    <div class="bg-green-500 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-bold text-gray-900 mb-1">Podaci o Kompaniji</h3>
-                        <p class="text-sm text-gray-600">Unesite osnovne podatke o vašoj kompaniji koji će se prikazivati na fakturama</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                    Podaci o Kompaniji
+                </h2>
+                
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 sm:p-6">
+                    <p class="text-sm text-gray-600 mb-4">Podaci koji će se prikazivati na fakturama</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Company Name -->
                     <div>
                         <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="company_name">
@@ -325,11 +410,12 @@
                             </div>
                         @enderror
                     </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Form Actions -->
-            <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-200">
                 <a href="{{ route('worker.dashboard') }}" class="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -346,4 +432,72 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const trigger = document.getElementById('primary-warehouse-select-trigger');
+    const dropdown = document.getElementById('primary-warehouse-dropdown');
+    const valueInput = document.getElementById('primary_warehouse_value');
+    const selectedText = document.getElementById('primary_warehouse_selected_text');
+    const arrow = document.getElementById('dropdown-arrow');
+    
+    if (!trigger || !dropdown) return;
+    
+    // Toggle dropdown
+    trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const isHidden = dropdown.classList.contains('hidden');
+        dropdown.classList.toggle('hidden');
+        if (arrow) {
+            arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    });
+    
+    // Handle option selection
+    const options = dropdown.querySelectorAll('.warehouse-option');
+    options.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const value = this.getAttribute('data-value');
+            const text = this.getAttribute('data-text');
+            
+            // Update value and text
+            valueInput.value = value;
+            selectedText.textContent = text;
+            
+            // Remove selected styling from all options
+            options.forEach(opt => {
+                opt.classList.remove('bg-purple-50');
+                const svg = opt.querySelector('svg');
+                if (svg) svg.remove();
+            });
+            
+            // Add selected styling to clicked option
+            this.classList.add('bg-purple-50');
+            const parentDiv = this.querySelector('div');
+            if (parentDiv && !parentDiv.querySelector('svg')) {
+                parentDiv.insertAdjacentHTML('beforeend', '<svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>');
+            }
+            
+            // Close dropdown
+            dropdown.classList.add('hidden');
+            if (arrow) {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+            if (arrow) {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+    });
+});
+</script>
+
 @endsection

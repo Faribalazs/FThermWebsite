@@ -16,12 +16,30 @@
                 </h1>
                 <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Upravljajte internim materijalima</p>
             </div>
-            <a href="{{ route('worker.products.create') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 btn-gradient text-sm sm:text-base">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Dodaj Materijal
-            </a>
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <a href="{{ route('worker.products.create') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 btn-gradient text-sm sm:text-base">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Dodaj Materijal
+                </a>
+                <a href="{{ route('worker.products.export') }}" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Izvezi u Excel
+                </a>
+                <button type="button" onclick="document.getElementById('import-file-input').click()" class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    Uvezi iz Excel
+                </button>
+                <form id="import-form" action="{{ route('worker.products.import') }}" method="POST" enctype="multipart/form-data" class="hidden">
+                    @csrf
+                    <input type="file" id="import-file-input" name="file" accept=".xlsx,.xls,.csv" onchange="document.getElementById('import-form').submit()">
+                </form>
+            </div>
         </div>
     </div>
 
@@ -37,8 +55,22 @@
         </div>
     @endif
 
+    <!-- Error Message -->
+    @if (session('error'))
+        <div class="mb-6 bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm animate-fade-in">
+            <div class="flex items-start">
+                <svg class="w-6 h-6 text-red-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="flex-1">
+                    <span class="text-red-800 font-medium block">{{ session('error') }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Search Bar -->
-    <div class="mb-4 sm:mb-6">
+    <div class="mb-2 sm:mb-3">
         <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,6 +83,44 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Per Page Dropdown -->
+    <div class="mb-4 sm:mb-6 flex justify-end">
+        <div class="w-40 sm:w-44">
+            <div class="custom-select-wrapper">
+                <input type="hidden" id="per-page-value" value="{{ request('per_page', 10) }}">
+                <div class="custom-select-trigger" onclick="togglePerPageDropdown()">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        <span class="custom-select-value text-xs sm:text-sm" id="per_page_selected_text">
+                            {{ request('per_page', 10) }} po stranici
+                        </span>
+                    </div>
+                    <svg class="custom-select-arrow w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+                <div class="custom-select-dropdown" id="per-page-dropdown">
+                    <div class="custom-select-options">
+                        @foreach([10, 20, 30, 40, 50, 100] as $option)
+                            <div class="custom-select-option {{ request('per_page', 10) == $option ? 'selected' : '' }}" onclick="selectPerPageOption({{ $option }})">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs sm:text-sm">{{ $option }} po stranici</span>
+                                    @if(request('per_page', 10) == $option)
+                                        <svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -211,17 +281,27 @@ document.addEventListener('click', function(e) {
         e.preventDefault();
         const url = e.target.closest('a').href;
         const searchQuery = searchInput.value;
+        const perPage = document.getElementById('per-page-value').value;
         
-        // Add search query to pagination URL if exists
+        // Add search query and per_page to pagination URL if exists
+        let fullUrl = url;
         const separator = url.includes('?') ? '&' : '?';
-        const fullUrl = searchQuery ? `${url}${separator}search=${encodeURIComponent(searchQuery)}` : url;
+        if (searchQuery) {
+            fullUrl += `${separator}search=${encodeURIComponent(searchQuery)}`;
+        }
+        if (perPage) {
+            const nextSeparator = fullUrl.includes('?') ? '&' : '?';
+            fullUrl += `${nextSeparator}per_page=${perPage}`;
+        }
+        fullUrl = fullUrl;
         
         fetchResults(fullUrl);
     }
 });
 
 function performSearch(query) {
-    const url = `{{ route('worker.products.index') }}?search=${encodeURIComponent(query)}`;
+    const perPage = document.getElementById('per-page-value').value;
+    const url = `{{ route('worker.products.index') }}?search=${encodeURIComponent(query)}&per_page=${perPage}`;
     fetchResults(url);
 }
 
@@ -297,6 +377,44 @@ function attachDeleteHandlers() {
 
 // Initial attachment
 attachDeleteHandlers();
+
+// Per Page Dropdown Functions
+function togglePerPageDropdown() {
+    const dropdown = document.getElementById('per-page-dropdown');
+    dropdown.classList.toggle('active');
+}
+
+function selectPerPageOption(value) {
+    document.getElementById('per-page-value').value = value;
+    document.getElementById('per_page_selected_text').textContent = value + ' po stranici';
+    
+    // Remove selected class from all options
+    document.querySelectorAll('#per-page-dropdown .custom-select-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked option
+    event.target.closest('.custom-select-option').classList.add('selected');
+    
+    // Close dropdown
+    document.getElementById('per-page-dropdown').classList.remove('active');
+    
+    // Reload with new per_page value
+    const searchQuery = searchInput.value;
+    const url = `{{ route('worker.products.index') }}?per_page=${value}${searchQuery ? '&search=' + encodeURIComponent(searchQuery) : ''}`;
+    fetchResults(url);
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    const perPageDropdown = document.getElementById('per-page-dropdown');
+    const perPageTrigger = perPageDropdown?.previousElementSibling;
+    
+    if (perPageDropdown && perPageTrigger && !perPageDropdown.contains(event.target) && !perPageTrigger.contains(event.target)) {
+        perPageDropdown.classList.remove('active');
+    }
+});
+
 </script>
 @endpush
 

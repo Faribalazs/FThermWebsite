@@ -17,4 +17,9 @@ class InternalProduct extends Model
     {
         return $this->hasOne(Inventory::class, 'internal_product_id');
     }
+
+    public function inventories()
+    {
+        return $this->hasMany(Inventory::class, 'internal_product_id');
+    }
 }

@@ -8,6 +8,7 @@ class WorkOrder extends Model
 {
     protected $fillable = [
         'worker_id',
+        'warehouse_id',
         'client_name',
         'client_address',
         'client_type',
@@ -40,6 +41,11 @@ class WorkOrder extends Model
     public function worker()
     {
         return $this->belongsTo(User::class, 'worker_id');
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function sections()
