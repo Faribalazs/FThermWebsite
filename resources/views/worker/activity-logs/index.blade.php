@@ -77,6 +77,44 @@
             </form>
         </div>
 
+        <!-- Per Page Selector -->
+        <div class="flex justify-end mb-4">
+            <div class="w-full sm:w-44">
+                <div class="custom-select-wrapper">
+                    <div class="custom-select-trigger" onclick="togglePerPageDropdown()">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                            </svg>
+                            <span class="custom-select-value text-xs sm:text-sm" id="per_page_selected_text">
+                                {{ request('per_page', 20) }} po stranici
+                            </span>
+                        </div>
+                        <svg class="custom-select-arrow w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="custom-select-dropdown" id="per-page-dropdown">
+                        <div class="custom-select-options">
+                            @foreach ([10, 20, 30, 40, 50, 100] as $option)
+                                <div class="custom-select-option {{ request('per_page', 20) == $option ? 'selected' : '' }}"
+                                    onclick="selectPerPageOption({{ $option }})">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs sm:text-sm">{{ $option }} po stranici</span>
+                                        @if (request('per_page', 20) == $option)
+                                            <svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Activity Logs List -->
         <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
             @if($logs->count() > 0)
@@ -100,7 +138,7 @@
                                         </p>
                                         <p class="text-xs sm:text-sm text-gray-500">
                                             {{ $log->created_at->format('d.m.Y H:i') }}
-                                            <span class="hidden sm:inline">• {{ $log->created_at->diffForHumans() }}</span>
+                                            <span class="hidden sm:inline">• {{ $log->created_at->locale('sr')->diffForHumans() }}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -135,7 +173,7 @@
                                 
                                 <!-- Mobile timestamp -->
                                 <span class="sm:hidden text-xs text-gray-500 ml-auto">
-                                    {{ $log->created_at->diffForHumans() }}
+                                    {{ $log->created_at->locale('sr')->diffForHumans() }}
                                 </span>
                             </div>
 
@@ -144,14 +182,44 @@
 
                             <!-- Additional Data -->
                             @if($log->data)
+                                @php
+                                    $keyLabels = [
+                                        'location'       => 'Lokacija',
+                                        'client_type'    => 'Tip klijenta',
+                                        'client_display' => 'Klijent',
+                                        'total_amount'   => 'Ukupan iznos',
+                                        'sections_count' => 'Broj usluga',
+                                        'items_count'    => 'Broj stavki',
+                                        'old_quantity'   => 'Stara količina',
+                                        'new_quantity'   => 'Nova količina',
+                                        'quantity'       => 'Količina',
+                                        'product_name'   => 'Naziv materijala',
+                                        'warehouse'      => 'Magacin',
+                                        'reason'         => 'Razlog',
+                                        'amount'         => 'Iznos',
+                                        'invoice_number' => 'Broj fakture',
+                                        'status'         => 'Status',
+                                        'name'           => 'Naziv',
+                                        'unit'           => 'Jedinica mere',
+                                        'price'          => 'Cena',
+                                        'category'       => 'Kategorija',
+                                    ];
+                                    $valueLabels = [
+                                        'fizicko_lice'  => 'Fizičko lice',
+                                        'pravno_lice'   => 'Pravno lice',
+                                        'pending'       => 'Na čekanju',
+                                        'completed'     => 'Završeno',
+                                        'cancelled'     => 'Otkazano',
+                                    ];
+                                @endphp
                                 <div class="mt-3 bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
                                     <p class="text-xs font-semibold text-gray-600 mb-2 uppercase">Detalji:</p>
                                     <div class="grid grid-cols-1 gap-2 text-xs sm:text-sm">
                                         @foreach($log->data as $key => $value)
                                             @if(!is_array($value))
                                                 <div class="flex flex-col sm:flex-row sm:items-start">
-                                                    <span class="font-semibold text-gray-700 sm:min-w-[120px] mb-1 sm:mb-0">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
-                                                    <span class="text-gray-600 break-words">{{ $value }}</span>
+                                                    <span class="font-semibold text-gray-700 sm:min-w-[120px] mb-1 sm:mb-0">{{ $keyLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}:</span>
+                                                    <span class="text-gray-600 break-words">{{ $valueLabels[$value] ?? $value }}</span>
                                                 </div>
                                             @endif
                                         @endforeach
@@ -185,3 +253,33 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePerPageDropdown() {
+        document.getElementById('per-page-dropdown').classList.toggle('active');
+    }
+
+    function selectPerPageOption(value) {
+        document.getElementById('per_page_selected_text').textContent = value + ' po stranici';
+
+        document.querySelectorAll('#per-page-dropdown .custom-select-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        event.target.closest('.custom-select-option').classList.add('selected');
+        document.getElementById('per-page-dropdown').classList.remove('active');
+
+        const currentParams = new URLSearchParams(window.location.search);
+        currentParams.set('per_page', value);
+        currentParams.delete('page');
+        window.location.href = '{{ route('worker.activity-logs.index') }}?' + currentParams.toString();
+    }
+
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.custom-select-wrapper')) {
+            const perPageDropdown = document.getElementById('per-page-dropdown');
+            if (perPageDropdown) perPageDropdown.classList.remove('active');
+        }
+    });
+</script>
+@endpush

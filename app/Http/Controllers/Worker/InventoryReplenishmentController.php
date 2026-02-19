@@ -117,6 +117,16 @@ class InventoryReplenishmentController extends Controller
 
             DB::commit();
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Uspešno dodato {$validated['quantity_to_add']} {$product->unit} u zalihe proizvoda: {$product->name} (Skladište: {$warehouse->name})",
+                    'product_id' => $product->id,
+                    'new_quantity' => $inventory->quantity,
+                    'unit' => $product->unit,
+                ]);
+            }
+
             // Preserve current page, search, sort, and warehouse filters
             $queryParams = request()->only(['page', 'search', 'sort_by', 'sort_order', 'warehouse_id', 'per_page']);
             return redirect()->route('worker.inventory.index', $queryParams)
@@ -124,6 +134,9 @@ class InventoryReplenishmentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Greška: ' . $e->getMessage()], 422);
+            }
             return redirect()->back()->with('error', 'Greška: ' . $e->getMessage());
         }
     }

@@ -48,6 +48,16 @@ class ActivityLog extends Model
             'description' => $description,
             'data' => $data,
         ]);
+
+        // Keep only the latest 300 records
+        $count = self::count();
+        if ($count > 300) {
+            self::whereIn('id',
+                self::orderBy('created_at', 'asc')
+                    ->limit($count - 300)
+                    ->pluck('id')
+            )->delete();
+        }
     }
 
     /**

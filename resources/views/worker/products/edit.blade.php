@@ -3,39 +3,39 @@
 @section('title', 'Izmeni Materijal')
 
 @section('content')
-<div class="p-6 max-w-4xl mx-auto">
+<div class="p-3 sm:p-6 max-w-4xl mx-auto">
     <!-- Breadcrumb -->
-    <nav class="mb-6">
+    <nav class="mb-4 sm:mb-6">
         <ol class="flex items-center space-x-2 text-sm text-gray-600">
-            <li><a href="{{ route('worker.products.index') }}" class="hover:text-primary-600 transition">Interni Materijali</a></li>
-            <li><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
-            <li class="text-gray-900 font-medium">Izmeni Materijal</li>
+            <li class="flex items-center"><a href="{{ route('worker.products.index') }}" class="hover:text-primary-600 transition truncate max-w-[120px] sm:max-w-none">Interni Materijali</a></li>
+            <li class="flex items-center"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></li>
+            <li class="flex items-center text-gray-900 font-medium truncate">Izmeni Materijal</li>
         </ol>
     </nav>
 
     <!-- Form Card -->
     <div class="bg-white rounded-xl shadow-enhanced overflow-hidden border border-gray-100 animate-scale-in">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-secondary-600 to-secondary-700 px-8 py-6">
+        <div class="bg-gradient-to-r from-secondary-600 to-secondary-700 px-4 sm:px-8 py-4 sm:py-6">
             <div class="flex items-center gap-3">
-                <div class="bg-white/20 p-3 rounded-lg backdrop-blur-sm">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white/20 p-2 sm:p-3 rounded-lg backdrop-blur-sm flex-shrink-0">
+                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                 </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-white">Izmeni Materijal</h1>
-                    <p class="text-secondary-100 text-sm mt-1">{{ $product->name }}</p>
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-2xl font-bold text-white">Izmeni Materijal</h1>
+                    <p class="text-secondary-100 text-xs sm:text-sm mt-0.5 truncate">{{ $product->name }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Form Body -->
-        <form action="{{ route('worker.products.update', $product) }}" method="POST" class="p-8">
+        <form action="{{ route('worker.products.update', $product) }}" method="POST" class="p-4 sm:p-8">
             @csrf
             @method('PUT')
             
-            <div class="space-y-6">
+            <div class="space-y-5 sm:space-y-6">
                 <!-- Product Name -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2" for="name">
@@ -46,7 +46,7 @@
                         <span class="text-red-500">*</span>
                     </label>
                     <input 
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('name') border-red-500 ring-2 ring-red-200 error @enderror" 
+                        class="form-input w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('name') border-red-500 ring-2 ring-red-200 error @enderror" 
                         id="name" 
                         type="text" 
                         name="name" 
@@ -75,7 +75,7 @@
                             <span class="text-red-500">*</span>
                         </label>
                         <input 
-                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('unit') border-red-500 ring-2 ring-red-200 error @enderror" 
+                            class="form-input w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('unit') border-red-500 ring-2 ring-red-200 error @enderror" 
                             id="unit" 
                             type="text" 
                             name="unit" 
@@ -103,7 +103,7 @@
                         </label>
                         <div class="relative">
                             <input 
-                                class="form-input w-full pl-4 pr-16 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('price') border-red-500 ring-2 ring-red-200 error @enderror" 
+                                class="form-input w-full pl-3 sm:pl-4 pr-14 sm:pr-16 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 transition-all @error('price') border-red-500 ring-2 ring-red-200 error @enderror" 
                                 id="price" 
                                 type="number" 
                                 step="0.01" 
@@ -136,7 +136,7 @@
                         <span class="text-red-500">*</span>
                     </label>
                     <input 
-                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('low_stock_threshold') border-red-500 ring-2 ring-red-200 error @enderror" 
+                        class="form-input w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('low_stock_threshold') border-red-500 ring-2 ring-red-200 error @enderror" 
                         id="low_stock_threshold" 
                         type="number" 
                         name="low_stock_threshold" 
@@ -171,14 +171,14 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 mt-8 pt-6 border-t border-gray-200">
-                <a href="{{ route('worker.products.index') }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+                <a href="{{ route('worker.products.index') }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors text-sm sm:text-base">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                     Otkaži
                 </a>
-                <button type="submit" class="btn-gradient inline-flex items-center justify-center gap-2 bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                <button type="submit" class="btn-gradient inline-flex items-center justify-center gap-2 bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 text-sm sm:text-base">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>

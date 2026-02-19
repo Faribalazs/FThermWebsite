@@ -92,6 +92,12 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
         Route::get('work-orders/{workOrder}/invoice/download', [App\Http\Controllers\Worker\WorkOrderController::class, 'downloadInvoice'])->name('work-orders.invoice.download');
     });
 
+    // Ponude (Offers/Quotes) - requires ponude permission
+    Route::middleware('worker.permission:ponude')->group(function () {
+        Route::resource('ponude', App\Http\Controllers\Worker\PonudaController::class)->parameters(['ponude' => 'ponuda']);
+        Route::get('ponude/{ponuda}/export-pdf', [App\Http\Controllers\Worker\PonudaController::class, 'exportPdf'])->name('ponude.export-pdf');
+    });
+
     // Inventory Replenishment (Dopuna Zaliha) - requires inventory permission
     Route::middleware('worker.permission:inventory')->group(function () {
         Route::get('inventory', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'index'])->name('inventory.index');

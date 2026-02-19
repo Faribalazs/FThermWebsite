@@ -181,9 +181,9 @@
         @endif
 
         <!-- Work Orders Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        @forelse ($workOrders as $workOrder)
-        <div class="bg-white rounded-xl shadow-enhanced overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 card-hover animate-scale-in">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="work-orders-grid">
+        @forelse ($workOrders as $i => $workOrder)
+        <div class="bg-white rounded-xl shadow-enhanced overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 card-hover animate-scale-in work-order-card" data-index="{{ $i }}">
             <div class="bg-gradient-to-r from-primary-600 to-primary-700 p-4">
                 <div class="flex justify-between items-start">
                     <div class="text-white">
@@ -274,6 +274,19 @@
         @endforelse
     </div>
 
+    <!-- Show All / Show Less Button -->
+    @if ($workOrders->count() > 4)
+    <div class="mt-4 sm:mt-6 text-center" id="show-all-container">
+        <button onclick="toggleAllWorkOrders()" id="show-all-btn"
+            class="inline-flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition-all">
+            <svg id="show-all-icon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+            <span id="show-all-label">Prikaži sve ({{ $workOrders->count() }})</span>
+        </button>
+    </div>
+    @endif
+
     <!-- Pagination -->
     @if ($workOrders->hasPages())
     <div class="mt-6 sm:mt-8">
@@ -282,4 +295,45 @@
     @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const TOTAL = {{ $workOrders->count() }};
+    let allVisible = false;
+
+    function getLimit() {
+        return window.innerWidth >= 768 ? 6 : 4;
+    }
+
+    function applyLimit() {
+        if (allVisible) return;
+        const limit = getLimit();
+        document.querySelectorAll('.work-order-card').forEach(el => {
+            const idx = parseInt(el.dataset.index);
+            el.classList.toggle('hidden', idx >= limit);
+        });
+        const container = document.getElementById('show-all-container');
+        if (container) container.classList.toggle('hidden', TOTAL <= limit);
+    }
+
+    function toggleAllWorkOrders() {
+        allVisible = !allVisible;
+        const limit = getLimit();
+        document.querySelectorAll('.work-order-card').forEach(el => {
+            const idx = parseInt(el.dataset.index);
+            el.classList.toggle('hidden', !allVisible && idx >= limit);
+        });
+        const label = document.getElementById('show-all-label');
+        const icon  = document.getElementById('show-all-icon');
+        label.textContent = allVisible ? 'Prikaži manje' : 'Prikaži sve (' + TOTAL + ')';
+        icon.style.transform = allVisible ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+
+    // Apply on load and on resize (reset to collapsed when resizing)
+    applyLimit();
+    window.addEventListener('resize', () => {
+        if (!allVisible) applyLimit();
+    });
+</script>
+@endpush
 @endsection

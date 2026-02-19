@@ -92,6 +92,7 @@ class User extends Authenticatable
             'dashboard' => 'Kontrolna tabla',
             'products' => 'Interni Materijali',
             'work_orders' => 'Radni Nalozi',
+            'ponude' => 'Ponude',
             'inventory' => 'Dopuna Zaliha',
             'invoices' => 'Fakture',
             'activity_logs' => 'Dnevnik Aktivnosti',

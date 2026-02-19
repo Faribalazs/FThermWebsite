@@ -38,7 +38,12 @@ class ActivityLogController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $logs = $query->paginate(20)->withQueryString();
+        $perPage = (int) $request->get('per_page', 20);
+        if (!in_array($perPage, [10, 20, 30, 40, 50, 100])) {
+            $perPage = 20;
+        }
+
+        $logs = $query->paginate($perPage)->withQueryString();
 
         $actionTypes = [
             'create' => 'Kreiranje',

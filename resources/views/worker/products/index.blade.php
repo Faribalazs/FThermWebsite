@@ -88,8 +88,8 @@
     </div>
 
     <!-- Per Page Dropdown -->
-    <div class="mb-4 sm:mb-6 flex justify-end">
-        <div class="w-40 sm:w-44">
+    <div class="mb-4 sm:mb-6 sm:flex sm:justify-end">
+        <div class="w-full sm:w-44">
             <div class="custom-select-wrapper">
                 <input type="hidden" id="per-page-value" value="{{ request('per_page', 10) }}">
                 <div class="custom-select-trigger" onclick="togglePerPageDropdown()">
