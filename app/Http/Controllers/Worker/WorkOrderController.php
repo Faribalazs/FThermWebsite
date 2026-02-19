@@ -11,6 +11,7 @@ use App\Models\Inventory;
 use App\Models\Warehouse;
 use App\Models\ActivityLog;
 use App\Models\Setting;
+use App\Services\EfakturaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -569,6 +570,38 @@ class WorkOrderController extends Controller
             ->setOption('defaultFont', 'DejaVu Sans');
         
         return $pdf->download('Faktura-' . $workOrder->invoice_number . '.pdf');
+    }
+
+    public function sendToEfaktura(WorkOrder $workOrder)
+    {
+        if ($workOrder->worker_id !== auth('worker')->id()) {
+            abort(403);
+        }
+
+        if (!$workOrder->has_invoice) {
+            return back()->with('error', 'Faktura nije generisana za ovaj radni nalog.');
+        }
+
+        try {
+            $service = new EfakturaService();
+            $result = $service->sendInvoice($workOrder);
+
+            if ($result['success']) {
+                ActivityLog::log(
+                    auth('worker')->id(),
+                    'efaktura_sent',
+                    'invoice',
+                    $workOrder->id,
+                    "Faktura {$workOrder->invoice_number} poslata na eFaktura sistem"
+                );
+
+                return back()->with('success', 'Faktura uspešno poslata na eFaktura sistem.');
+            }
+
+            return back()->with('error', 'Greška pri slanju na eFaktura: ' . ($result['data']['message'] ?? 'Nepoznata greška.'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Greška: ' . $e->getMessage());
+        }
     }
 
     public function destroy(WorkOrder $workOrder)

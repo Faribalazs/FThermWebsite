@@ -31,11 +31,15 @@ class WorkOrder extends Model
         'total_amount',
         'has_invoice',
         'hourly_rate',
+        'efaktura_status',
+        'efaktura_response',
+        'efaktura_sent_at',
     ];
 
     protected $casts = [
         'has_invoice' => 'boolean',
         'total_amount' => 'decimal:2',
+        'efaktura_sent_at' => 'datetime',
     ];
 
     public function worker()

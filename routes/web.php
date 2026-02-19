@@ -90,6 +90,7 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
         Route::post('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'generateInvoice'])->name('work-orders.invoice.generate');
         Route::get('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'showInvoice'])->name('work-orders.invoice');
         Route::get('work-orders/{workOrder}/invoice/download', [App\Http\Controllers\Worker\WorkOrderController::class, 'downloadInvoice'])->name('work-orders.invoice.download');
+        Route::post('work-orders/{workOrder}/invoice/send-efaktura', [App\Http\Controllers\Worker\WorkOrderController::class, 'sendToEfaktura'])->name('work-orders.invoice.send-efaktura');
     });
 
     // Ponude (Offers/Quotes) - requires ponude permission
