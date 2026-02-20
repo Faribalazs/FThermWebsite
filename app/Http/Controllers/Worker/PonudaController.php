@@ -8,6 +8,7 @@ use App\Models\PonudaSection;
 use App\Models\PonudaItem;
 use App\Models\InternalProduct;
 use App\Models\ActivityLog;
+use App\Models\Contact;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,8 @@ class PonudaController extends Controller
     public function create()
     {
         $products = InternalProduct::orderBy('name')->get();
-        return view('worker.ponude.create', compact('products'));
+        $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
+        return view('worker.ponude.create', compact('products', 'contacts'));
     }
 
     public function store(Request $request)
@@ -167,6 +169,27 @@ class PonudaController extends Controller
                 ]
             );
 
+            // Save client data as contact if checkbox was checked
+            if ($request->has('save_as_contact')) {
+                $contactData = [
+                    'created_by' => auth('worker')->id(),
+                    'type' => $validated['client_type'],
+                    'client_name' => $validated['client_name'] ?? null,
+                    'client_address' => $validated['client_address'] ?? null,
+                    'client_phone' => $validated['client_phone'] ?? null,
+                    'client_email' => $validated['client_email'] ?? null,
+                ];
+
+                if ($validated['client_type'] === 'pravno_lice') {
+                    $contactData['company_name'] = $validated['company_name'] ?? null;
+                    $contactData['pib'] = $validated['pib'] ?? null;
+                    $contactData['maticni_broj'] = $validated['maticni_broj'] ?? null;
+                    $contactData['company_address'] = $validated['company_address'] ?? null;
+                }
+
+                Contact::create($contactData);
+            }
+
             DB::commit();
 
             return redirect()->route('worker.ponude.show', $ponuda)
@@ -194,7 +217,8 @@ class PonudaController extends Controller
         }
         $ponuda->load(['sections.items.product']);
         $products = InternalProduct::orderBy('name')->get();
-        return view('worker.ponude.edit', compact('ponuda', 'products'));
+        $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
+        return view('worker.ponude.edit', compact('ponuda', 'products', 'contacts'));
     }
 
     public function update(Request $request, Ponuda $ponuda)

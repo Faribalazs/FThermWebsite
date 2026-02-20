@@ -14,11 +14,18 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@ftherm.rs',
-            'password' => Hash::make('password'),
-            'is_admin' => true,
-        ]);
+        User::updateOrCreate(
+            ['email' => 'farkas.tibor@ftherm.rs'],
+            [
+                'name' => 'Farkas Tibor',
+                'email' => 'farkas.tibor@ftherm.rs',
+                'password' => Hash::make('ftherm'),
+                'is_admin' => true,
+                'role' => 'worker',
+                'is_active' => true,
+                'email_verified_at' => now(),
+                'permissions' => array_keys(\App\Models\User::getAvailablePermissions()),
+            ]
+        );
     }
 }

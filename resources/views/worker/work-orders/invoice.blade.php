@@ -85,9 +85,9 @@
                         PDF
                     </a>
                     @if(!$workOrder->efaktura_status || $workOrder->efaktura_status === 'error')
-                    <form method="POST" action="{{ route('worker.work-orders.invoice.send-efaktura', $workOrder) }}" class="inline" onsubmit="return confirm('Da li ste sigurni da želite da pošaljete fakturu na eFaktura sistem?')">
+                    <form id="efaktura-form" method="POST" action="{{ route('worker.work-orders.invoice.send-efaktura', $workOrder) }}" class="inline">
                         @csrf
-                        <button type="submit" class="inline-flex items-center gap-2 bg-white text-primary-700 px-4 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-sm">
+                        <button type="button" onclick="document.getElementById('efaktura-confirm-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 bg-white text-primary-700 px-4 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                             eFaktura
                         </button>
@@ -333,6 +333,30 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                     Sve Fakture
                 </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- eFaktura Confirm Modal --}}
+<div id="efaktura-confirm-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="document.getElementById('efaktura-confirm-modal').classList.add('hidden')"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden z-10">
+            <div class="p-6 text-center">
+                <div class="mx-auto flex items-center justify-center w-14 h-14 rounded-full bg-primary-100 mb-4">
+                    <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Slanje na eFaktura</h3>
+                <p class="text-sm text-gray-600 mb-1">Da li ste sigurni da želite da pošaljete fakturu <span class="font-semibold text-gray-900">{{ $workOrder->invoice_number }}</span> na eFaktura sistem?</p>
+            </div>
+            <div class="flex items-center gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <button onclick="document.getElementById('efaktura-confirm-modal').classList.add('hidden')" class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors">
+                    Otkaži
+                </button>
+                <button onclick="document.getElementById('efaktura-confirm-modal').classList.add('hidden'); document.getElementById('efaktura-form').submit();" class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors">
+                    Pošalji
+                </button>
             </div>
         </div>
     </div>

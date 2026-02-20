@@ -51,9 +51,33 @@
                 </div>
             @endif
 
+            @if ($errors->any())
+                <div class="m-3 sm:m-6 bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 sm:mr-3 flex-shrink-0 mt-0.5" fill="currentColor"
+                            viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p class="text-red-800 font-semibold text-sm sm:text-base mb-1">Greške u formi:</p>
+                            <ul class="list-disc list-inside text-red-700 text-xs sm:text-sm space-y-0.5">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Form Body -->
             <form action="{{ route('worker.work-orders.store') }}" method="POST" class="p-3 sm:p-8" id="workOrderForm">
                 @csrf
+
+                <!-- Contact Selector -->
+                @include('worker.partials.contact-selector')
 
                                 <!-- Warehouse Selection -->
                 <div
@@ -345,6 +369,16 @@
                         </div>
                     </div>
 
+                    <!-- Save as Contact Checkbox -->
+                    <div id="save-contact-checkbox" class="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl mt-4">
+                        <input type="checkbox" name="save_as_contact" id="save_as_contact" value="1"
+                            class="mt-0.5 w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer">
+                        <label for="save_as_contact" class="cursor-pointer">
+                            <span class="text-sm font-semibold text-gray-700">Sačuvaj kao kontakt</span>
+                            <p class="text-xs text-gray-500 mt-0.5">Podatke o klijentu sačuvaj u kontakte za buduću upotrebu</p>
+                        </label>
+                    </div>
+
                     <div>
                         <label
                             class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2"
@@ -409,7 +443,7 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-gray-900">Usluge</h2>
                         <button type="button" onclick="addSection()"
-                            class="btn-gradient inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                            class="hidden sm:inline-flex btn-gradient items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                                 </path>
@@ -421,12 +455,19 @@
                     <div id="sectionsContainer" class="space-y-6">
                         <!-- Sections will be added here dynamically -->
                     </div>
+                    <button type="button" onclick="addSection()"
+                        class="sm:hidden mt-4 w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-4 py-3 rounded-lg shadow-lg transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Dodaj Uslugu
+                    </button>
                 </div>
 
                 <!-- Form Actions -->
-                <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200">
                     <a href="{{ route('worker.work-orders.index') }}"
-                        class="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -434,7 +475,7 @@
                         Otkaži
                     </a>
                     <button type="submit"
-                        class="btn-gradient inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
+                        class="btn-gradient inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 py-3.5 sm:py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
                             </path>
@@ -576,7 +617,7 @@
             const container = document.getElementById('sectionsContainer');
 
             const sectionHtml = `
-        <div class="section-block bg-gray-50 border-2 border-gray-200 rounded-xl p-6 animate-scale-in" data-section="${sectionIndex}">
+        <div class="section-block bg-gray-50 border-2 border-gray-200 rounded-xl p-3 sm:p-6 animate-scale-in" data-section="${sectionIndex}">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                     <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -677,14 +718,19 @@
             const container = document.getElementById(`itemsContainer_${sectionId}`);
 
             const itemHtml = `
-        <div class="item-row bg-white border border-gray-300 rounded-lg p-4 flex gap-4 items-start" data-item="${itemId}">
-            <div class="flex-1">
-                <label class="block text-xs font-medium text-gray-700 mb-1">Materijal *</label>
+        <div class="item-row bg-white border border-gray-300 rounded-lg p-3" data-item="${itemId}">
+            <div class="mb-2">
+                <div class="flex items-center justify-between mb-1">
+                    <label class="text-xs font-medium text-gray-700">Materijal *</label>
+                    <button type="button" onclick="removeItem(${sectionId}, ${itemId})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
                 <div class="custom-select-wrapper" id="selectWrapper_${sectionId}_${itemId}">
                     <input type="hidden" 
                         name="sections[${sectionId}][items][${itemId}][product_id]" 
                         id="productInput_${sectionId}_${itemId}"
-                        required>
+                        >
                     <div class="custom-select-trigger" onclick="toggleDropdown(${sectionId}, ${itemId})">
                         <span class="custom-select-value" id="selectValue_${sectionId}_${itemId}">Izaberite materijal</span>
                         <svg class="custom-select-arrow w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -721,7 +767,7 @@
                                         data-product-unit="${productUnit}"
                                         onclick="selectProduct(${sectionId}, ${itemId}, ${product.id}, this.getAttribute('data-text'), ${product.price}, ${stock})">
                                         <div class="flex items-center gap-2">
-                                            <div class="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                                 </svg>
@@ -745,31 +791,25 @@
                     </div>
                 </div>
             </div>
-            <div class="w-32">
-                <label class="block text-xs font-medium text-gray-700 mb-1">Količina *</label>
-                <input 
-                    type="number" 
-                    name="sections[${sectionId}][items][${itemId}][quantity]" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
-                    min="1"
-                    value="1"
-                    required
-                    oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId}); updateAllMaterialQuantities();"
-                    onchange="updateItemPrice(${sectionId}, ${itemId})"
-                >
-            </div>
-            <div class="w-32">
-                <label class="block text-xs font-medium text-gray-700 mb-1">Cena</label>
-                <div class="text-sm font-bold text-gray-900 px-3 py-2 bg-gray-50 rounded-lg" id="itemPrice_${sectionId}_${itemId}">
-                    0.00 RSD
+            <div class="flex gap-2">
+                <div class="w-28 shrink-0">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Količina</label>
+                    <input 
+                        type="number" 
+                        name="sections[${sectionId}][items][${itemId}][quantity]" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                        min="1"
+                        value="1"
+                        oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId}); updateAllMaterialQuantities();"
+                        onchange="updateItemPrice(${sectionId}, ${itemId})"
+                    >
                 </div>
-            </div>
-            <div class="pt-6">
-                <button type="button" onclick="removeItem(${sectionId}, ${itemId})" class="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+                <div class="flex-1">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Ukupno</label>
+                    <div class="text-sm font-bold text-primary-700 px-3 py-2 bg-primary-50 rounded-lg" id="itemPrice_${sectionId}_${itemId}">
+                        0.00 RSD
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -1021,4 +1061,5 @@
             updateAllMaterialQuantities();
         }
     </script>
+    @include('worker.partials.contact-selector-js')
 @endsection

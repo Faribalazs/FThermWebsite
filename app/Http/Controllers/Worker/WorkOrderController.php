@@ -10,6 +10,7 @@ use App\Models\InternalProduct;
 use App\Models\Inventory;
 use App\Models\Warehouse;
 use App\Models\ActivityLog;
+use App\Models\Contact;
 use App\Models\Setting;
 use App\Services\EfakturaService;
 use Illuminate\Http\Request;
@@ -80,7 +81,8 @@ class WorkOrderController extends Controller
         $products = InternalProduct::with(['inventories.warehouse'])->orderBy('name')->get();
         $warehouses = Warehouse::active()->orderBy('name')->get();
         $primaryWarehouseId = auth('worker')->user()->primary_warehouse_id;
-        return view('worker.work-orders.create', compact('products', 'warehouses', 'primaryWarehouseId'));
+        $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
+        return view('worker.work-orders.create', compact('products', 'warehouses', 'primaryWarehouseId', 'contacts'));
     }
 
     public function store(Request $request)
@@ -104,8 +106,25 @@ class WorkOrderController extends Controller
             'sections.*.hours_spent' => 'nullable|numeric|min:0',
             'sections.*.service_price' => 'nullable|numeric|min:0',
             'sections.*.items' => 'nullable|array',
-            'sections.*.items.*.product_id' => 'required_with:sections.*.items|exists:internal_products,id',
-            'sections.*.items.*.quantity' => 'required_with:sections.*.items|integer|min:1',
+            'sections.*.items.*.product_id' => 'nullable|exists:internal_products,id',
+            'sections.*.items.*.quantity' => 'nullable|integer|min:1',
+        ], [
+            'warehouse_id.required' => 'Skladište je obavezno.',
+            'client_type.required' => 'Tip klijenta je obavezan.',
+            'client_name.required_if' => 'Ime i prezime klijenta je obavezno.',
+            'company_name.required_if' => 'Naziv firme je obavezan.',
+            'client_email.email' => 'Email adresa nije ispravna.',
+            'location.required' => 'Lokacija radova je obavezna.',
+            'km_to_destination.numeric' => 'Kilometraža mora biti broj.',
+            'hourly_rate.numeric' => 'Cena po satu mora biti broj.',
+            'sections.required' => 'Dodajte barem jednu uslugu.',
+            'sections.min' => 'Dodajte barem jednu uslugu.',
+            'sections.*.title.required' => 'Naziv usluge je obavezan.',
+            'sections.*.hours_spent.numeric' => 'Sati moraju biti broj.',
+            'sections.*.service_price.numeric' => 'Cena usluge mora biti broj.',
+            'sections.*.items.*.product_id.exists' => 'Izabrani materijal ne postoji.',
+            'sections.*.items.*.quantity.integer' => 'Količina mora biti ceo broj.',
+            'sections.*.items.*.quantity.min' => 'Količina mora biti najmanje 1.',
         ]);
 
         DB::beginTransaction();
@@ -115,6 +134,7 @@ class WorkOrderController extends Controller
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
+                        if (empty($itemData['product_id'])) continue;
                         $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
                             ->where('warehouse_id', $validated['warehouse_id'])
                             ->first();
@@ -156,6 +176,7 @@ class WorkOrderController extends Controller
 
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
+                        if (empty($itemData['product_id'])) continue;
                         $product = InternalProduct::find($itemData['product_id']);
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
@@ -212,6 +233,27 @@ class WorkOrderController extends Controller
                     'total_amount' => $total
                 ]
             );
+
+            // Save client data as contact if checkbox was checked
+            if ($request->has('save_as_contact')) {
+                $contactData = [
+                    'created_by' => auth('worker')->id(),
+                    'type' => $validated['client_type'],
+                    'client_name' => $validated['client_name'] ?? null,
+                    'client_address' => $validated['client_address'] ?? null,
+                    'client_phone' => $validated['client_phone'] ?? null,
+                    'client_email' => $validated['client_email'] ?? null,
+                ];
+
+                if ($validated['client_type'] === 'pravno_lice') {
+                    $contactData['company_name'] = $validated['company_name'] ?? null;
+                    $contactData['pib'] = $validated['pib'] ?? null;
+                    $contactData['maticni_broj'] = $validated['maticni_broj'] ?? null;
+                    $contactData['company_address'] = $validated['company_address'] ?? null;
+                }
+
+                Contact::create($contactData);
+            }
 
             DB::commit();
 
@@ -273,7 +315,8 @@ class WorkOrderController extends Controller
         $warehouses = Warehouse::active()->orderBy('name')->get();
         $primaryWarehouseId = auth('worker')->user()->primary_warehouse_id;
         
-        return view('worker.work-orders.edit', compact('workOrder', 'products', 'warehouses', 'primaryWarehouseId'));
+        $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
+        return view('worker.work-orders.edit', compact('workOrder', 'products', 'warehouses', 'primaryWarehouseId', 'contacts'));
     }
 
     public function update(Request $request, WorkOrder $workOrder)
@@ -301,8 +344,8 @@ class WorkOrderController extends Controller
             'sections.*.hours_spent' => 'nullable|numeric|min:0',
             'sections.*.service_price' => 'nullable|numeric|min:0',
             'sections.*.items' => 'nullable|array',
-            'sections.*.items.*.product_id' => 'required_with:sections.*.items|exists:internal_products,id',
-            'sections.*.items.*.quantity' => 'required_with:sections.*.items|integer|min:1',
+            'sections.*.items.*.product_id' => 'nullable|exists:internal_products,id',
+            'sections.*.items.*.quantity' => 'nullable|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -320,6 +363,7 @@ class WorkOrderController extends Controller
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
+                        if (empty($itemData['product_id'])) continue;
                         $newItems[$itemData['product_id']] = ($newItems[$itemData['product_id']] ?? 0) + $itemData['quantity'];
                     }
                 }
@@ -385,6 +429,7 @@ class WorkOrderController extends Controller
 
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
+                        if (empty($itemData['product_id'])) continue;
                         $product = InternalProduct::find($itemData['product_id']);
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
@@ -455,9 +500,26 @@ class WorkOrderController extends Controller
             'invoice_phone' => 'nullable|string|max:20',
         ]);
 
-        // Generate invoice number (format: YY-ID, e.g., 26-7 for 2026)
-        // Keep existing invoice number if regenerating, otherwise create new one
-        $invoiceNumber = $workOrder->invoice_number ?? (substr(date('Y'), -2) . '-' . $workOrder->id);
+        // Generate invoice number (format: YY-N, e.g., 26-7 for 2026)
+        // Keep existing invoice number if regenerating, otherwise create new one using auto-increment counter
+        if ($workOrder->invoice_number) {
+            $invoiceNumber = $workOrder->invoice_number;
+        } else {
+            $yearPrefix = substr(date('Y'), -2);
+            $counterStart = (int) (Setting::where('key', 'invoice_counter_start')->value('value') ?? 1);
+            
+            // Find the highest existing invoice number for this year
+            $maxNumber = \App\Models\WorkOrder::where('invoice_number', 'LIKE', $yearPrefix . '-%')
+                ->get()
+                ->map(function ($wo) use ($yearPrefix) {
+                    $parts = explode('-', $wo->invoice_number);
+                    return isset($parts[1]) ? (int) $parts[1] : 0;
+                })
+                ->max();
+            
+            $nextNumber = max($counterStart, ($maxNumber ?? 0) + 1);
+            $invoiceNumber = $yearPrefix . '-' . $nextNumber;
+        }
 
         $workOrder->update([
             'invoice_type' => $validated['invoice_type'],
@@ -598,7 +660,7 @@ class WorkOrderController extends Controller
                 return back()->with('success', 'Faktura uspešno poslata na eFaktura sistem.');
             }
 
-            return back()->with('error', 'Greška pri slanju na eFaktura: ' . ($result['data']['message'] ?? 'Nepoznata greška.'));
+            return back()->with('error', 'Greška pri slanju na eFaktura: ' . ($result['data']['Message'] ?? $result['data']['message'] ?? 'Server je vratio status ' . $result['status']));
         } catch (\Exception $e) {
             return back()->with('error', 'Greška: ' . $e->getMessage());
         }

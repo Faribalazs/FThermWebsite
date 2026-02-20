@@ -267,10 +267,19 @@
 
             <!-- Total -->
             <div class="border-t-2 border-gray-300 pt-4 sm:pt-6 space-y-3 sm:space-y-4">
+                @if($workOrder->calculateMaterialTotal() > 0)
                 <div class="flex justify-between items-center gap-2">
                     <span class="text-sm sm:text-lg font-semibold text-gray-700">Ukupno Materijal:</span>
-                    <span class="text-sm sm:text-lg font-bold text-gray-900 whitespace-nowrap">{{ number_format($workOrder->total_amount, 2) }} RSD</span>
+                    <span class="text-sm sm:text-lg font-bold text-gray-900 whitespace-nowrap">{{ number_format($workOrder->calculateMaterialTotal(), 2) }} RSD</span>
                 </div>
+                @endif
+
+                @if($workOrder->calculateServiceTotal() > 0)
+                <div class="flex justify-between items-center gap-2">
+                    <span class="text-sm sm:text-lg font-semibold text-gray-700">Ukupno Usluge:</span>
+                    <span class="text-sm sm:text-lg font-bold text-gray-900 whitespace-nowrap">{{ number_format($workOrder->calculateServiceTotal(), 2) }} RSD</span>
+                </div>
+                @endif
                 
                 @if($workOrder->hourly_rate && $workOrder->calculateTotalHours() > 0)
                 <div class="flex justify-between items-center gap-2">
@@ -279,21 +288,14 @@
                     </span>
                     <span class="text-sm sm:text-lg font-bold text-gray-900 whitespace-nowrap">{{ number_format($workOrder->calculateLaborCost(), 2) }} RSD</span>
                 </div>
-                
+                @endif
+
                 <div class="border-t border-gray-300 pt-3 sm:pt-4 mt-3 sm:mt-4">
                     <div class="flex justify-between items-center gap-2">
                         <span class="text-base sm:text-xl font-semibold text-gray-700">Ukupan Iznos:</span>
                         <span class="text-xl sm:text-4xl font-bold text-primary-600 whitespace-nowrap">{{ number_format($workOrder->calculateGrandTotal(), 2) }} RSD</span>
                     </div>
                 </div>
-                @else
-                <div class="border-t border-gray-300 pt-3 sm:pt-4 mt-3 sm:mt-4">
-                    <div class="flex justify-between items-center gap-2">
-                        <span class="text-base sm:text-xl font-semibold text-gray-700">Ukupan Iznos:</span>
-                        <span class="text-xl sm:text-4xl font-bold text-primary-600 whitespace-nowrap">{{ number_format($workOrder->total_amount, 2) }} RSD</span>
-                    </div>
-                </div>
-                @endif
             </div>
 
             <!-- Actions -->

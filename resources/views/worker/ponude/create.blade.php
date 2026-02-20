@@ -63,6 +63,9 @@
             <form action="{{ route('worker.ponude.store') }}" method="POST" class="p-3 sm:p-8" id="ponudaForm">
                 @csrf
 
+                <!-- Contact Selector -->
+                @include('worker.partials.contact-selector')
+
                 <!-- Client Type -->
                 <div class="mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
                     <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
@@ -177,6 +180,16 @@
                             <p class="mt-1 text-xs text-gray-500">Opciono</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Save as Contact Checkbox -->
+                <div id="save-contact-checkbox" class="flex items-start gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl mb-6 sm:mb-8">
+                    <input type="checkbox" name="save_as_contact" id="save_as_contact" value="1"
+                        class="mt-0.5 w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer">
+                    <label for="save_as_contact" class="cursor-pointer">
+                        <span class="text-sm font-semibold text-gray-700">Sačuvaj kao kontakt</span>
+                        <p class="text-xs text-gray-500 mt-0.5">Podatke o klijentu sačuvaj u kontakte za buduću upotrebu</p>
+                    </label>
                 </div>
 
                 <!-- Location & rates -->
@@ -455,4 +468,5 @@
             }
         });
     </script>
+    @include('worker.partials.contact-selector-js')
 @endsection

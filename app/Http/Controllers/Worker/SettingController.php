@@ -22,6 +22,7 @@ class SettingController extends Controller
         $companyEmail = Setting::where('key', 'company_email')->value('value') ?? '';
         $companyAddress = Setting::where('key', 'company_address')->value('value') ?? '';
         $companyBankAccount = Setting::where('key', 'company_bank_account')->value('value') ?? '';
+        $invoiceCounterStart = Setting::where('key', 'invoice_counter_start')->value('value') ?? '1';
         
         // Load active warehouses
         $warehouses = Warehouse::where('is_active', true)->orderBy('name')->get();
@@ -37,6 +38,7 @@ class SettingController extends Controller
             'companyEmail',
             'companyAddress',
             'companyBankAccount',
+            'invoiceCounterStart',
             'warehouses',
             'currentUser'
         ));
@@ -54,6 +56,7 @@ class SettingController extends Controller
             'company_email' => 'required|email|max:255',
             'company_address' => 'required|string|max:500',
             'company_bank_account' => 'required|string|max:100',
+            'invoice_counter_start' => 'required|integer|min:1',
             'primary_warehouse_id' => 'nullable|exists:warehouses,id',
         ]);
 
@@ -67,6 +70,7 @@ class SettingController extends Controller
             'company_email' => $validated['company_email'],
             'company_address' => $validated['company_address'],
             'company_bank_account' => $validated['company_bank_account'],
+            'invoice_counter_start' => $validated['invoice_counter_start'],
         ];
 
         foreach ($settings as $key => $value) {

@@ -65,10 +65,6 @@
             </div>
             <div style="font-weight: normal; font-size: 8pt;">
                 <div>Mesto i datum: {{ $ponuda->location }}, {{ $ponuda->created_at->format('d/m/Y') }}</div>
-                <div>Radnik: {{ $ponuda->worker->name }}</div>
-                @if($ponuda->hourly_rate)
-                <div>Cena rada/sat: {{ number_format($ponuda->hourly_rate, 2) }} RSD</div>
-                @endif
             </div>
         </div>
         <div class="customer-box">

@@ -59,6 +59,9 @@
             <form action="{{ route('worker.ponude.update', $ponuda) }}" method="POST" class="p-3 sm:p-8" id="ponudaForm">
                 @csrf @method('PUT')
 
+                <!-- Contact Selector -->
+                @include('worker.partials.contact-selector')
+
                 <!-- Client Type -->
                 <div class="mb-6 sm:mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 sm:p-6">
                     <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
@@ -479,4 +482,5 @@
             }
         });
     </script>
+    @include('worker.partials.contact-selector-js')
 @endsection

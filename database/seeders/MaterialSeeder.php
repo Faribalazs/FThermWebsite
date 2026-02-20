@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\InternalProduct;
+use App\Models\Inventory;
+use App\Models\Warehouse;
 use App\Models\User;
 
 class MaterialSeeder extends Seeder
@@ -157,7 +159,7 @@ class MaterialSeeder extends Seeder
         ];
 
         foreach ($materials as $material) {
-            InternalProduct::firstOrCreate(
+            $product = InternalProduct::firstOrCreate(
                 ['name' => $material['name']],
                 [
                     'unit' => $material['unit'],
@@ -166,6 +168,21 @@ class MaterialSeeder extends Seeder
                     'created_by' => $worker->id,
                 ]
             );
+
+            // Add inventory with quantity 100 for each warehouse
+            $warehouses = Warehouse::where('is_active', true)->get();
+            foreach ($warehouses as $warehouse) {
+                Inventory::updateOrCreate(
+                    [
+                        'internal_product_id' => $product->id,
+                        'warehouse_id' => $warehouse->id,
+                    ],
+                    [
+                        'quantity' => 100,
+                        'updated_by' => $worker->id,
+                    ]
+                );
+            }
         }
     }
 }

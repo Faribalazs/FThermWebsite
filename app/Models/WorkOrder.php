@@ -57,7 +57,7 @@ class WorkOrder extends Model
         return $this->hasMany(WorkOrderSection::class);
     }
 
-    public function calculateTotal()
+    public function calculateMaterialTotal()
     {
         $total = 0;
         foreach ($this->sections as $section) {
@@ -66,6 +66,22 @@ class WorkOrder extends Model
             }
         }
         return $total;
+    }
+
+    public function calculateServiceTotal()
+    {
+        $total = 0;
+        foreach ($this->sections as $section) {
+            if ($section->service_price && $section->service_price > 0) {
+                $total += $section->service_price;
+            }
+        }
+        return $total;
+    }
+
+    public function calculateTotal()
+    {
+        return $this->calculateMaterialTotal() + $this->calculateServiceTotal();
     }
 
     public function calculateTotalHours()

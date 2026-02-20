@@ -124,6 +124,13 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
     // Settings
     Route::get('settings', [App\Http\Controllers\Worker\SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [App\Http\Controllers\Worker\SettingController::class, 'update'])->name('settings.update');
+
+    // Contacts
+    Route::get('contacts', [App\Http\Controllers\Worker\ContactController::class, 'index'])->name('contacts.index');
+    Route::post('contacts', [App\Http\Controllers\Worker\ContactController::class, 'store'])->name('contacts.store');
+    Route::get('contacts/{contact}', [App\Http\Controllers\Worker\ContactController::class, 'show'])->name('contacts.show');
+    Route::put('contacts/{contact}', [App\Http\Controllers\Worker\ContactController::class, 'update'])->name('contacts.update');
+    Route::delete('contacts/{contact}', [App\Http\Controllers\Worker\ContactController::class, 'destroy'])->name('contacts.destroy');
 });
 
 // Auth Routes for Admin/Worker

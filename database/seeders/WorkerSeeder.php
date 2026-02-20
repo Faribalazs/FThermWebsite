@@ -17,13 +17,14 @@ class WorkerSeeder extends Seeder
     {
         $workers = [
             [
-                'name' => 'Worker One',
-                'email' => 'worker1@ftherm.rs',
-                'password' => Hash::make('password'),
+                'name' => 'Farkas Tibor',
+                'email' => 'farkas.tibor@ftherm.rs',
+                'password' => Hash::make('ftherm'),
                 'is_admin' => false,
                 'role' => 'worker',
                 'is_active' => true,
                 'email_verified_at' => now(),
+                'permissions' => array_keys(\App\Models\User::getAvailablePermissions()),
             ],
             [
                 'name' => 'Worker Two',
