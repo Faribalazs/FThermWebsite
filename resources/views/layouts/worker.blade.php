@@ -38,7 +38,7 @@
                 </svg>
             </button>
             
-            <div class="p-4 lg:p-6 lg:pb-2 border-b border-industrial-800/50">
+            <div class="p-4 lg:p-6 lg:pb-2">
                 <div class="flex items-center gap-2 lg:gap-3">
                     <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-12 w-20 lg:h-20 lg:w-32">
                 </div>

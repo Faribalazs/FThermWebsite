@@ -93,24 +93,24 @@
                 </div>
 
                 <!-- Filter Tabs -->
-                <div class="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1">
+                <div class="flex flex-col sm:flex-row gap-2 mb-5">
                     <button type="button" onclick="setFilter('all')" id="filter_all"
-                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md">
+                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-sm font-semibold transition-all bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                         Svi
-                        <span class="px-1.5 py-0.5 rounded-full text-xs bg-white/25">{{ $contacts->count() }}</span>
+                        <span class="ml-auto sm:ml-0 px-1.5 py-0.5 rounded-full text-xs bg-white/25">{{ $contacts->count() }}</span>
                     </button>
                     <button type="button" onclick="setFilter('fizicko_lice')" id="filter_fizicko_lice"
-                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200">
+                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-sm font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         Fizička Lica
-                        <span class="px-1.5 py-0.5 rounded-full text-xs bg-black/8">{{ $contacts->where('type', 'fizicko_lice')->count() }}</span>
+                        <span class="ml-auto sm:ml-0 px-1.5 py-0.5 rounded-full text-xs bg-black/8">{{ $contacts->where('type', 'fizicko_lice')->count() }}</span>
                     </button>
                     <button type="button" onclick="setFilter('pravno_lice')" id="filter_pravno_lice"
-                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap bg-gray-100 text-gray-600 hover:bg-gray-200">
+                        class="filter-tab inline-flex items-center gap-1.5 px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-sm font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         Pravna Lica
-                        <span class="px-1.5 py-0.5 rounded-full text-xs bg-black/8">{{ $contacts->where('type', 'pravno_lice')->count() }}</span>
+                        <span class="ml-auto sm:ml-0 px-1.5 py-0.5 rounded-full text-xs bg-black/8">{{ $contacts->where('type', 'pravno_lice')->count() }}</span>
                     </button>
                 </div>
 
@@ -124,91 +124,114 @@
                             {{-- Color accent bar --}}
                             <div class="absolute left-0 top-0 bottom-0 w-1 {{ $contact->type === 'fizicko_lice' ? 'bg-blue-500' : 'bg-emerald-500' }} rounded-l-xl"></div>
 
-                            <div class="flex items-start gap-3 sm:gap-4 p-4 pl-5">
-                                {{-- Avatar --}}
-                                <div class="flex-shrink-0">
-                                    @if($contact->type === 'fizicko_lice')
-                                        <div class="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
-                                            <span class="text-white font-bold text-sm sm:text-base">{{ strtoupper(mb_substr($contact->client_name ?? '?', 0, 1)) }}{{ strtoupper(mb_substr(explode(' ', $contact->client_name ?? '')[1] ?? '', 0, 1)) }}</span>
+                            <div class="p-4 pl-5">
+                                <div class="flex items-start gap-3 sm:gap-4">
+                                    {{-- Avatar --}}
+                                    <div class="hidden sm:block flex-shrink-0">
+                                        @if($contact->type === 'fizicko_lice')
+                                            <div class="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+                                                <span class="text-white font-bold text-sm sm:text-base">{{ strtoupper(mb_substr($contact->client_name ?? '?', 0, 1)) }}{{ strtoupper(mb_substr(explode(' ', $contact->client_name ?? '')[1] ?? '', 0, 1)) }}</span>
+                                            </div>
+                                        @else
+                                            <div class="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Contact Info --}}
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="min-w-0 flex-1">
+                                                <h3 class="font-bold text-gray-900 text-base sm:text-lg truncate">
+                                                    {{ $contact->type === 'fizicko_lice' ? $contact->client_name : $contact->company_name }}
+                                                </h3>
+                                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium {{ $contact->type === 'fizicko_lice' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                        {{ $contact->type === 'fizicko_lice' ? 'Fizičko lice' : 'Pravno lice' }}
+                                                    </span>
+                                                    @if($contact->type === 'pravno_lice' && $contact->pib)
+                                                        <span class="text-xs text-gray-500">PIB: {{ $contact->pib }}</span>
+                                                    @endif
+                                                    @if($contact->type === 'pravno_lice' && $contact->maticni_broj)
+                                                        <span class="text-xs text-gray-500">MB: {{ $contact->maticni_broj }}</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            {{-- Desktop Action Buttons --}}
+                                            <div class="hidden sm:flex items-center gap-0.5 flex-shrink-0">
+                                                <button type="button" onclick="openEditModal({{ $contact->id }})"
+                                                    class="p-2.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                                                    title="Izmeni">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                </button>
+                                                <form action="{{ route('worker.contacts.destroy', $contact) }}" method="POST" class="inline"
+                                                    onsubmit="return confirm('Da li ste sigurni da želite obrisati kontakt {{ $contact->type === 'fizicko_lice' ? addslashes($contact->client_name) : addslashes($contact->company_name) }}?')">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit"
+                                                        class="p-2.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                                                        title="Obriši">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
-                                    @else
-                                        <div class="w-11 h-11 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-md">
-                                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                            </svg>
+
+                                        {{-- Contact Details --}}
+                                        <div class="mt-2.5 flex flex-col sm:flex-row sm:flex-wrap gap-y-2 sm:gap-y-1.5 sm:gap-x-4 text-sm text-gray-600">
+                                            @if($contact->type === 'pravno_lice' && $contact->client_name)
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                                    <span class="truncate">{{ $contact->client_name }}</span>
+                                                </div>
+                                            @endif
+                                            @if($contact->type === 'fizicko_lice' ? $contact->client_address : $contact->company_address)
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                                    <span class="truncate">{{ $contact->type === 'fizicko_lice' ? $contact->client_address : $contact->company_address }}</span>
+                                                </div>
+                                            @endif
+                                            @if($contact->client_phone)
+                                                <a href="tel:{{ $contact->client_phone }}" class="flex items-center gap-2 text-primary-600 sm:text-gray-600 sm:hover:text-primary-600 transition-colors">
+                                                    <svg class="w-3.5 h-3.5 flex-shrink-0 sm:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                                    <span class="font-medium sm:font-normal">{{ $contact->client_phone }}</span>
+                                                </a>
+                                            @endif
+                                            @if($contact->client_email)
+                                                <a href="mailto:{{ $contact->client_email }}" class="flex items-center gap-2 hover:text-primary-600 transition-colors">
+                                                    <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                                    <span class="truncate">{{ $contact->client_email }}</span>
+                                                </a>
+                                            @endif
                                         </div>
-                                    @endif
+                                    </div>
                                 </div>
 
-                                {{-- Contact Info --}}
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-start justify-between gap-2">
-                                        <div class="min-w-0">
-                                            <h3 class="font-bold text-gray-900 text-base sm:text-lg truncate">
-                                                {{ $contact->type === 'fizicko_lice' ? $contact->client_name : $contact->company_name }}
-                                            </h3>
-                                            <div class="flex items-center gap-2 mt-0.5">
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium {{ $contact->type === 'fizicko_lice' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                                    {{ $contact->type === 'fizicko_lice' ? 'Fizičko lice' : 'Pravno lice' }}
-                                                </span>
-                                                @if($contact->type === 'pravno_lice' && $contact->pib)
-                                                    <span class="text-xs text-gray-500 hidden sm:inline">PIB: {{ $contact->pib }}</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        {{-- Action Buttons --}}
-                                        <div class="flex items-center gap-0.5 flex-shrink-0">
-                                            <button type="button" onclick="openEditModal({{ $contact->id }})"
-                                                class="p-2 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-                                                title="Izmeni">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                            </button>
-                                            <form action="{{ route('worker.contacts.destroy', $contact) }}" method="POST" class="inline"
-                                                onsubmit="return confirm('Da li ste sigurni da želite obrisati kontakt {{ $contact->type === 'fizicko_lice' ? addslashes($contact->client_name) : addslashes($contact->company_name) }}?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit"
-                                                    class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                    title="Obriši">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    {{-- Contact Details --}}
-                                    <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-gray-600">
-                                        @if($contact->type === 'pravno_lice' && $contact->client_name)
-                                            <div class="flex items-center gap-1.5">
-                                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                                <span class="truncate">{{ $contact->client_name }}</span>
-                                            </div>
-                                        @endif
-                                        @if($contact->type === 'fizicko_lice' ? $contact->client_address : $contact->company_address)
-                                            <div class="flex items-center gap-1.5">
-                                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                                <span class="truncate">{{ $contact->type === 'fizicko_lice' ? $contact->client_address : $contact->company_address }}</span>
-                                            </div>
-                                        @endif
-                                        @if($contact->client_phone)
-                                            <a href="tel:{{ $contact->client_phone }}" class="flex items-center gap-1.5 hover:text-primary-600 transition-colors">
-                                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                                <span>{{ $contact->client_phone }}</span>
-                                            </a>
-                                        @endif
-                                        @if($contact->client_email)
-                                            <a href="mailto:{{ $contact->client_email }}" class="flex items-center gap-1.5 hover:text-primary-600 transition-colors">
-                                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                                <span class="truncate">{{ $contact->client_email }}</span>
-                                            </a>
-                                        @endif
-                                        @if($contact->type === 'pravno_lice' && $contact->maticni_broj)
-                                            <div class="flex items-center gap-1.5 hidden sm:flex">
-                                                <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                                <span>MB: {{ $contact->maticni_broj }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
+                                {{-- Mobile Action Bar --}}
+                                <div class="sm:hidden flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                                    @if($contact->client_phone)
+                                        <a href="tel:{{ $contact->client_phone }}"
+                                            class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-50 text-primary-700 font-semibold rounded-lg text-sm transition-colors active:bg-primary-100">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                            Pozovi
+                                        </a>
+                                    @endif
+                                    <button type="button" onclick="openEditModal({{ $contact->id }})"
+                                        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg text-sm transition-colors active:bg-gray-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        Izmeni
+                                    </button>
+                                    <form action="{{ route('worker.contacts.destroy', $contact) }}" method="POST"
+                                        onsubmit="return confirm('Da li ste sigurni da želite obrisati kontakt {{ $contact->type === 'fizicko_lice' ? addslashes($contact->client_name) : addslashes($contact->company_name) }}?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit"
+                                            class="flex items-center justify-center gap-2 py-2.5 px-4 bg-red-50 text-red-600 font-semibold rounded-lg text-sm transition-colors active:bg-red-100">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

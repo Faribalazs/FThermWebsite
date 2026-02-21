@@ -123,6 +123,7 @@ class WorkOrderController extends Controller
             'sections.*.hours_spent.numeric' => 'Sati moraju biti broj.',
             'sections.*.service_price.numeric' => 'Cena usluge mora biti broj.',
             'sections.*.items.*.product_id.exists' => 'Izabrani materijal ne postoji.',
+            'sections.*.items.*.quantity.required_with' => 'Količina je obavezna kada je materijal izabran.',
             'sections.*.items.*.quantity.integer' => 'Količina mora biti ceo broj.',
             'sections.*.items.*.quantity.min' => 'Količina mora biti najmanje 1.',
         ]);
@@ -139,11 +140,11 @@ class WorkOrderController extends Controller
                             ->where('warehouse_id', $validated['warehouse_id'])
                             ->first();
                         $currentStock = $inventory ? $inventory->quantity : 0;
-                        
-                        if ($currentStock < $itemData['quantity']) {
+                        $neededQty = max(1, (int) ($itemData['quantity'] ?? 1));
+                        if ($currentStock < $neededQty) {
                             $product = InternalProduct::find($itemData['product_id']);
                             $warehouse = Warehouse::find($validated['warehouse_id']);
-                            throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno: {$itemData['quantity']}");
+                            throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno: {$neededQty}");
                         }
                     }
                 }
@@ -178,9 +179,10 @@ class WorkOrderController extends Controller
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
                         $product = InternalProduct::find($itemData['product_id']);
+                        $qty = max(1, (int) ($itemData['quantity'] ?? 1));
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
-                            'quantity' => $itemData['quantity'],
+                            'quantity' => $qty,
                             'price_at_time' => $product->price,
                         ]);
 
@@ -189,7 +191,7 @@ class WorkOrderController extends Controller
                             ->where('warehouse_id', $validated['warehouse_id'])
                             ->first();
                         if ($inventory) {
-                            $inventory->quantity -= $itemData['quantity'];
+                            $inventory->quantity -= $qty;
                             $inventory->updated_by = auth('worker')->id();
                             $inventory->save();
                         } else {
@@ -197,7 +199,7 @@ class WorkOrderController extends Controller
                             Inventory::create([
                                 'internal_product_id' => $itemData['product_id'],
                                 'warehouse_id' => $validated['warehouse_id'],
-                                'quantity' => -$itemData['quantity'],
+                                'quantity' => -$qty,
                                 'updated_by' => auth('worker')->id(),
                             ]);
                         }
@@ -211,7 +213,7 @@ class WorkOrderController extends Controller
             // Log activity
             $itemCount = 0;
             foreach ($validated['sections'] as $section) {
-                $itemCount += count($section['items']);
+                $itemCount += count($section['items'] ?? []);
             }
             
             $clientDisplay = $validated['client_type'] === 'pravno_lice' 
@@ -345,7 +347,7 @@ class WorkOrderController extends Controller
             'sections.*.service_price' => 'nullable|numeric|min:0',
             'sections.*.items' => 'nullable|array',
             'sections.*.items.*.product_id' => 'nullable|exists:internal_products,id',
-            'sections.*.items.*.quantity' => 'nullable|integer|min:1',
+            'sections.*.items.*.quantity' => 'required_with:sections.*.items.*.product_id|integer|min:1',
         ]);
 
         DB::beginTransaction();
@@ -364,7 +366,7 @@ class WorkOrderController extends Controller
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $newItems[$itemData['product_id']] = ($newItems[$itemData['product_id']] ?? 0) + $itemData['quantity'];
+                        $newItems[$itemData['product_id']] = ($newItems[$itemData['product_id']] ?? 0) + max(1, (int) ($itemData['quantity'] ?? 1));
                     }
                 }
             }
@@ -431,9 +433,10 @@ class WorkOrderController extends Controller
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
                         $product = InternalProduct::find($itemData['product_id']);
+                        $qty = max(1, (int) ($itemData['quantity'] ?? 1));
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
-                            'quantity' => $itemData['quantity'],
+                            'quantity' => $qty,
                             'price_at_time' => $product->price,
                         ]);
 
@@ -442,14 +445,14 @@ class WorkOrderController extends Controller
                             ->where('warehouse_id', $validated['warehouse_id'])
                             ->first();
                         if ($inventory) {
-                            $inventory->quantity -= $itemData['quantity'];
+                            $inventory->quantity -= $qty;
                             $inventory->updated_by = auth('worker')->id();
                             $inventory->save();
                         } else {
                             Inventory::create([
                                 'internal_product_id' => $itemData['product_id'],
                                 'warehouse_id' => $validated['warehouse_id'],
-                                'quantity' => -$itemData['quantity'],
+                                'quantity' => -$qty,
                                 'updated_by' => auth('worker')->id(),
                             ]);
                         }

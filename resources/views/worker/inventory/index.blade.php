@@ -364,64 +364,113 @@
     </div>
 
     <!-- Add Quantity Modal -->
-    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
-        onclick="if(event.target === this) closeAddModal()">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full animate-scale-in" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4 rounded-t-xl">
-                <h2 class="text-2xl font-bold text-white">Dodaj Zalihe</h2>
-            </div>
+    <div id="addModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeAddModal()"></div>
+        <div class="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div class="bg-white w-full sm:rounded-2xl sm:max-w-md sm:w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden relative shadow-2xl rounded-t-2xl animate-slide-up-inv" onclick="event.stopPropagation()">
 
-            <form id="addForm" method="POST" class="p-6">
-                @csrf
-                <div class="mb-6">
-                    <p class="text-gray-600 mb-4">Dodajte količinu za materijal: <span id="addProductName"
-                            class="font-bold text-gray-900"></span></p>
+                {{-- Modal Header --}}
+                <div class="sticky top-0 z-10 bg-white border-b border-gray-100 px-5 sm:px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Dodaj Zalihe</h2>
+                            <p class="text-xs text-gray-500 mt-0.5">Materijal: <span id="addProductName" class="font-semibold text-gray-700"></span></p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 p-2 -mr-2 rounded-xl hover:bg-gray-100 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
 
-                    <!-- Warehouse Selection -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Skladište <span
-                                class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
-                            </svg>
-                            <select name="warehouse_id" id="addWarehouseSelect" required
-                                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}"
-                                        {{ $selectedWarehouseId == $warehouse->id ? 'selected' : '' }}>
-                                        {{ $warehouse->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                <form id="addForm" method="POST" class="overflow-y-auto" style="max-height: calc(95vh - 140px)">
+                    @csrf
+                    <div class="p-5 sm:p-6 space-y-5">
+                        <!-- Warehouse Selection -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Skladište <span class="text-red-500">*</span></label>
+                            <div class="custom-select-wrapper">
+                                <input type="hidden" name="warehouse_id" id="addWarehouseValue"
+                                    value="{{ $selectedWarehouseId }}">
+                                <div class="custom-select-trigger" onclick="toggleModalWarehouseDropdown()">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                                        </svg>
+                                        <span class="custom-select-value text-sm {{ $selectedWarehouseId ? 'selected' : '' }}" id="addWarehouseSelectedText">
+                                            @php $selWh = $warehouses->firstWhere('id', $selectedWarehouseId); @endphp
+                                            {{ $selWh ? $selWh->name : 'Izaberite skladište' }}
+                                        </span>
+                                    </div>
+                                    <svg class="custom-select-arrow w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                                <div class="custom-select-dropdown" id="modal-warehouse-dropdown">
+                                    <div class="custom-select-options">
+                                        @foreach ($warehouses as $warehouse)
+                                            <div class="custom-select-option {{ $selectedWarehouseId == $warehouse->id ? 'selected' : '' }}"
+                                                onclick="selectModalWarehouseOption({{ $warehouse->id }}, '{{ addslashes($warehouse->name) }}')">
+                                                <div class="flex items-center justify-between">
+                                                    <span>{{ $warehouse->name }}</span>
+                                                    @if ($selectedWarehouseId == $warehouse->id)
+                                                        <svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Količina za Dodavanje</label>
+                            <div class="relative">
+                                <input type="number" name="quantity_to_add" id="addQuantityInput" min="1" required
+                                    class="form-input w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white text-lg font-semibold transition-all pr-16"
+                                    placeholder="0">
+                                <span id="addProductUnit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-sm"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Količina za Dodavanje</label>
-                    <div class="relative">
-                        <input type="number" name="quantity_to_add" min="1" required
-                            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold"
-                            placeholder="Unesite količinu">
-                        <span id="addProductUnit"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium"></span>
+                    {{-- Sticky Actions --}}
+                    <div class="sticky bottom-0 bg-white border-t border-gray-100 px-5 sm:px-6 py-4 flex gap-3">
+                        <button type="button" onclick="closeAddModal()"
+                            class="flex-1 sm:flex-none px-5 py-3 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 transition-colors text-sm">
+                            Otkaži
+                        </button>
+                        <button type="submit"
+                            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Dodaj Zalihe
+                        </button>
                     </div>
-                </div>
-
-                <div class="flex gap-4">
-                    <button type="button" onclick="closeAddModal()"
-                        class="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
-                        Otkaži
-                    </button>
-                    <button type="submit"
-                        class="flex-1 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
-                        Dodaj
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
+
+    <style>
+        @keyframes slide-up-inv {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up-inv {
+            animation: slide-up-inv 0.3s ease-out;
+        }
+        @media (min-width: 640px) {
+            .animate-slide-up-inv {
+                animation: none;
+            }
+        }
+    </style>
 
     <script>
         let currentAddProductId = null;
@@ -429,9 +478,9 @@
         function openAddModal(productId, productName, productUnit) {
             currentAddProductId = productId;
             document.getElementById('addModal').classList.remove('hidden');
-            document.getElementById('addModal').classList.add('flex');
             document.getElementById('addProductName').textContent = productName;
             document.getElementById('addProductUnit').textContent = productUnit;
+            document.body.style.overflow = 'hidden';
 
             const currentParams = new URLSearchParams(window.location.search);
             const formAction = `/worker/inventory/${productId}/add?${currentParams.toString()}`;
@@ -440,8 +489,8 @@
 
         function closeAddModal() {
             document.getElementById('addModal').classList.add('hidden');
-            document.getElementById('addModal').classList.remove('flex');
             document.getElementById('addForm').reset();
+            document.body.style.overflow = '';
             currentAddProductId = null;
         }
 
@@ -697,15 +746,44 @@
             window.location.href = '{{ route('worker.inventory.index') }}?' + currentParams.toString();
         }
 
+        // Modal Warehouse Dropdown Functions
+        function toggleModalWarehouseDropdown() {
+            const dropdown = document.getElementById('modal-warehouse-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function selectModalWarehouseOption(value, text) {
+            document.getElementById('addWarehouseValue').value = value;
+            const labelEl = document.getElementById('addWarehouseSelectedText');
+            labelEl.textContent = text;
+            labelEl.classList.add('selected');
+
+            // Update selected state in options
+            document.querySelectorAll('#modal-warehouse-dropdown .custom-select-option').forEach(opt => {
+                opt.classList.remove('selected');
+                const svg = opt.querySelector('svg');
+                if (svg) svg.remove();
+            });
+            const clicked = event.target.closest('.custom-select-option');
+            clicked.classList.add('selected');
+            clicked.querySelector('div').insertAdjacentHTML('beforeend',
+                '<svg class="w-4 h-4 text-primary-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>'
+            );
+
+            document.getElementById('modal-warehouse-dropdown').classList.remove('active');
+        }
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.custom-select-wrapper')) {
                 const sortDropdown = document.getElementById('sort-dropdown');
                 const warehouseDropdown = document.getElementById('warehouse-dropdown');
                 const perPageDropdown = document.getElementById('per-page-dropdown');
+                const modalWarehouseDropdown = document.getElementById('modal-warehouse-dropdown');
                 if (sortDropdown) sortDropdown.classList.remove('active');
                 if (warehouseDropdown) warehouseDropdown.classList.remove('active');
                 if (perPageDropdown) perPageDropdown.classList.remove('active');
+                if (modalWarehouseDropdown) modalWarehouseDropdown.classList.remove('active');
             }
         });
     </script>

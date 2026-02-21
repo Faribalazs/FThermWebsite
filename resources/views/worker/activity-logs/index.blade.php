@@ -217,7 +217,7 @@
                                     <div class="grid grid-cols-1 gap-2 text-xs sm:text-sm">
                                         @foreach($log->data as $key => $value)
                                             @if(!is_array($value))
-                                                <div class="flex flex-col sm:flex-row sm:items-start">
+                                                <div class="flex gap-2 sm:flex-row sm:items-start">
                                                     <span class="font-semibold text-gray-700 sm:min-w-[120px] mb-1 sm:mb-0">{{ $keyLabels[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}:</span>
                                                     <span class="text-gray-600 break-words">{{ $valueLabels[$value] ?? $value }}</span>
                                                 </div>
