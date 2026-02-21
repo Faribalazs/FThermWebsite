@@ -310,6 +310,17 @@
                             </a>
                             @endif
 
+                            @if(Auth::guard('worker')->user()->hasPermission('inventory'))
+                            <a href="{{ route('worker.warehouses.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('worker.warehouses.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('worker.warehouses.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path>
+                                    </svg>
+                                </div>
+                                <span class="font-medium">Skladišta</span>
+                            </a>
+                            @endif
+
                             @if(Auth::guard('worker')->user()->hasPermission('invoices'))
                             <a href="{{ route('worker.invoices.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('worker.invoices.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
                                 <div class="w-10 h-10 rounded-full {{ request()->routeIs('worker.invoices.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">

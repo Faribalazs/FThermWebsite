@@ -12,12 +12,14 @@ class WarehouseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('warehouses')->insert([
-            'name' => 'Glavno Skladište',
-            'description' => 'Glavno skladište za materijale',
-            'is_active' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::table('warehouses')->updateOrInsert(
+            ['name' => 'Glavno Skladište'],
+            [
+                'description' => 'Glavno skladište za materijale',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
     }
 }

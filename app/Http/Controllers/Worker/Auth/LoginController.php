@@ -45,6 +45,12 @@ class LoginController extends Controller
             // Store a flag to indicate which guard this user should use
             $request->session()->put('auth_guard', 'worker');
             
+            // When "remember me" is checked, extend the session cookie lifetime
+            // so the session persists across webview/browser restarts (30 days)
+            if ($request->boolean('remember')) {
+                config(['session.lifetime' => 43200]); // 30 days in minutes
+            }
+            
             // Save session immediately to ensure it persists
             $request->session()->save();
             

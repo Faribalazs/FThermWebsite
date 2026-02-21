@@ -135,6 +135,7 @@
                         type="checkbox" 
                         class="w-4 h-4 rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-500 focus:ring-offset-0 transition cursor-pointer" 
                         name="remember"
+                        {{ $isWorker ? 'checked' : '' }}
                     >
                     <span class="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-900">@if($isWorker) Zapamti me @else Remember me @endif</span>
                 </label>

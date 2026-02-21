@@ -27,6 +27,12 @@ class WorkerMiddleware
             return redirect()->route('worker.login');
         }
 
+        // Restore session guard flag when re-authenticated via remember token
+        if (!$request->session()->has('auth_guard')) {
+            $request->session()->put('auth_guard', 'worker');
+            $request->session()->save();
+        }
+
         if (!$user->is_active) {
             auth('worker')->logout();
             if ($request->ajax() || $request->wantsJson()) {
