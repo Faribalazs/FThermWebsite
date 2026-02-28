@@ -41,7 +41,15 @@ class Ponuda extends Model
         return $this->hasMany(PonudaSection::class);
     }
 
-    public function calculateTotal()
+    public function calculateTravelCost($kmPrice = 0)
+    {
+        if ($this->km_to_destination && $kmPrice > 0) {
+            return $this->km_to_destination * $kmPrice;
+        }
+        return 0;
+    }
+
+    public function calculateTotal($kmPrice = 0)
     {
         $total = 0;
         foreach ($this->sections as $section) {
@@ -55,6 +63,7 @@ class Ponuda extends Model
                 $total += $section->hours_spent * $this->hourly_rate;
             }
         }
+        $total += $this->calculateTravelCost($kmPrice);
         return $total;
     }
 }

@@ -427,7 +427,6 @@
 
             <!-- Form Actions -->
             <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200">
-                <span id="autosave-status" class="self-center flex items-center gap-1.5 text-xs text-gray-400 sm:mr-auto"></span>
                 <a href="{{ route('worker.work-orders.show', $workOrder) }}" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -511,7 +510,7 @@ function renderDropdownOptions(sectionId, itemId, filter) {
         return `<div class="custom-select-option"
             data-value="${product.id}" data-price="${product.price}" data-stock="${stock}"
             data-text="${name} - ${product.price} RSD/${unit}"
-            data-search="${product.name.toLowerCase()}"
+            data-search="${name.toLowerCase()}"
             onclick="selectProduct(${sectionId}, ${itemId}, ${product.id}, this.getAttribute('data-text'), ${product.price}, ${stock})">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -611,9 +610,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const product = products.find(p => p.id === item.product_id);
                     if (product) {
                         const stock = product.inventory ? parseInt(product.inventory.quantity) || 0 : 0;
-                        const productName = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        const productUnit = product.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        const displayText = `${productName} - ${product.price} RSD/${productUnit}`;
+                        // Use raw name/unit for direct JS call — textContent does NOT decode HTML entities
+                        const displayText = `${product.name} - ${product.price} RSD/${product.unit}`;
                         
                         setTimeout(() => {
                             selectProduct(newSectionIndex, newItemId, product.id, displayText, product.price, stock);
@@ -1069,7 +1067,6 @@ function triggerAutosave() {
 function runAutosave() {
     if (_autosaveBusy) { triggerAutosave(); return; }
     _autosaveBusy = true;
-    setAutosaveStatus('saving');
     const form = document.getElementById('workOrderForm');
     const formData = new FormData(form);
     formData.delete('_method'); // strip PUT spoofing so the POST route matches
@@ -1083,29 +1080,10 @@ function runAutosave() {
     })
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(data => {
-        setAutosaveStatus('saved', data.saved_at);
         showAutosaveToast();
     })
-    .catch(() => setAutosaveStatus('error'))
+    .catch(() => {})
     .finally(() => { _autosaveBusy = false; });
-}
-
-function setAutosaveStatus(state, time) {
-    const el = document.getElementById('autosave-status');
-    if (!el) return;
-    const spin = '<svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
-    const check = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-    const warn  = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-    if (state === 'saving') {
-        el.innerHTML = spin + ' Čuvanje izmena...';
-        el.className = 'self-center flex items-center gap-1.5 text-xs text-gray-400 sm:mr-auto';
-    } else if (state === 'saved') {
-        el.innerHTML = check + ' Sačuvano u ' + (time || '');
-        el.className = 'self-center flex items-center gap-1.5 text-xs text-green-500 sm:mr-auto';
-    } else {
-        el.innerHTML = warn + ' Greška pri čuvanju';
-        el.className = 'self-center flex items-center gap-1.5 text-xs text-red-400 sm:mr-auto';
-    }
 }
 
 function showAutosaveToast() {

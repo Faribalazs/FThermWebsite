@@ -253,9 +253,6 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex items-center justify-end mb-2 min-h-[20px]">
-                    <span id="autosave-status" class="flex items-center gap-1.5 text-xs text-gray-400"></span>
-                </div>
                 <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-200">
                     <a href="{{ route('worker.ponude.index') }}"
                         class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
@@ -290,8 +287,8 @@
                 return `<div class="custom-select-option"
                     data-value="${p.id}" data-price="${p.price}"
                     data-text="${n} - ${p.price} RSD/${u}"
-                    data-search="${p.name.toLowerCase()}"
-                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
+                    data-search="${n.toLowerCase()}"
+                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, this.getAttribute('data-text'), ${p.price})">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
@@ -428,7 +425,7 @@
                             <label class="block text-xs font-medium text-gray-700 mb-1">Količina</label>
                             <input type="number" name="sections[${sectionId}][items][${itemId}][quantity]"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm"
-                                min="1" value="1"
+                                min="1" placeholder=""
                                 oninput="updateItemPrice(${sectionId}, ${itemId})"
                                 onchange="updateItemPrice(${sectionId}, ${itemId})">
                         </div>
@@ -506,7 +503,6 @@
         function runAutosave() {
             if (_autosaveBusy) { triggerAutosave(); return; }
             _autosaveBusy = true;
-            setAutosaveStatus('saving');
             const form = document.getElementById('ponudaForm');
             const formData = new FormData(form);
             fetch('{{ route("worker.ponude.autosave") }}', {
@@ -525,29 +521,10 @@
                 if (data.edit_url && window.location.href !== data.edit_url) {
                     history.replaceState({ draftId: data.id }, '', data.edit_url);
                 }
-                setAutosaveStatus('saved', data.saved_at);
                 showAutosaveToast();
             })
-            .catch(() => setAutosaveStatus('error'))
+            .catch(() => {})
             .finally(() => { _autosaveBusy = false; });
-        }
-
-        function setAutosaveStatus(state, time) {
-            const el = document.getElementById('autosave-status');
-            if (!el) return;
-            const spin = '<svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
-            const check = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-            const warn  = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-            if (state === 'saving') {
-                el.innerHTML = spin + ' Čuvanje nacrta...';
-                el.className = 'flex items-center gap-1.5 text-xs text-gray-400';
-            } else if (state === 'saved') {
-                el.innerHTML = check + ' Nacrt sačuvan u ' + (time || '');
-                el.className = 'flex items-center gap-1.5 text-xs text-green-500';
-            } else {
-                el.innerHTML = warn + ' Greška pri čuvanju nacrta';
-                el.className = 'flex items-center gap-1.5 text-xs text-red-400';
-            }
         }
 
         function showAutosaveToast() {

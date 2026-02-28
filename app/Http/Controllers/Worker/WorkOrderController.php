@@ -22,7 +22,7 @@ class WorkOrderController extends Controller
     public function index(Request $request)
     {
         $query = WorkOrder::where('worker_id', auth('worker')->id())
-            ->with(['sections.items.product']);
+            ->withCount('sections');
 
         // Search filter
         if ($request->filled('search')) {
@@ -64,9 +64,10 @@ class WorkOrderController extends Controller
             $query->where('total_amount', '<=', $request->price_to);
         }
 
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Sorting (whitelist to prevent column injection)
+        $allowedSort = ['created_at', 'total_amount', 'location', 'status'];
+        $sortBy = in_array($request->get('sort_by'), $allowedSort) ? $request->get('sort_by') : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
         $workOrders = $query->paginate(15)->withQueryString();
@@ -136,16 +137,27 @@ class WorkOrderController extends Controller
         }
         $workOrder->sections()->delete();
 
+        // Batch-load all needed products (eliminates N+1 per item)
+        $allProductIds = collect($request->input('sections', []))
+            ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+            ->unique()->values()->all();
+        $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
+
         foreach ($request->input('sections', []) as $sectionData) {
-            if (empty($sectionData['title'])) continue;
+            // In autosave/draft context, keep sections even without a title
+            // so that items (materials) are not lost while the user is still typing.
+            $sectionTitle = trim($sectionData['title'] ?? '');
+            if ($sectionTitle === '') {
+                $sectionTitle = 'Usluga'; // temporary placeholder
+            }
             $section = $workOrder->sections()->create([
-                'title'         => $sectionData['title'],
+                'title'         => $sectionTitle,
                 'hours_spent'   => $sectionData['hours_spent'] ?: null,
                 'service_price' => $sectionData['service_price'] ?: null,
             ]);
             foreach ($sectionData['items'] ?? [] as $itemData) {
                 if (empty($itemData['product_id'])) continue;
-                $product = InternalProduct::find($itemData['product_id']);
+                $product = $productMap->get($itemData['product_id']);
                 if (!$product) continue;
                 $section->items()->create([
                     'product_id'    => $itemData['product_id'],
@@ -154,6 +166,10 @@ class WorkOrderController extends Controller
                 ]);
             }
         }
+
+        $workOrder->load('sections.items');
+        $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+        $workOrder->update(['total_amount' => $workOrder->calculateGrandTotal($kmPrice)]);
 
         return response()->json([
             'id'       => $workOrder->id,
@@ -193,16 +209,26 @@ class WorkOrderController extends Controller
         }
         $workOrder->sections()->delete();
 
+        // Batch-load all needed products (eliminates N+1 per item)
+        $allProductIds = collect($request->input('sections', []))
+            ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+            ->unique()->values()->all();
+        $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
+
         foreach ($request->input('sections', []) as $sectionData) {
-            if (empty($sectionData['title'])) continue;
+            // In autosave context, keep sections even without a title
+            $sectionTitle = trim($sectionData['title'] ?? '');
+            if ($sectionTitle === '') {
+                $sectionTitle = 'Usluga'; // temporary placeholder
+            }
             $section = $workOrder->sections()->create([
-                'title'         => $sectionData['title'],
+                'title'         => $sectionTitle,
                 'hours_spent'   => $sectionData['hours_spent'] ?: null,
                 'service_price' => $sectionData['service_price'] ?: null,
             ]);
             foreach ($sectionData['items'] ?? [] as $itemData) {
                 if (empty($itemData['product_id'])) continue;
-                $product = InternalProduct::find($itemData['product_id']);
+                $product = $productMap->get($itemData['product_id']);
                 if (!$product) continue;
                 $section->items()->create([
                     'product_id'    => $itemData['product_id'],
@@ -211,6 +237,10 @@ class WorkOrderController extends Controller
                 ]);
             }
         }
+
+        $workOrder->load('sections.items');
+        $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+        $workOrder->update(['total_amount' => $workOrder->calculateGrandTotal($kmPrice)]);
 
         return response()->json(['saved_at' => now()->format('H:i:s')]);
     }
@@ -261,19 +291,26 @@ class WorkOrderController extends Controller
         DB::beginTransaction();
 
         try {
+            // Batch-load all products and inventories to avoid N+1 queries
+            $allProductIds = collect($validated['sections'])
+                ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+                ->unique()->values()->all();
+            $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->get()->keyBy('id') : collect();
+            $inventoryMap = $allProductIds ? Inventory::whereIn('internal_product_id', $allProductIds)
+                ->where('warehouse_id', $validated['warehouse_id'])
+                ->get()->keyBy('internal_product_id') : collect();
+            $warehouse = Warehouse::find($validated['warehouse_id']);
+
             // Check inventory availability before creating work order
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
-                            ->where('warehouse_id', $validated['warehouse_id'])
-                            ->first();
+                        $inventory = $inventoryMap->get($itemData['product_id']);
                         $currentStock = $inventory ? $inventory->quantity : 0;
                         $neededQty = max(1, (int) ($itemData['quantity'] ?? 1));
                         if ($currentStock < $neededQty) {
-                            $product = InternalProduct::find($itemData['product_id']);
-                            $warehouse = Warehouse::find($validated['warehouse_id']);
+                            $product = $productMap->get($itemData['product_id']);
                             throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno: {$neededQty}");
                         }
                     }
@@ -342,7 +379,8 @@ class WorkOrderController extends Controller
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $product = InternalProduct::find($itemData['product_id']);
+                        $product = $productMap->get($itemData['product_id']);
+                        if (!$product) continue;
                         $qty = max(1, (int) ($itemData['quantity'] ?? 1));
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
@@ -351,9 +389,7 @@ class WorkOrderController extends Controller
                         ]);
 
                         // Update inventory - deduct the used quantity
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
-                            ->where('warehouse_id', $validated['warehouse_id'])
-                            ->first();
+                        $inventory = $inventoryMap->get($itemData['product_id']);
                         if ($inventory) {
                             $inventory->quantity -= $qty;
                             $inventory->updated_by = auth('worker')->id();
@@ -371,7 +407,8 @@ class WorkOrderController extends Controller
                 }
             }
 
-            $total = $workOrder->calculateTotal();
+            $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $total = $workOrder->calculateGrandTotal($kmPrice);
             $workOrder->update(['total_amount' => $total]);
 
             // Log activity
@@ -440,7 +477,8 @@ class WorkOrderController extends Controller
         }
 
         $workOrder->load(['sections.items.product']);
-        return view('worker.work-orders.show', compact('workOrder'));
+        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
+        return view('worker.work-orders.show', compact('workOrder', 'kmPrice'));
     }
 
     public function edit(WorkOrder $workOrder)
@@ -507,6 +545,7 @@ class WorkOrderController extends Controller
             'client_email' => 'nullable|email|max:255',
             'location' => 'required|string|max:255',
             'km_to_destination' => 'nullable|numeric|min:0',
+            'hourly_rate' => 'nullable|numeric|min:0',
             'sections' => 'required|array|min:1',
             'sections.*.title' => 'required|string|max:255',
             'sections.*.hours_spent' => 'nullable|numeric|min:0',
@@ -537,20 +576,34 @@ class WorkOrderController extends Controller
                 }
             }
 
+            // Batch-load products and inventories to avoid N+1 queries
+            $allOldProductIds = array_keys($oldItems);
+            $allNewProductIds = array_keys($newItems);
+            $allProductIds = array_unique(array_merge($allOldProductIds, $allNewProductIds));
+            $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->get()->keyBy('id') : collect();
+            // Inventories for the new/target warehouse
+            $inventoryNewMap = $allNewProductIds ? Inventory::whereIn('internal_product_id', $allNewProductIds)
+                ->where('warehouse_id', $validated['warehouse_id'])
+                ->get()->keyBy('internal_product_id') : collect();
+            // Inventories for the old warehouse (may differ when changing warehouse)
+            $inventoryOldMap = ($workOrder->warehouse_id == (int)$validated['warehouse_id'])
+                ? $inventoryNewMap
+                : ($allOldProductIds ? Inventory::whereIn('internal_product_id', $allOldProductIds)
+                    ->where('warehouse_id', $workOrder->warehouse_id)
+                    ->get()->keyBy('internal_product_id') : collect());
+            $warehouse = Warehouse::find($validated['warehouse_id']);
+
             // Check inventory availability for increased quantities
             foreach ($newItems as $productId => $newQty) {
                 $oldQty = $oldItems[$productId] ?? 0;
                 $difference = $newQty - $oldQty;
-                
+
                 if ($difference > 0) {
-                    $inventory = Inventory::where('internal_product_id', $productId)
-                        ->where('warehouse_id', $validated['warehouse_id'])
-                        ->first();
+                    $inventory = $inventoryNewMap->get($productId);
                     $currentStock = $inventory ? $inventory->quantity : 0;
-                    
+
                     if ($currentStock < $difference) {
-                        $product = InternalProduct::find($productId);
-                        $warehouse = Warehouse::find($validated['warehouse_id']);
+                        $product = $productMap->get($productId);
                         throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno dodatno: {$difference}");
                     }
                 }
@@ -558,9 +611,7 @@ class WorkOrderController extends Controller
 
             // Return old items to inventory (original warehouse)
             foreach ($oldItems as $productId => $quantity) {
-                $inventory = Inventory::where('internal_product_id', $productId)
-                    ->where('warehouse_id', $workOrder->warehouse_id)
-                    ->first();
+                $inventory = $inventoryOldMap->get($productId);
                 if ($inventory) {
                     $inventory->quantity += $quantity;
                     $inventory->updated_by = auth('worker')->id();
@@ -582,6 +633,7 @@ class WorkOrderController extends Controller
                 'client_email' => $validated['client_email'] ?? null,
                 'location' => $validated['location'],
                 'km_to_destination' => $validated['km_to_destination'] ?? null,
+                'hourly_rate' => $validated['hourly_rate'] ?? null,
                 'status' => 'completed',
             ]);
 
@@ -599,7 +651,8 @@ class WorkOrderController extends Controller
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $product = InternalProduct::find($itemData['product_id']);
+                        $product = $productMap->get($itemData['product_id']);
+                        if (!$product) continue;
                         $qty = max(1, (int) ($itemData['quantity'] ?? 1));
                         $section->items()->create([
                             'product_id' => $itemData['product_id'],
@@ -608,9 +661,7 @@ class WorkOrderController extends Controller
                         ]);
 
                         // Deduct from inventory
-                        $inventory = Inventory::where('internal_product_id', $itemData['product_id'])
-                            ->where('warehouse_id', $validated['warehouse_id'])
-                            ->first();
+                        $inventory = $inventoryNewMap->get($itemData['product_id']);
                         if ($inventory) {
                             $inventory->quantity -= $qty;
                             $inventory->updated_by = auth('worker')->id();
@@ -628,7 +679,8 @@ class WorkOrderController extends Controller
             }
 
             // Update total amount
-            $total = $workOrder->calculateTotal();
+            $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $total = $workOrder->calculateGrandTotal($kmPrice);
             $workOrder->update(['total_amount' => $total]);
 
             // Log activity
@@ -736,18 +788,22 @@ class WorkOrderController extends Controller
         }
 
         $workOrder->load(['sections.items.product', 'worker']);
-        
-        // Get all settings for the invoice view
-        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
-        $companyName = Setting::where('key', 'company_name')->value('value') ?? 'F-Therm d.o.o.';
-        $companyPib = Setting::where('key', 'company_pib')->value('value') ?? '';
-        $companyMaticniBroj = Setting::where('key', 'company_maticni_broj')->value('value') ?? '';
-        $companySifraDelatnosti = Setting::where('key', 'company_sifra_delatnosti')->value('value') ?? '';
-        $companyPhone = Setting::where('key', 'company_phone')->value('value') ?? '';
-        $companyEmail = Setting::where('key', 'company_email')->value('value') ?? '';
-        $companyAddress = Setting::where('key', 'company_address')->value('value') ?? '';
-        $companyBankAccount = Setting::where('key', 'company_bank_account')->value('value') ?? '';
-        
+
+        // Single query for all company settings
+        $settings = Setting::whereIn('key', [
+            'km_price', 'company_name', 'company_pib', 'company_maticni_broj',
+            'company_sifra_delatnosti', 'company_phone', 'company_email', 'company_address', 'company_bank_account',
+        ])->pluck('value', 'key');
+        $kmPrice             = $settings->get('km_price', 0);
+        $companyName         = $settings->get('company_name', 'F-Therm d.o.o.');
+        $companyPib          = $settings->get('company_pib', '');
+        $companyMaticniBroj  = $settings->get('company_maticni_broj', '');
+        $companySifraDelatnosti = $settings->get('company_sifra_delatnosti', '');
+        $companyPhone        = $settings->get('company_phone', '');
+        $companyEmail        = $settings->get('company_email', '');
+        $companyAddress      = $settings->get('company_address', '');
+        $companyBankAccount  = $settings->get('company_bank_account', '');
+
         return view('worker.work-orders.invoice', compact(
             'workOrder', 
             'kmPrice',
@@ -773,18 +829,22 @@ class WorkOrderController extends Controller
         }
 
         $workOrder->load(['sections.items.product', 'worker']);
-        
-        // Get all settings for the invoice
-        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
-        $companyName = Setting::where('key', 'company_name')->value('value') ?? 'F-Therm d.o.o.';
-        $companyPib = Setting::where('key', 'company_pib')->value('value') ?? '';
-        $companyMaticniBroj = Setting::where('key', 'company_maticni_broj')->value('value') ?? '';
-        $companySifraDelatnosti = Setting::where('key', 'company_sifra_delatnosti')->value('value') ?? '';
-        $companyPhone = Setting::where('key', 'company_phone')->value('value') ?? '';
-        $companyEmail = Setting::where('key', 'company_email')->value('value') ?? '';
-        $companyAddress = Setting::where('key', 'company_address')->value('value') ?? '';
-        $companyBankAccount = Setting::where('key', 'company_bank_account')->value('value') ?? '';
-        
+
+        // Single query for all company settings
+        $settings = Setting::whereIn('key', [
+            'km_price', 'company_name', 'company_pib', 'company_maticni_broj',
+            'company_sifra_delatnosti', 'company_phone', 'company_email', 'company_address', 'company_bank_account',
+        ])->pluck('value', 'key');
+        $kmPrice             = $settings->get('km_price', 0);
+        $companyName         = $settings->get('company_name', 'F-Therm d.o.o.');
+        $companyPib          = $settings->get('company_pib', '');
+        $companyMaticniBroj  = $settings->get('company_maticni_broj', '');
+        $companySifraDelatnosti = $settings->get('company_sifra_delatnosti', '');
+        $companyPhone        = $settings->get('company_phone', '');
+        $companyEmail        = $settings->get('company_email', '');
+        $companyAddress      = $settings->get('company_address', '');
+        $companyBankAccount  = $settings->get('company_bank_account', '');
+
         $pdf = Pdf::loadView('worker.work-orders.invoice-pdf', compact(
             'workOrder', 
             'kmPrice',
@@ -855,8 +915,9 @@ class WorkOrderController extends Controller
         }
 
         $workOrder->load(['sections.items.product', 'worker']);
-        
-        $pdf = Pdf::loadView('worker.work-orders.pdf', compact('workOrder'))
+        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
+
+        $pdf = Pdf::loadView('worker.work-orders.pdf', compact('workOrder', 'kmPrice'))
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true)
             ->setOption('defaultFont', 'DejaVu Sans')

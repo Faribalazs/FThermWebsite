@@ -97,8 +97,16 @@ class WorkOrder extends Model
         return $this->calculateTotalHours() * $this->hourly_rate;
     }
 
-    public function calculateGrandTotal()
+    public function calculateTravelCost($kmPrice = 0)
     {
-        return $this->calculateTotal() + $this->calculateLaborCost();
+        if ($this->km_to_destination && $kmPrice > 0) {
+            return $this->km_to_destination * $kmPrice;
+        }
+        return 0;
+    }
+
+    public function calculateGrandTotal($kmPrice = 0)
+    {
+        return $this->calculateTotal() + $this->calculateLaborCost() + $this->calculateTravelCost($kmPrice);
     }
 }

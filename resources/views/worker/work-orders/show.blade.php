@@ -335,11 +335,20 @@
                     </div>
                     @endif
 
+                    @if($workOrder->km_to_destination && $kmPrice > 0)
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">
+                            Putni troškovi ({{ number_format($workOrder->km_to_destination, 0) }} km &times; {{ number_format($kmPrice, 2) }})
+                        </span>
+                        <span class="text-sm font-bold text-gray-900">{{ number_format($workOrder->calculateTravelCost($kmPrice), 2) }} RSD</span>
+                    </div>
+                    @endif
+
                     <!-- Grand Total -->
                     <div class="border-t-2 border-gray-300 pt-3 mt-3">
                         <div class="flex justify-between items-center">
                             <span class="text-base sm:text-lg font-bold text-gray-800">Ukupan Iznos</span>
-                            <span class="text-xl sm:text-3xl font-extrabold text-primary-600">{{ number_format($workOrder->calculateGrandTotal(), 2) }} <span class="text-sm sm:text-base font-bold">RSD</span></span>
+                            <span class="text-xl sm:text-3xl font-extrabold text-primary-600">{{ number_format($workOrder->calculateGrandTotal($kmPrice), 2) }} <span class="text-sm sm:text-base font-bold">RSD</span></span>
                         </div>
                     </div>
                 </div>

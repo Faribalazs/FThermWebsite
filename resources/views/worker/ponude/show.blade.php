@@ -168,24 +168,56 @@
             </div>
 
             <!-- Total -->
-            <div class="mt-6 bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-4 sm:p-6 text-white">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                    <div>
-                        <p class="text-primary-100 text-xs sm:text-sm">Ukupna vrednost ponude</p>
-                        <p class="text-2xl sm:text-3xl font-bold mt-1 break-all">{{ number_format($ponuda->total_amount, 2) }} RSD</p>
+            @php
+                $materialsTotal = 0;
+                $servicesTotal = 0;
+                $laborTotal = 0;
+                foreach ($ponuda->sections as $section) {
+                    foreach ($section->items as $item) {
+                        $materialsTotal += $item->price_at_time * $item->quantity;
+                    }
+                    if ($section->service_price) $servicesTotal += $section->service_price;
+                    if ($section->hours_spent && $ponuda->hourly_rate) $laborTotal += $section->hours_spent * $ponuda->hourly_rate;
+                }
+                $travelTotal = $ponuda->calculateTravelCost($kmPrice);
+                $grandTotal = $materialsTotal + $servicesTotal + $laborTotal + $travelTotal;
+            @endphp
+            <div class="mt-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-4 sm:p-6">
+                <div class="space-y-3">
+                    @if($materialsTotal > 0)
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Ukupno Materijal</span>
+                        <span class="text-sm font-bold text-gray-900">{{ number_format($materialsTotal, 2) }} RSD</span>
                     </div>
-                    <div class="flex sm:flex-col gap-4 sm:gap-0 sm:text-right">
-                        <div class="text-primary-100 text-xs sm:text-sm">
-                            <p>Datum kreiranja</p>
-                            <p class="font-semibold text-white">{{ $ponuda->created_at->format('d.m.Y') }}</p>
-                        </div>
-                        @if($ponuda->hourly_rate)
-                        <div class="text-primary-100 text-xs sm:text-sm sm:mt-2">
-                            <p>Cena rada</p>
-                            <p class="font-semibold text-white">{{ number_format($ponuda->hourly_rate, 2) }} RSD/h</p>
-                        </div>
-                        @endif
+                    @endif
+                    @if($servicesTotal > 0)
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Ukupno Usluge (paušal)</span>
+                        <span class="text-sm font-bold text-gray-900">{{ number_format($servicesTotal, 2) }} RSD</span>
                     </div>
+                    @endif
+                    @if($laborTotal > 0)
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Rad ({{ number_format($ponuda->hourly_rate, 2) }} RSD/h)</span>
+                        <span class="text-sm font-bold text-gray-900">{{ number_format($laborTotal, 2) }} RSD</span>
+                    </div>
+                    @endif
+                    @if($travelTotal > 0)
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-600">Putni troškovi ({{ number_format($ponuda->km_to_destination, 0) }} km &times; {{ number_format($kmPrice, 2) }})</span>
+                        <span class="text-sm font-bold text-gray-900">{{ number_format($travelTotal, 2) }} RSD</span>
+                    </div>
+                    @endif
+                    <div class="border-t-2 border-gray-300 pt-3 mt-3 flex justify-between items-center">
+                        <span class="text-base sm:text-lg font-bold text-gray-800">Ukupna vrednost ponude</span>
+                        <span class="text-xl sm:text-3xl font-extrabold text-primary-600">{{ number_format($grandTotal, 2) }} <span class="text-sm sm:text-base font-bold">RSD</span></span>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-4 text-xs text-gray-500">
+                    <span>Datum kreiranja: <span class="font-semibold text-gray-700">{{ $ponuda->created_at->format('d.m.Y') }}</span></span>
+                    @if($ponuda->hourly_rate)
+                    <span>Cena rada: <span class="font-semibold text-gray-700">{{ number_format($ponuda->hourly_rate, 2) }} RSD/h</span></span>
+                    @endif
                 </div>
             </div>
         </div>

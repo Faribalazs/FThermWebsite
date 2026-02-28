@@ -98,6 +98,7 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
     // Ponude (Offers/Quotes) - requires ponude permission
     Route::middleware('worker.permission:ponude')->group(function () {
         Route::post('ponude/autosave', [App\Http\Controllers\Worker\PonudaController::class, 'autosave'])->name('ponude.autosave');
+        Route::post('ponude/{ponuda}/autosave-edit', [App\Http\Controllers\Worker\PonudaController::class, 'autosaveEdit'])->name('ponude.autosave-edit');
         Route::resource('ponude', App\Http\Controllers\Worker\PonudaController::class)->parameters(['ponude' => 'ponuda']);
         Route::get('ponude/{ponuda}/export-pdf', [App\Http\Controllers\Worker\PonudaController::class, 'exportPdf'])->name('ponude.export-pdf');
     });

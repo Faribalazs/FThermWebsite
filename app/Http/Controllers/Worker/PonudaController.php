@@ -19,7 +19,7 @@ class PonudaController extends Controller
     public function index(Request $request)
     {
         $query = Ponuda::where('worker_id', auth('worker')->id())
-            ->with(['sections.items.product']);
+            ->withCount('sections');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -46,8 +46,10 @@ class PonudaController extends Controller
             $query->where('status', $request->status);
         }
 
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
+        // Sorting (whitelist to prevent column injection)
+        $allowedSort = ['created_at', 'total_amount', 'location', 'status'];
+        $sortBy = in_array($request->get('sort_by'), $allowedSort) ? $request->get('sort_by') : 'created_at';
+        $sortOrder = $request->get('sort_order') === 'asc' ? 'asc' : 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
         $ponude = $query->paginate(15)->withQueryString();
@@ -112,16 +114,27 @@ class PonudaController extends Controller
         }
         $ponuda->sections()->delete();
 
+        // Batch-load all needed products (eliminates N+1 per item)
+        $allProductIds = collect($request->input('sections', []))
+            ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+            ->unique()->values()->all();
+        $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
+
         foreach ($request->input('sections', []) as $sectionData) {
-            if (empty($sectionData['title'])) continue;
+            // In autosave/draft context, keep sections even without a title
+            // so that items (materials) are not lost while the user is still typing.
+            $sectionTitle = trim($sectionData['title'] ?? '');
+            if ($sectionTitle === '') {
+                $sectionTitle = 'Usluga'; // temporary placeholder
+            }
             $section = $ponuda->sections()->create([
-                'title'         => $sectionData['title'],
+                'title'         => $sectionTitle,
                 'hours_spent'   => $sectionData['hours_spent'] ?: null,
                 'service_price' => $sectionData['service_price'] ?: null,
             ]);
             foreach ($sectionData['items'] ?? [] as $itemData) {
                 if (empty($itemData['product_id'])) continue;
-                $product = InternalProduct::find($itemData['product_id']);
+                $product = $productMap->get($itemData['product_id']);
                 if (!$product) continue;
                 $section->items()->create([
                     'product_id'    => $itemData['product_id'],
@@ -131,11 +144,79 @@ class PonudaController extends Controller
             }
         }
 
+        $ponuda->load('sections.items');
+        $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+        $ponuda->update(['total_amount' => $ponuda->calculateTotal($kmPrice)]);
+
         return response()->json([
             'id'       => $ponuda->id,
             'saved_at' => now()->format('H:i:s'),
             'edit_url' => route('worker.ponude.edit', $ponuda),
         ]);
+    }
+
+    public function autosaveEdit(Request $request, Ponuda $ponuda)
+    {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $ponuda->update([
+            'client_type'       => $request->input('client_type') ?: $ponuda->client_type,
+            'client_name'       => $request->input('client_name') ?: null,
+            'client_address'    => $request->input('client_address') ?: null,
+            'company_name'      => $request->input('company_name') ?: null,
+            'pib'               => $request->input('pib') ?: null,
+            'maticni_broj'      => $request->input('maticni_broj') ?: null,
+            'company_address'   => $request->input('company_address') ?: null,
+            'client_phone'      => $request->input('client_phone') ?: null,
+            'client_email'      => $request->input('client_email') ?: null,
+            'location'          => $request->input('location') ?: null,
+            'km_to_destination' => $request->input('km_to_destination') ?: null,
+            'hourly_rate'       => $request->input('hourly_rate') ?: null,
+            'notes'             => $request->input('notes') ?: null,
+        ]);
+
+        // Wipe and rebuild sections / items (no inventory deduction for autosave)
+        $ponuda->load('sections.items');
+        foreach ($ponuda->sections as $section) {
+            $section->items()->delete();
+        }
+        $ponuda->sections()->delete();
+
+        // Batch-load all needed products (eliminates N+1 per item)
+        $allProductIds = collect($request->input('sections', []))
+            ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+            ->unique()->values()->all();
+        $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
+
+        foreach ($request->input('sections', []) as $sectionData) {
+            $sectionTitle = trim($sectionData['title'] ?? '');
+            if ($sectionTitle === '') {
+                $sectionTitle = 'Usluga';
+            }
+            $section = $ponuda->sections()->create([
+                'title'         => $sectionTitle,
+                'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                'service_price' => $sectionData['service_price'] ?: null,
+            ]);
+            foreach ($sectionData['items'] ?? [] as $itemData) {
+                if (empty($itemData['product_id'])) continue;
+                $product = $productMap->get($itemData['product_id']);
+                if (!$product) continue;
+                $section->items()->create([
+                    'product_id'    => $itemData['product_id'],
+                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                    'price_at_time' => $product->price,
+                ]);
+            }
+        }
+
+        $ponuda->load('sections.items');
+        $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+        $ponuda->update(['total_amount' => $ponuda->calculateTotal($kmPrice)]);
+
+        return response()->json(['saved_at' => now()->format('H:i:s')]);
     }
 
     public function store(Request $request)
@@ -235,6 +316,12 @@ class PonudaController extends Controller
                 ]);
             }
 
+            // Batch-load all needed products (eliminates N+1 per item)
+            $allProductIds = collect($validated['sections'])
+                ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+                ->unique()->values()->all();
+            $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->get()->keyBy('id') : collect();
+
             foreach ($validated['sections'] as $sectionData) {
                 $section = $ponuda->sections()->create([
                     'title'         => $sectionData['title'],
@@ -245,7 +332,8 @@ class PonudaController extends Controller
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $product = InternalProduct::find($itemData['product_id']);
+                        $product = $productMap->get($itemData['product_id']);
+                        if (!$product) continue;
                         $section->items()->create([
                             'product_id'    => $itemData['product_id'],
                             'quantity'      => $itemData['quantity'] ?? 1,
@@ -257,7 +345,8 @@ class PonudaController extends Controller
             }
 
             $ponuda->load('sections.items');
-            $total = $ponuda->calculateTotal();
+            $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $total = $ponuda->calculateTotal($kmPrice);
             $ponuda->update(['total_amount' => $total]);
 
             $clientDisplay = $validated['client_type'] === 'pravno_lice'
@@ -316,7 +405,8 @@ class PonudaController extends Controller
             abort(403);
         }
         $ponuda->load(['sections.items.product']);
-        return view('worker.ponude.show', compact('ponuda'));
+        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
+        return view('worker.ponude.show', compact('ponuda', 'kmPrice'));
     }
 
     public function edit(Ponuda $ponuda)
@@ -401,6 +491,12 @@ class PonudaController extends Controller
             $ponuda->sections()->each(fn($s) => $s->items()->delete());
             $ponuda->sections()->delete();
 
+            // Batch-load all needed products (eliminates N+1 per item)
+            $allProductIds = collect($validated['sections'])
+                ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
+                ->unique()->values()->all();
+            $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->get()->keyBy('id') : collect();
+
             foreach ($validated['sections'] as $sectionData) {
                 $section = $ponuda->sections()->create([
                     'title'         => $sectionData['title'],
@@ -411,7 +507,8 @@ class PonudaController extends Controller
                 if (!empty($sectionData['items'])) {
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $product = InternalProduct::find($itemData['product_id']);
+                        $product = $productMap->get($itemData['product_id']);
+                        if (!$product) continue;
                         $section->items()->create([
                             'product_id'    => $itemData['product_id'],
                             'quantity'      => $itemData['quantity'] ?? 1,
@@ -422,7 +519,8 @@ class PonudaController extends Controller
             }
 
             $ponuda->load('sections.items');
-            $total = $ponuda->calculateTotal();
+            $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $total = $ponuda->calculateTotal($kmPrice);
             $ponuda->update(['total_amount' => $total]);
 
             DB::commit();
@@ -454,15 +552,20 @@ class PonudaController extends Controller
 
         $ponuda->load(['sections.items.product', 'worker']);
 
-        $companyName = Setting::where('key', 'company_name')->value('value') ?? 'F-Therm d.o.o.';
-        $companyPhone = Setting::where('key', 'company_phone')->value('value') ?? '';
-        $companyEmail = Setting::where('key', 'company_email')->value('value') ?? '';
-        $companyAddress = Setting::where('key', 'company_address')->value('value') ?? '';
-        $companyPib = Setting::where('key', 'company_pib')->value('value') ?? '';
-        $companyMaticniBroj = Setting::where('key', 'company_maticni_broj')->value('value') ?? '';
-        $companySifraDelatnosti = Setting::where('key', 'company_sifra_delatnosti')->value('value') ?? '';
-        $companyBankAccount = Setting::where('key', 'company_bank_account')->value('value') ?? '';
-        $kmPrice = Setting::where('key', 'km_price')->value('value') ?? 0;
+        // Single query for all company settings
+        $settings = Setting::whereIn('key', [
+            'company_name', 'company_phone', 'company_email', 'company_address',
+            'company_pib', 'company_maticni_broj', 'company_sifra_delatnosti', 'company_bank_account', 'km_price',
+        ])->pluck('value', 'key');
+        $companyName            = $settings->get('company_name', 'F-Therm d.o.o.');
+        $companyPhone           = $settings->get('company_phone', '');
+        $companyEmail           = $settings->get('company_email', '');
+        $companyAddress         = $settings->get('company_address', '');
+        $companyPib             = $settings->get('company_pib', '');
+        $companyMaticniBroj     = $settings->get('company_maticni_broj', '');
+        $companySifraDelatnosti = $settings->get('company_sifra_delatnosti', '');
+        $companyBankAccount     = $settings->get('company_bank_account', '');
+        $kmPrice                = $settings->get('km_price', 0);
 
         $pdf = Pdf::loadView('worker.ponude.pdf', compact(
             'ponuda', 'companyName', 'companyPhone', 'companyEmail', 'companyAddress',

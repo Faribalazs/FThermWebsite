@@ -230,6 +230,9 @@
     </div>
 
     <script>
+        let _pageLoading = true;
+        let _autosaveTimer = null;
+        let _autosaveBusy = false;
         let sectionIndex = 0;
         const products = @json($products);
         const productMap = Object.fromEntries(products.map(p => [p.id, p]));
@@ -247,8 +250,8 @@
                 return `<div class="custom-select-option"
                     data-value="${p.id}" data-price="${p.price}"
                     data-text="${n} - ${p.price} RSD/${u}"
-                    data-search="${p.name.toLowerCase()}"
-                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
+                    data-search="${n.toLowerCase()}"
+                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, this.getAttribute('data-text'), ${p.price})">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
@@ -298,6 +301,12 @@
                     if (saveCheckbox) saveCheckbox.style.display = 'none';
                 }
             }
+            _pageLoading = false;
+            const form = document.getElementById('ponudaForm');
+            if (form) {
+                form.addEventListener('input', triggerAutosave);
+                form.addEventListener('change', triggerAutosave);
+            }
         });
 
         function toggleClientFields() {
@@ -332,6 +341,7 @@
             } else {
                 addItem(sectionIndex);
             }
+            triggerAutosave();
         }
 
         function addSection() {
@@ -339,6 +349,7 @@
             const container = document.getElementById('sectionsContainer');
             container.insertAdjacentHTML('beforeend', buildSectionHtml(sectionIndex, '', '', ''));
             addItem(sectionIndex);
+            triggerAutosave();
         }
 
         function buildSectionHtml(idx, title, hours, servicePrice) {
@@ -389,6 +400,7 @@
 
         function removeSection(sectionId) {
             document.querySelector(`[data-section="${sectionId}"]`)?.remove();
+            triggerAutosave();
         }
 
         function addItemWithData(sectionId, itemData) {
@@ -416,6 +428,7 @@
                 qtyInput.value = parseInt(itemData.quantity) || 0;
                 updateItemPrice(sectionId, itemId);
             }
+            triggerAutosave();
         }
 
         function addItem(sectionId) {
@@ -424,6 +437,7 @@
             const itemId = itemCounters[sectionId];
             const container = document.getElementById(`itemsContainer_${sectionId}`);
             container.insertAdjacentHTML('beforeend', buildItemHtml(sectionId, itemId));
+            triggerAutosave();
         }
 
         function buildItemHtml(sectionId, itemId) {
@@ -472,6 +486,7 @@
 
         function removeItem(sectionId, itemId) {
             document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"]`)?.remove();
+            triggerAutosave();
         }
 
         function updateItemPrice(sectionId, itemId) {
@@ -504,6 +519,7 @@
             valueDisplay.classList.add('selected');
             document.getElementById(`dropdown_${sectionId}_${itemId}`).classList.remove('active');
             updateItemPrice(sectionId, itemId);
+            triggerAutosave();
         }
 
         function filterProducts(sectionId, itemId) {
@@ -516,6 +532,48 @@
                 document.querySelectorAll('.custom-select-dropdown').forEach(dd => dd.classList.remove('active'));
             }
         });
+
+        function triggerAutosave() {
+            if (_pageLoading) return;
+            clearTimeout(_autosaveTimer);
+            _autosaveTimer = setTimeout(runAutosave, 2000);
+        }
+
+        function runAutosave() {
+            if (_autosaveBusy) { triggerAutosave(); return; }
+            _autosaveBusy = true;
+            const form = document.getElementById('ponudaForm');
+            const formData = new FormData(form);
+            formData.delete('_method'); // strip PUT spoofing so the POST route matches
+            fetch('{{ route("worker.ponude.autosave-edit", $ponuda) }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData,
+            })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+                showAutosaveToast();
+            })
+            .catch(() => {})
+            .finally(() => { _autosaveBusy = false; });
+        }
+
+        function showAutosaveToast() {
+            let toast = document.getElementById('autosave-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'autosave-toast';
+                toast.style.cssText = 'position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;align-items:center;gap:0.4rem;background:#166534;color:#dcfce7;font-size:0.7rem;font-weight:600;padding:0.45rem 0.85rem;border-radius:0.6rem;box-shadow:0 4px 14px rgba(0,0,0,0.18);opacity:0;transition:opacity 0.25s ease;pointer-events:none;';
+                toast.innerHTML = '<svg style="width:0.8rem;height:0.8rem;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Izmene sačuvane';
+                document.body.appendChild(toast);
+            }
+            clearTimeout(toast._t);
+            toast.style.opacity = '1';
+            toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+        }
     </script>
     @include('worker.partials.contact-selector-js')
 @endsection
