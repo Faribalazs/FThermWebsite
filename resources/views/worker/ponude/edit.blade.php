@@ -413,7 +413,7 @@
             // Pre-set quantity
             const qtyInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
             if (qtyInput && itemData.quantity) {
-                qtyInput.value = itemData.quantity;
+                qtyInput.value = parseInt(itemData.quantity) || 0;
                 updateItemPrice(sectionId, itemId);
             }
         }

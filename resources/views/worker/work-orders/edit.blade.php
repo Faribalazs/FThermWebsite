@@ -456,8 +456,8 @@ let currentWarehouseId = {{ $workOrder->warehouse_id ?? 'null' }};
 function getWarehouseStock(productId, warehouseId) {
     const product = productMap[productId];
     if (!product || !product.inventories) return 0;
-    const inventory = product.inventories.find(inv => inv.warehouse_id === warehouseId);
-    return inventory ? inventory.quantity : 0;
+    const inventory = product.inventories.find(inv => inv.warehouse_id == warehouseId);
+    return inventory ? parseInt(inventory.quantity) || 0 : 0;
 }
 
 // Calculate available quantity (warehouse stock - already used in form)
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Set product
                     const product = products.find(p => p.id === item.product_id);
                     if (product) {
-                        const stock = product.inventory ? product.inventory.quantity : 0;
+                        const stock = product.inventory ? parseInt(product.inventory.quantity) || 0 : 0;
                         const productName = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                         const productUnit = product.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
                         const displayText = `${productName} - ${product.price} RSD/${productUnit}`;
@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Set quantity
                             const quantityInput = document.querySelector(`[data-section="${newSectionIndex}"] [data-item="${newItemId}"] input[type="number"]`);
                             if (quantityInput && item.quantity) {
-                                quantityInput.value = item.quantity;
+                                quantityInput.value = parseInt(item.quantity) || 0;
                                 validateStock(newSectionIndex, newItemId);
                                 updateItemPrice(newSectionIndex, newItemId);
                             }
