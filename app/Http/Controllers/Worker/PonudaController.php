@@ -107,42 +107,41 @@ class PonudaController extends Controller
             $ponuda = Ponuda::create($attrs);
         }
 
-        // Wipe and rebuild sections / items
-        $ponuda->load('sections.items');
-        foreach ($ponuda->sections as $section) {
-            $section->items()->delete();
-        }
-        $ponuda->sections()->delete();
-
         // Batch-load all needed products (eliminates N+1 per item)
         $allProductIds = collect($request->input('sections', []))
             ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
             ->unique()->values()->all();
         $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
 
-        foreach ($request->input('sections', []) as $sectionData) {
-            // In autosave/draft context, keep sections even without a title
-            // so that items (materials) are not lost while the user is still typing.
-            $sectionTitle = trim($sectionData['title'] ?? '');
-            if ($sectionTitle === '') {
-                $sectionTitle = 'Usluga'; // temporary placeholder
-            }
-            $section = $ponuda->sections()->create([
-                'title'         => $sectionTitle,
-                'hours_spent'   => $sectionData['hours_spent'] ?: null,
-                'service_price' => $sectionData['service_price'] ?: null,
-            ]);
-            foreach ($sectionData['items'] ?? [] as $itemData) {
-                if (empty($itemData['product_id'])) continue;
-                $product = $productMap->get($itemData['product_id']);
-                if (!$product) continue;
-                $section->items()->create([
-                    'product_id'    => $itemData['product_id'],
-                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
-                    'price_at_time' => $product->price,
+        // Wipe and rebuild sections / items inside a transaction
+        // (cascade FK on ponuda_items ensures items are deleted when sections are deleted)
+        DB::transaction(function () use ($ponuda, $request, $productMap) {
+            $ponuda->sections()->delete();
+
+            foreach ($request->input('sections', []) as $sectionData) {
+                // In autosave/draft context, keep sections even without a title
+                // so that items (materials) are not lost while the user is still typing.
+                $sectionTitle = trim($sectionData['title'] ?? '');
+                if ($sectionTitle === '') {
+                    $sectionTitle = 'Usluga'; // temporary placeholder
+                }
+                $section = $ponuda->sections()->create([
+                    'title'         => $sectionTitle,
+                    'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                    'service_price' => $sectionData['service_price'] ?: null,
                 ]);
+                foreach ($sectionData['items'] ?? [] as $itemData) {
+                    if (empty($itemData['product_id'])) continue;
+                    $product = $productMap->get($itemData['product_id']);
+                    if (!$product) continue;
+                    $section->items()->create([
+                        'product_id'    => $itemData['product_id'],
+                        'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                        'price_at_time' => $product->price,
+                    ]);
+                }
             }
-        }
+        });
 
         $ponuda->load('sections.items');
         $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
@@ -177,40 +176,39 @@ class PonudaController extends Controller
             'notes'             => $request->input('notes') ?: null,
         ]);
 
-        // Wipe and rebuild sections / items (no inventory deduction for autosave)
-        $ponuda->load('sections.items');
-        foreach ($ponuda->sections as $section) {
-            $section->items()->delete();
-        }
-        $ponuda->sections()->delete();
-
         // Batch-load all needed products (eliminates N+1 per item)
         $allProductIds = collect($request->input('sections', []))
             ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
             ->unique()->values()->all();
         $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
 
-        foreach ($request->input('sections', []) as $sectionData) {
-            $sectionTitle = trim($sectionData['title'] ?? '');
-            if ($sectionTitle === '') {
-                $sectionTitle = 'Usluga';
-            }
-            $section = $ponuda->sections()->create([
-                'title'         => $sectionTitle,
-                'hours_spent'   => $sectionData['hours_spent'] ?: null,
-                'service_price' => $sectionData['service_price'] ?: null,
-            ]);
-            foreach ($sectionData['items'] ?? [] as $itemData) {
-                if (empty($itemData['product_id'])) continue;
-                $product = $productMap->get($itemData['product_id']);
-                if (!$product) continue;
-                $section->items()->create([
-                    'product_id'    => $itemData['product_id'],
-                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
-                    'price_at_time' => $product->price,
+        // Wipe and rebuild sections / items inside a transaction
+        // (cascade FK on ponuda_items ensures items are deleted when sections are deleted)
+        DB::transaction(function () use ($ponuda, $request, $productMap) {
+            $ponuda->sections()->delete();
+
+            foreach ($request->input('sections', []) as $sectionData) {
+                $sectionTitle = trim($sectionData['title'] ?? '');
+                if ($sectionTitle === '') {
+                    $sectionTitle = 'Usluga';
+                }
+                $section = $ponuda->sections()->create([
+                    'title'         => $sectionTitle,
+                    'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                    'service_price' => $sectionData['service_price'] ?: null,
                 ]);
+                foreach ($sectionData['items'] ?? [] as $itemData) {
+                    if (empty($itemData['product_id'])) continue;
+                    $product = $productMap->get($itemData['product_id']);
+                    if (!$product) continue;
+                    $section->items()->create([
+                        'product_id'    => $itemData['product_id'],
+                        'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                        'price_at_time' => $product->price,
+                    ]);
+                }
             }
-        }
+        });
 
         $ponuda->load('sections.items');
         $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
@@ -401,7 +399,7 @@ class PonudaController extends Controller
 
     public function show(Ponuda $ponuda)
     {
-        if ($ponuda->worker_id !== auth('worker')->id()) {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
         $ponuda->load(['sections.items.product']);
@@ -411,7 +409,7 @@ class PonudaController extends Controller
 
     public function edit(Ponuda $ponuda)
     {
-        if ($ponuda->worker_id !== auth('worker')->id()) {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
         $ponuda->load(['sections.items.product']);
@@ -423,7 +421,7 @@ class PonudaController extends Controller
 
     public function update(Request $request, Ponuda $ponuda)
     {
-        if ($ponuda->worker_id !== auth('worker')->id()) {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -546,7 +544,7 @@ class PonudaController extends Controller
 
     public function exportPdf(Ponuda $ponuda)
     {
-        if ($ponuda->worker_id !== auth('worker')->id()) {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 

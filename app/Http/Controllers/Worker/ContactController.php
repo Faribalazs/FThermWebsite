@@ -43,7 +43,7 @@ class ContactController extends Controller
 
     public function update(Request $request, Contact $contact)
     {
-        if ($contact->created_by !== Auth::guard('worker')->id()) {
+        if ((int)$contact->created_by !== (int)Auth::guard('worker')->id()) {
             abort(403);
         }
 
@@ -66,7 +66,7 @@ class ContactController extends Controller
 
     public function destroy(Contact $contact)
     {
-        if ($contact->created_by !== Auth::guard('worker')->id()) {
+        if ((int)$contact->created_by !== (int)Auth::guard('worker')->id()) {
             abort(403);
         }
 
@@ -80,7 +80,7 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        if ($contact->created_by !== Auth::guard('worker')->id()) {
+        if ((int)$contact->created_by !== (int)Auth::guard('worker')->id()) {
             abort(403);
         }
 

@@ -130,42 +130,41 @@ class WorkOrderController extends Controller
             $workOrder = WorkOrder::create($attrs);
         }
 
-        // Wipe and rebuild sections / items (no inventory deduction for drafts)
-        $workOrder->load('sections.items');
-        foreach ($workOrder->sections as $section) {
-            $section->items()->delete();
-        }
-        $workOrder->sections()->delete();
-
         // Batch-load all needed products (eliminates N+1 per item)
         $allProductIds = collect($request->input('sections', []))
             ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
             ->unique()->values()->all();
         $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
 
-        foreach ($request->input('sections', []) as $sectionData) {
-            // In autosave/draft context, keep sections even without a title
-            // so that items (materials) are not lost while the user is still typing.
-            $sectionTitle = trim($sectionData['title'] ?? '');
-            if ($sectionTitle === '') {
-                $sectionTitle = 'Usluga'; // temporary placeholder
-            }
-            $section = $workOrder->sections()->create([
-                'title'         => $sectionTitle,
-                'hours_spent'   => $sectionData['hours_spent'] ?: null,
-                'service_price' => $sectionData['service_price'] ?: null,
-            ]);
-            foreach ($sectionData['items'] ?? [] as $itemData) {
-                if (empty($itemData['product_id'])) continue;
-                $product = $productMap->get($itemData['product_id']);
-                if (!$product) continue;
-                $section->items()->create([
-                    'product_id'    => $itemData['product_id'],
-                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
-                    'price_at_time' => $product->price,
+        // Wipe and rebuild sections / items inside a transaction
+        // (cascade FK on work_order_items ensures items are deleted when sections are deleted)
+        DB::transaction(function () use ($workOrder, $request, $productMap) {
+            $workOrder->sections()->delete();
+
+            foreach ($request->input('sections', []) as $sectionData) {
+                // In autosave/draft context, keep sections even without a title
+                // so that items (materials) are not lost while the user is still typing.
+                $sectionTitle = trim($sectionData['title'] ?? '');
+                if ($sectionTitle === '') {
+                    $sectionTitle = 'Usluga'; // temporary placeholder
+                }
+                $section = $workOrder->sections()->create([
+                    'title'         => $sectionTitle,
+                    'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                    'service_price' => $sectionData['service_price'] ?: null,
                 ]);
+                foreach ($sectionData['items'] ?? [] as $itemData) {
+                    if (empty($itemData['product_id'])) continue;
+                    $product = $productMap->get($itemData['product_id']);
+                    if (!$product) continue;
+                    $section->items()->create([
+                        'product_id'    => $itemData['product_id'],
+                        'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                        'price_at_time' => $product->price,
+                    ]);
+                }
             }
-        }
+        });
 
         $workOrder->load('sections.items');
         $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
@@ -202,41 +201,40 @@ class WorkOrderController extends Controller
             'hourly_rate'       => $request->input('hourly_rate') ?: null,
         ]);
 
-        // Wipe and rebuild sections / items (no inventory deduction for autosave)
-        $workOrder->load('sections.items');
-        foreach ($workOrder->sections as $section) {
-            $section->items()->delete();
-        }
-        $workOrder->sections()->delete();
-
         // Batch-load all needed products (eliminates N+1 per item)
         $allProductIds = collect($request->input('sections', []))
             ->flatMap(fn($s) => collect($s['items'] ?? [])->pluck('product_id')->filter())
             ->unique()->values()->all();
         $productMap = $allProductIds ? InternalProduct::whereIn('id', $allProductIds)->select('id', 'price')->get()->keyBy('id') : collect();
 
-        foreach ($request->input('sections', []) as $sectionData) {
-            // In autosave context, keep sections even without a title
-            $sectionTitle = trim($sectionData['title'] ?? '');
-            if ($sectionTitle === '') {
-                $sectionTitle = 'Usluga'; // temporary placeholder
-            }
-            $section = $workOrder->sections()->create([
-                'title'         => $sectionTitle,
-                'hours_spent'   => $sectionData['hours_spent'] ?: null,
-                'service_price' => $sectionData['service_price'] ?: null,
-            ]);
-            foreach ($sectionData['items'] ?? [] as $itemData) {
-                if (empty($itemData['product_id'])) continue;
-                $product = $productMap->get($itemData['product_id']);
-                if (!$product) continue;
-                $section->items()->create([
-                    'product_id'    => $itemData['product_id'],
-                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
-                    'price_at_time' => $product->price,
+        // Wipe and rebuild sections / items inside a transaction
+        // (cascade FK on work_order_items ensures items are deleted when sections are deleted)
+        DB::transaction(function () use ($workOrder, $request, $productMap) {
+            $workOrder->sections()->delete();
+
+            foreach ($request->input('sections', []) as $sectionData) {
+                // In autosave context, keep sections even without a title
+                $sectionTitle = trim($sectionData['title'] ?? '');
+                if ($sectionTitle === '') {
+                    $sectionTitle = 'Usluga'; // temporary placeholder
+                }
+                $section = $workOrder->sections()->create([
+                    'title'         => $sectionTitle,
+                    'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                    'service_price' => $sectionData['service_price'] ?: null,
                 ]);
+                foreach ($sectionData['items'] ?? [] as $itemData) {
+                    if (empty($itemData['product_id'])) continue;
+                    $product = $productMap->get($itemData['product_id']);
+                    if (!$product) continue;
+                    $section->items()->create([
+                        'product_id'    => $itemData['product_id'],
+                        'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                        'price_at_time' => $product->price,
+                    ]);
+                }
             }
-        }
+        });
 
         $workOrder->load('sections.items');
         $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);

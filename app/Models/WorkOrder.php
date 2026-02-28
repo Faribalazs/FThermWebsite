@@ -37,7 +37,8 @@ class WorkOrder extends Model
     ];
 
     protected $casts = [
-        'has_invoice' => 'boolean',
+        'worker_id'    => 'integer',
+        'has_invoice'  => 'boolean',
         'total_amount' => 'decimal:2',
         'efaktura_sent_at' => 'datetime',
     ];

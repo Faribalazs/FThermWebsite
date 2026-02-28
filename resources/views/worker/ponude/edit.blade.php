@@ -412,7 +412,7 @@
 
             // Pre-select the product
             if (itemData.product_id) {
-                const product = products.find(p => p.id === itemData.product_id);
+                const product = products.find(p => p.id == itemData.product_id);
                 if (product) {
                     const displayText = `${product.name} - ${product.price} RSD/${product.unit}`;
                     document.getElementById(`productInput_${sectionId}_${itemId}`).value = product.id;

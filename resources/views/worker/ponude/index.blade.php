@@ -194,7 +194,7 @@
                         <svg class="w-5 h-5 mr-2 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                         </svg>
-                        <span class="text-sm">{{ $p->sections_count }} {{ $p->sections_count === 1 ? 'usluga' : 'usluge/usluga' }}</span>
+                        <span class="text-sm">{{ $p->sections_count }} {{ $p->sections_count == 1 ? 'usluga' : 'usluge/usluga' }}</span>
                     </div>
 
                     <div class="pt-3 border-t border-gray-200">

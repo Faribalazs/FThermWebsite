@@ -8,6 +8,13 @@ class PonudaItem extends Model
 {
     protected $fillable = ['section_id', 'product_id', 'quantity', 'price_at_time'];
 
+    protected $casts = [
+        'section_id'    => 'integer',
+        'product_id'    => 'integer',
+        'quantity'      => 'integer',
+        'price_at_time' => 'decimal:2',
+    ];
+
     public function section()
     {
         return $this->belongsTo(PonudaSection::class, 'section_id');

@@ -9,9 +9,10 @@ class Inventory extends Model
     protected $fillable = ['internal_product_id', 'warehouse_id', 'quantity', 'updated_by'];
 
     protected $casts = [
-        'quantity' => 'integer',
-        'warehouse_id' => 'integer',
+        'quantity'            => 'integer',
+        'warehouse_id'        => 'integer',
         'internal_product_id' => 'integer',
+        'updated_by'          => 'integer',
     ];
 
     public function product()

@@ -28,6 +28,7 @@ class Ponuda extends Model
     ];
 
     protected $casts = [
+        'worker_id'    => 'integer',
         'total_amount' => 'decimal:2',
     ];
 

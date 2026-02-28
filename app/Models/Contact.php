@@ -19,6 +19,10 @@ class Contact extends Model
         'company_address',
     ];
 
+    protected $casts = [
+        'created_by' => 'integer',
+    ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

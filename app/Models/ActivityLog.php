@@ -17,7 +17,9 @@ class ActivityLog extends Model
     ];
 
     protected $casts = [
-        'data' => 'array',
+        'user_id'    => 'integer',
+        'entity_id'  => 'integer',
+        'data'       => 'array',
         'created_at' => 'datetime',
     ];
 

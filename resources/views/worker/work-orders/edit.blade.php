@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const newItemId = addItem(newSectionIndex);
                     
                     // Set product
-                    const product = products.find(p => p.id === item.product_id);
+                    const product = products.find(p => p.id == item.product_id);
                     if (product) {
                         const stock = product.inventory ? parseInt(product.inventory.quantity) || 0 : 0;
                         // Use raw name/unit for direct JS call — textContent does NOT decode HTML entities

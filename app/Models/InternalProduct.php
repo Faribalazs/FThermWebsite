@@ -8,6 +8,12 @@ class InternalProduct extends Model
 {
     protected $fillable = ['name', 'unit', 'price', 'low_stock_threshold', 'created_by'];
 
+    protected $casts = [
+        'created_by'          => 'integer',
+        'price'               => 'decimal:2',
+        'low_stock_threshold' => 'integer',
+    ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
