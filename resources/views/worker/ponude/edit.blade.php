@@ -171,8 +171,8 @@
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Kilometraža (km)</label>
-                            <input type="number" name="km_to_destination" value="{{ old('km_to_destination', $ponuda->km_to_destination) }}"
-                                class="form-input w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm sm:text-base" step="0.1" min="0">
+                            <input type="number" name="km_to_destination" value="{{ old('km_to_destination', $ponuda->km_to_destination ? (int)$ponuda->km_to_destination : '') }}"
+                                    class="form-input w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm sm:text-base" step="1" min="0">
                             <p class="mt-1 text-xs text-gray-500">Opciono</p>
                         </div>
                         <div>
@@ -232,6 +232,40 @@
     <script>
         let sectionIndex = 0;
         const products = @json($products);
+        const productMap = Object.fromEntries(products.map(p => [p.id, p]));
+        const MAX_VISIBLE = 80;
+
+        function renderDropdownOptions(sectionId, itemId, filter) {
+            const container = document.getElementById(`options_${sectionId}_${itemId}`);
+            if (!container) return;
+            const term = (filter || '').toLowerCase().trim();
+            const list = term ? products.filter(p => p.name.toLowerCase().includes(term)) : products;
+            const visible = list.slice(0, MAX_VISIBLE);
+            container.innerHTML = visible.map(p => {
+                const n = p.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                const u = p.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                return `<div class="custom-select-option"
+                    data-value="${p.id}" data-price="${p.price}"
+                    data-text="${n} - ${p.price} RSD/${u}"
+                    data-search="${p.name.toLowerCase()}"
+                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${n}</div>
+                            <div class="text-xs text-gray-500">${p.price} RSD/${u}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            if (list.length > MAX_VISIBLE && !term) {
+                container.insertAdjacentHTML('beforeend',
+                    `<div class="px-4 py-2 text-xs text-gray-500 text-center border-t">Prikazano ${MAX_VISIBLE} od ${list.length} – koristite pretragu za više</div>`);
+            }
+            container.setAttribute('data-rendered', 'true');
+        }
         let itemCounters = {};
 
         // Existing sections data from server
@@ -244,6 +278,26 @@
                 addSectionWithData(section);
             });
             if (existingSections.length === 0) addSection();
+
+            // Pre-select the matching saved contact in the dropdown (display only — fields already filled by Blade)
+            if (typeof savedContacts !== 'undefined' && savedContacts.length > 0) {
+                const currentType = document.querySelector('input[name="client_type"]:checked')?.value;
+                const currentName = (document.getElementById('client_name')?.value || '').trim();
+                const currentCompany = (document.getElementById('company_name')?.value || '').trim();
+                const currentPib = (document.getElementById('pib')?.value || '').trim();
+                const matched = savedContacts.find(c => {
+                    if (c.type !== currentType) return false;
+                    if (c.type === 'fizicko_lice') return currentName && c.client_name === currentName;
+                    return (currentPib && c.pib === currentPib) || (currentCompany && c.company_name === currentCompany);
+                });
+                if (matched) {
+                    const displayName = matched.type === 'fizicko_lice' ? matched.client_name : matched.company_name;
+                    const el = document.getElementById('contact_selected_text');
+                    if (el) { el.textContent = displayName; el.classList.add('selected'); }
+                    const saveCheckbox = document.getElementById('save-contact-checkbox');
+                    if (saveCheckbox) saveCheckbox.style.display = 'none';
+                }
+            }
         });
 
         function toggleClientFields() {
@@ -318,9 +372,9 @@
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Cena usluge (RSD)</label>
                             <input type="number" name="sections[${idx}][service_price]"
-                                value="${servicePrice || ''}"
+                                value="${servicePrice ? parseInt(servicePrice) : ''}"
                                 class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                                step="0.01" min="0">
+                                step="1" min="0">
                             <p class="mt-1 text-xs text-gray-500">Opciono</p>
                         </div>
                     </div>
@@ -373,25 +427,6 @@
         }
 
         function buildItemHtml(sectionId, itemId) {
-            const options = products.map(p => {
-                const n = p.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                const u = p.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                return `<div class="custom-select-option"
-                    data-value="${p.id}" data-price="${p.price}"
-                    data-text="${n} - ${p.price} RSD/${u}"
-                    data-search="${p.name.toLowerCase()}"
-                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${n}</div>
-                            <div class="text-xs text-gray-500">${p.price} RSD/${u}</div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
 
             return `
                 <div class="item-row bg-white border border-gray-300 rounded-lg p-3" data-item="${itemId}">
@@ -414,7 +449,7 @@
                                     <input type="text" class="custom-select-search-input" id="searchInput_${sectionId}_${itemId}"
                                         placeholder="Pretraži materijale..." oninput="filterProducts(${sectionId}, ${itemId})">
                                 </div>
-                                <div class="custom-select-options" id="options_${sectionId}_${itemId}">${options}</div>
+                                <div class="custom-select-options" id="options_${sectionId}_${itemId}"><!-- lazy --></div>
                             </div>
                         </div>
                     </div>
@@ -423,7 +458,7 @@
                             <label class="block text-xs font-medium text-gray-700 mb-1">Količina</label>
                             <input type="number" name="sections[${sectionId}][items][${itemId}][quantity]"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 text-sm"
-                                min="1" value="1"
+                                min="1" placeholder="0"
                                 oninput="updateItemPrice(${sectionId}, ${itemId})"
                                 onchange="updateItemPrice(${sectionId}, ${itemId})">
                         </div>
@@ -444,8 +479,8 @@
             const qtyInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
             const priceDisplay = document.getElementById(`itemPrice_${sectionId}_${itemId}`);
             if (!hiddenInput || !qtyInput || !priceDisplay) return;
-            const selectedOption = document.querySelector(`#options_${sectionId}_${itemId} [data-value="${hiddenInput.value}"]`);
-            const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) || 0 : 0;
+            const product = productMap[parseInt(hiddenInput.value)];
+            const price = product ? parseFloat(product.price) || 0 : 0;
             priceDisplay.textContent = (price * (parseInt(qtyInput.value) || 0)).toFixed(2) + ' RSD';
         }
 
@@ -456,7 +491,9 @@
             });
             dropdown.classList.toggle('active');
             if (dropdown.classList.contains('active')) {
-                setTimeout(() => document.getElementById(`searchInput_${sectionId}_${itemId}`).focus(), 100);
+                const container = document.getElementById(`options_${sectionId}_${itemId}`);
+                if (!container.getAttribute('data-rendered')) renderDropdownOptions(sectionId, itemId, '');
+                setTimeout(() => document.getElementById(`searchInput_${sectionId}_${itemId}`)?.focus(), 50);
             }
         }
 
@@ -470,10 +507,8 @@
         }
 
         function filterProducts(sectionId, itemId) {
-            const term = document.getElementById(`searchInput_${sectionId}_${itemId}`).value.toLowerCase();
-            document.querySelectorAll(`#options_${sectionId}_${itemId} .custom-select-option`).forEach(opt => {
-                opt.style.display = opt.getAttribute('data-search').includes(term) ? 'block' : 'none';
-            });
+            const term = document.getElementById(`searchInput_${sectionId}_${itemId}`)?.value || '';
+            renderDropdownOptions(sectionId, itemId, term);
         }
 
         document.addEventListener('click', function (e) {

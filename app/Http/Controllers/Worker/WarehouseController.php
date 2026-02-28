@@ -8,6 +8,8 @@ use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\WarehouseInventoryExport;
+use App\Imports\WarehouseInventoryImport;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class WarehouseController extends Controller
 {
@@ -34,6 +36,36 @@ class WarehouseController extends Controller
         $filename = 'skladiste_' . str_replace(' ', '_', strtolower($warehouse->name)) . '_' . date('Y-m-d_H-i-s') . '.xlsx';
         
         return Excel::download(new WarehouseInventoryExport($warehouse), $filename);
+    }
+
+    public function import(Request $request, Warehouse $warehouse)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ], [
+            'file.required' => 'Molimo odaberite fajl za uvoz.',
+            'file.mimes'    => 'Fajl mora biti Excel (xlsx, xls) ili CSV format.',
+            'file.max'      => 'Fajl ne sme biti veći od 2MB.',
+        ]);
+
+        try {
+            $import = new WarehouseInventoryImport($warehouse);
+            Excel::import($import, $request->file('file'));
+
+            $message = "Uspešno ažurirano {$import->updatedCount} artikala.";
+            if ($import->skippedCount > 0) {
+                $message .= " Preskočeno {$import->skippedCount} redova (nepoznat naziv materijala ili prazni podaci).";
+            }
+
+            return redirect()->route('worker.warehouses.show', $warehouse)
+                ->with('success', $message);
+        } catch (ValidationException $e) {
+            $failures = $e->failures();
+            $errors = collect($failures)->map(fn($f) => "Red {$f->row()}: " . implode(', ', $f->errors()))->join(' | ');
+            return redirect()->back()->with('error', 'Greška pri validaciji: ' . $errors);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Greška pri uvozu fajla: ' . $e->getMessage());
+        }
     }
 
     public function create()

@@ -85,6 +85,8 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
 
     // Work Orders (Radni Nalozi) - requires work_orders permission
     Route::middleware('worker.permission:work_orders')->group(function () {
+        Route::post('work-orders/autosave', [App\Http\Controllers\Worker\WorkOrderController::class, 'autosave'])->name('work-orders.autosave');
+        Route::post('work-orders/{workOrder}/autosave-edit', [App\Http\Controllers\Worker\WorkOrderController::class, 'autosaveEdit'])->name('work-orders.autosave-edit');
         Route::resource('work-orders', App\Http\Controllers\Worker\WorkOrderController::class);
         Route::get('work-orders/{workOrder}/export-pdf', [App\Http\Controllers\Worker\WorkOrderController::class, 'exportPdf'])->name('work-orders.export-pdf');
         Route::post('work-orders/{workOrder}/invoice', [App\Http\Controllers\Worker\WorkOrderController::class, 'generateInvoice'])->name('work-orders.invoice.generate');
@@ -95,6 +97,7 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
 
     // Ponude (Offers/Quotes) - requires ponude permission
     Route::middleware('worker.permission:ponude')->group(function () {
+        Route::post('ponude/autosave', [App\Http\Controllers\Worker\PonudaController::class, 'autosave'])->name('ponude.autosave');
         Route::resource('ponude', App\Http\Controllers\Worker\PonudaController::class)->parameters(['ponude' => 'ponuda']);
         Route::get('ponude/{ponuda}/export-pdf', [App\Http\Controllers\Worker\PonudaController::class, 'exportPdf'])->name('ponude.export-pdf');
     });
@@ -108,6 +111,7 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
         
         // Warehouses Management
         Route::get('warehouses/{warehouse}/export', [App\Http\Controllers\Worker\WarehouseController::class, 'export'])->name('warehouses.export');
+        Route::post('warehouses/{warehouse}/import', [App\Http\Controllers\Worker\WarehouseController::class, 'import'])->name('warehouses.import');
         Route::resource('warehouses', App\Http\Controllers\Worker\WarehouseController::class);
     });
 

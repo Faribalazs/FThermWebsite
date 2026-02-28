@@ -70,6 +70,23 @@
                     />
 
                     <x-custom-select
+                        name="status"
+                        id="status_filter"
+                        :selected="request('status')"
+                        :selectedText="[
+                            '' => 'Svi statusi',
+                            'active' => 'Aktivna',
+                            'draft' => 'Nacrt'
+                        ][request('status', '')] ?? 'Svi statusi'"
+                        :options="[
+                            '' => 'Svi statusi',
+                            'active' => 'Aktivna',
+                            'draft' => 'Nacrt'
+                        ]"
+                        label="Status"
+                    />
+
+                    <x-custom-select
                         name="sort_by"
                         id="sort_by_filter"
                         :selected="request('sort_by', 'created_at')"
@@ -144,9 +161,15 @@
                             @endif
                         </h3>
                     </div>
+                    @if($p->status === 'draft')
+                    <span class="bg-gray-400 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                        Nacrt
+                    </span>
+                    @else
                     <span class="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
                         #{{ $p->id }}
                     </span>
+                    @endif
                 </div>
             </div>
 
@@ -157,7 +180,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        <span class="text-sm">{{ $p->location }}</span>
+                        <span class="text-sm">{{ $p->location ?? '—' }}</span>
                     </div>
 
                     <div class="flex items-center text-gray-600">
@@ -183,6 +206,24 @@
                 </div>
 
                 <div class="mt-4 flex gap-2">
+                    @if($p->status === 'draft')
+                    <a href="{{ route('worker.ponude.edit', $p) }}" class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition-all action-btn text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Nastavi
+                    </a>
+                    <form method="POST" action="{{ route('worker.ponude.destroy', $p) }}" class="delete-form" data-title="Obriši nacrt" data-text="Ponuda br. {{ $p->id }} će biti trajno obrisana.">
+                        @csrf
+                        @method('DELETE')
+                        <button type="button" class="delete-btn inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-all action-btn text-sm font-medium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Obriši
+                        </button>
+                    </form>
+                    @else
                     <a href="{{ route('worker.ponude.show', $p) }}" class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-all action-btn text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -190,12 +231,15 @@
                         </svg>
                         Pregled
                     </a>
+                    @endif
+                    @if($p->status !== 'draft')
                     <a href="{{ route('worker.ponude.export-pdf', $p) }}" target="_blank" class="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-all action-btn text-sm font-medium">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                         PDF
                     </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -240,6 +284,39 @@
 
 @push('scripts')
 <script>
+    // Delete draft confirmation
+    document.querySelectorAll('.delete-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const form = btn.closest('.delete-form');
+            const title = form.dataset.title || 'Da li ste sigurni?';
+            const text = form.dataset.text || '';
+            Swal.fire({
+                title: title,
+                html: '<p class="text-gray-600 mt-2">' + text + '</p>',
+                icon: 'warning',
+                iconColor: '#ef4444',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#9ca3af',
+                confirmButtonText: '<span class="px-2">Da, obriši!</span>',
+                cancelButtonText: '<span class="px-2">Otkaži</span>',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl',
+                    title: 'text-2xl font-bold text-gray-900',
+                    htmlContainer: 'text-base',
+                    confirmButton: 'rounded-lg px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-200',
+                    cancelButton: 'rounded-lg px-6 py-3 font-semibold hover:bg-gray-300 transition-all duration-200',
+                    actions: 'gap-3',
+                },
+                buttonsStyling: true,
+                backdrop: 'rgba(0,0,0,0.4)',
+            }).then(function(result) {
+                if (result.isConfirmed) { form.submit(); }
+            });
+        });
+    });
+
     const TOTAL_PONUDE = {{ $ponude->count() }};
     let allPonudeVisible = false;
 

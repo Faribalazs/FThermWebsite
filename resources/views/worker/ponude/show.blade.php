@@ -41,7 +41,7 @@
                     @if($ponuda->km_to_destination)
                     <p class="text-xs sm:text-sm opacity-90 mt-1 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        {{ number_format($ponuda->km_to_destination, 2) }} km
+                        {{ number_format($ponuda->km_to_destination, 0) }} km
                     </p>
                     @endif
                 </div>
@@ -120,7 +120,7 @@
                             @endif
                             @if($section->service_price)
                             <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
-                                Usluga: {{ number_format($section->service_price, 2) }} RSD
+                                Usluga: {{ number_format($section->service_price, 0) }} RSD
                             </span>
                             @endif
                         </div>

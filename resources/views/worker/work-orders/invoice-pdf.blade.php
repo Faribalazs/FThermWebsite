@@ -269,8 +269,8 @@
                             <td>{{ $section->title }} - Usluge rada</td>
                             <td class="center">paušal</td>
                             <td class="right">1.00</td>
-                            <td class="right">{{ number_format($section->service_price, 2) }}</td>
-                            <td class="right">{{ number_format($section->service_price, 2) }}</td>
+                            <td class="right">{{ number_format($section->service_price, 0) }}</td>
+                            <td class="right">{{ number_format($section->service_price, 0) }}</td>
                         </tr>
                         @php $rowNumber++; @endphp
                     @endif

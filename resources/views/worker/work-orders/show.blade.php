@@ -64,7 +64,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
-                            {{ number_format($workOrder->km_to_destination, 2) }} km
+                            {{ number_format($workOrder->km_to_destination, 0) }} km
                         </span>
                         @endif
                     </div>
@@ -291,7 +291,7 @@
                                     </div>
                                     <div>
                                         <p class="text-xs text-blue-600 font-semibold">Cena usluge</p>
-                                        <p class="text-lg sm:text-2xl font-bold text-blue-900">{{ number_format($section->service_price, 2) }} RSD</p>
+                                        <p class="text-lg sm:text-2xl font-bold text-blue-900">{{ number_format($section->service_price, 0) }} RSD</p>
                                     </div>
                                 </div>
                                 <span class="bg-white px-3 py-1.5 rounded-lg border border-blue-200 text-xs text-blue-700 font-semibold">Paušal</span>

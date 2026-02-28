@@ -113,16 +113,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                         </svg>
                         <h2 class="text-base sm:text-xl font-bold text-white">Niske Zalihe</h2>
-                        @if($lowStockProducts->count() > 0)
+                        @if($lowStockCount > 0)
                         <span class="ml-auto bg-white text-red-600 text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full">
-                            {{ $lowStockProducts->count() }}
+                            {{ $lowStockCount }}
                         </span>
                         @endif
                     </div>
                 </div>
 
                 <div class="p-4 sm:p-6">
-                    @if($lowStockProducts->count() > 0)
+                    @if($lowStockCount > 0)
                     <div class="space-y-3">
                         @foreach($lowStockProducts as $product)
                         <div class="flex items-center justify-between p-3 sm:p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl hover:bg-red-100 transition-colors">
@@ -135,7 +135,7 @@
                                 <div class="min-w-0">
                                     <p class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $product->name }}</p>
                                     <p class="text-xs sm:text-sm text-gray-600">
-                                        <span class="font-semibold text-red-600">{{ $product->inventory->quantity ?? 0 }}</span>
+                                        <span class="font-semibold text-red-600">{{ $product->inventory?->quantity ?? 0 }}</span>
                                         <span class="text-gray-400">/</span>
                                         <span class="font-semibold">{{ $product->low_stock_threshold }}</span>
                                         {{ $product->unit }}
@@ -201,7 +201,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right flex-shrink-0">
-                                    <p class="text-sm sm:text-lg font-bold text-primary-600">{{ number_format($order->total_amount, 0) }} <span class="text-[10px] sm:text-xs font-normal text-gray-400">RSD</span></p>
+                                    <p class="text-sm sm:text-lg font-bold text-primary-600">{{ number_format($order->total_amount, 0) }} RSD</p>
                                     @if($order->has_invoice)
                                     <span class="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-800 text-[10px] sm:text-xs font-semibold rounded-full">
                                         Fakturisano
@@ -234,6 +234,105 @@
                 </div>
             </div>
         </div>
+
+        <!-- Draft Sections -->
+        @if($draftWorkOrders->count() > 0 || $draftPonude->count() > 0)
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 sm:mt-6">
+            <!-- Draft Work Orders -->
+            <div class="bg-white rounded-2xl shadow-enhanced border border-primary-200 overflow-hidden animate-slide-in">
+                <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            <h2 class="text-base sm:text-xl font-bold text-white">Nacrti Radnih Naloga</h2>
+                        </div>
+                        @if($draftWorkOrders->count() > 0)
+                        <span class="bg-white text-primary-600 text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                            {{ $draftWorkOrders->count() }}
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6">
+                    @if($draftWorkOrders->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($draftWorkOrders as $draft)
+                        <div class="flex items-center justify-between p-3 sm:p-4 bg-primary-50 border-l-4 border-primary-400 rounded-r-xl hover:bg-primary-100 transition-colors">
+                            <div class="flex-1 min-w-0 mr-3">
+                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $draft->client_name ?: '(bez klijenta)' }}</p>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $draft->location ?: '—' }}</p>
+                                <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5">{{ $draft->created_at->diffForHumans() }}</p>
+                            </div>
+                            <a href="{{ route('worker.work-orders.edit', $draft) }}" class="inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 bg-primary-500 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Nastavi
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-center py-6">
+                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-sm">Nema nedovršenih naloga</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Draft Ponude -->
+            <div class="bg-white rounded-2xl shadow-enhanced border border-primary-200 overflow-hidden animate-slide-in" style="animation-delay: 0.1s">
+                <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-4 sm:px-6 py-3 sm:py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                            <h2 class="text-base sm:text-xl font-bold text-white">Nacrti Ponuda</h2>
+                        </div>
+                        @if($draftPonude->count() > 0)
+                        <span class="bg-white text-primary-600 text-xs sm:text-sm font-bold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full">
+                            {{ $draftPonude->count() }}
+                        </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="p-4 sm:p-6">
+                    @if($draftPonude->count() > 0)
+                    <div class="space-y-3">
+                        @foreach($draftPonude as $draft)
+                        <div class="flex items-center justify-between p-3 sm:p-4 bg-primary-50 border-l-4 border-primary-400 rounded-r-xl hover:bg-primary-100 transition-colors">
+                            <div class="flex-1 min-w-0 mr-3">
+                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $draft->client_name ?: '(bez klijenta)' }}</p>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $draft->location ?: '—' }}</p>
+                                <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5">{{ $draft->created_at->diffForHumans() }}</p>
+                            </div>
+                            <a href="{{ route('worker.ponude.edit', $draft) }}" class="inline-flex items-center gap-1 px-3 py-1.5 sm:py-2 bg-primary-500 hover:bg-primary-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors flex-shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Nastavi
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-center py-6">
+                        <svg class="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p class="text-gray-500 text-sm">Nema nedovršenih ponuda</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Quick Actions -->
         <div class="mt-4 sm:mt-6 bg-white rounded-2xl shadow-md border border-gray-100 p-4 sm:p-6 animate-fade-in" style="animation-delay: 0.2s">

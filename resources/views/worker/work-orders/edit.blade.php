@@ -299,10 +299,10 @@
                         type="number" 
                         name="km_to_destination" 
                         id="km_to_destination" 
-                        value="{{ old('km_to_destination', $workOrder->km_to_destination) }}"
+                        value="{{ old('km_to_destination', $workOrder->km_to_destination ? (int)$workOrder->km_to_destination : '') }}"
                         class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('km_to_destination') border-red-500 ring-2 ring-red-200 error @enderror"
                         placeholder="npr. 25"
-                        step="0.01"
+                        step="1"
                         min="0"
                     >
                     @error('km_to_destination')
@@ -314,6 +314,34 @@
                         </div>
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">Opciono - Kilometraža će biti korišćena za fakturisanje</p>
+                </div>
+
+                <div>
+                    <label class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2" for="hourly_rate">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Cena rada po satu (RSD)
+                    </label>
+                    <input
+                        type="number"
+                        name="hourly_rate"
+                        id="hourly_rate"
+                        value="{{ old('hourly_rate', $workOrder->hourly_rate) }}"
+                        class="form-input w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all @error('hourly_rate') border-red-500 ring-2 ring-red-200 error @enderror"
+                        placeholder="npr. 1500"
+                        step="0.01"
+                        min="0"
+                    >
+                    @error('hourly_rate')
+                        <div class="mt-1 sm:mt-2 flex items-center gap-1 sm:gap-2 text-red-600 text-xs sm:text-sm">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            {{ $message }}
+                        </div>
+                    @enderror
+                    <p class="mt-1 text-xs text-gray-500">Opciono - Cena će biti korišćena za obračun sati rada</p>
                 </div>
             </div>
 
@@ -328,16 +356,16 @@
                 </label>
                 <div class="custom-select-wrapper">
                     <input type="hidden" name="warehouse_id" id="warehouse_value" value="{{ old('warehouse_id', $workOrder->warehouse_id) }}">
+                    @php
+                        $selectedWarehouseId = old('warehouse_id', $workOrder->warehouse_id);
+                        $selectedWarehouse = $warehouses->firstWhere('id', $selectedWarehouseId);
+                    @endphp
                     <div class="custom-select-trigger" onclick="toggleWarehouseDropdown()">
                         <div class="flex items-center gap-2">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                             </svg>
-                            <span class="custom-select-value text-sm sm:text-base" id="warehouse_selected_text">
-                                @php
-                                    $selectedWarehouseId = old('warehouse_id', $workOrder->warehouse_id);
-                                    $selectedWarehouse = $warehouses->firstWhere('id', $selectedWarehouseId);
-                                @endphp
+                            <span class="custom-select-value text-sm sm:text-base{{ $selectedWarehouse ? ' selected' : '' }}" id="warehouse_selected_text">
                                 {{ $selectedWarehouse ? $selectedWarehouse->name : 'Izaberite skladište' }}
                             </span>
                         </div>
@@ -399,6 +427,7 @@
 
             <!-- Form Actions -->
             <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200">
+                <span id="autosave-status" class="self-center flex items-center gap-1.5 text-xs text-gray-400 sm:mr-auto"></span>
                 <a href="{{ route('worker.work-orders.show', $workOrder) }}" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -419,14 +448,14 @@
 <script>
 let sectionIndex = 0;
 const products = @json($products);
+const productMap = Object.fromEntries(products.map(p => [p.id, p]));
 const existingSections = @json($workOrder->sections);
 let currentWarehouseId = {{ $workOrder->warehouse_id ?? 'null' }};
 
-// Get warehouse-specific quantity for a product
+// Build a fast O(1) lookup for warehouse stock
 function getWarehouseStock(productId, warehouseId) {
-    const product = products.find(p => p.id === productId);
+    const product = productMap[productId];
     if (!product || !product.inventories) return 0;
-    
     const inventory = product.inventories.find(inv => inv.warehouse_id === warehouseId);
     return inventory ? inventory.quantity : 0;
 }
@@ -463,73 +492,79 @@ function getAvailableQuantity(productId, warehouseId, excludeSectionId = null, e
     return Math.max(0, warehouseStock);
 }
 
-// Update all material dropdowns when warehouse changes
-function updateAllMaterialQuantities() {
-    document.querySelectorAll('.custom-select-options').forEach(optionsContainer => {
-        const options = optionsContainer.querySelectorAll('.custom-select-option[data-value]');
-        options.forEach(option => {
-            const productId = parseInt(option.getAttribute('data-value'));
-            
-            // Get section and item IDs from the container
-            const match = optionsContainer.id.match(/options_(\d+)_(\d+)/);
-            if (match) {
-                const sectionId = parseInt(match[1]);
-                const itemId = parseInt(match[2]);
-                
-                // Check if this item already has this product selected
-                const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
-                const isCurrentProduct = productInput && parseInt(productInput.value) === productId;
-                
-                const availableStock = isCurrentProduct 
-                    ? getAvailableQuantity(productId, currentWarehouseId, sectionId, itemId)
-                    : getAvailableQuantity(productId, currentWarehouseId);
-                
-                // Update the stock display
-                const stockBadge = option.querySelector('span.inline-flex');
-                if (stockBadge) {
-                    stockBadge.innerHTML = `
+// ── Lazy option renderer ─────────────────────────────────────────────
+const MAX_VISIBLE = 80;
+
+function renderDropdownOptions(sectionId, itemId, filter) {
+    const container = document.getElementById(`options_${sectionId}_${itemId}`);
+    if (!container) return;
+    const term = (filter || '').toLowerCase().trim();
+    const list = term ? products.filter(p => p.name.toLowerCase().includes(term)) : products;
+    const visible = list.slice(0, MAX_VISIBLE);
+
+    container.innerHTML = visible.map(product => {
+        const stock = getAvailableQuantity(product.id, currentWarehouseId);
+        const bg = stock === 0 ? 'bg-red-100' : stock < 10 ? 'bg-yellow-100' : 'bg-green-100';
+        const fg = stock === 0 ? 'text-red-600' : stock < 10 ? 'text-yellow-600' : 'text-green-600';
+        const name = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        const unit = product.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        return `<div class="custom-select-option"
+            data-value="${product.id}" data-price="${product.price}" data-stock="${stock}"
+            data-text="${name} - ${product.price} RSD/${unit}"
+            data-search="${product.name.toLowerCase()}"
+            onclick="selectProduct(${sectionId}, ${itemId}, ${product.id}, this.getAttribute('data-text'), ${product.price}, ${stock})">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium text-gray-900">${name}</div>
+                    <div class="text-xs text-gray-500">${product.price} RSD/${unit}</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${bg} ${fg}">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
-                        ${availableStock}
-                    `;
-                    
-                    // Update colors based on stock
-                    stockBadge.className = 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ';
-                    if (availableStock === 0) {
-                        stockBadge.className += 'bg-red-100 text-red-600';
-                    } else if (availableStock < 10) {
-                        stockBadge.className += 'bg-yellow-100 text-yellow-600';
-                    } else {
-                        stockBadge.className += 'bg-green-100 text-green-600';
-                    }
-                }
-                
-                // Update data-stock attribute
-                option.setAttribute('data-stock', availableStock);
-            }
-        });
+                        </svg>${stock}
+                    </span>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    if (list.length > MAX_VISIBLE && !term) {
+        container.insertAdjacentHTML('beforeend',
+            `<div class="px-4 py-2 text-xs text-gray-500 text-center border-t">Prikazano ${MAX_VISIBLE} od ${list.length} – koristite pretragu za više</div>`);
+    }
+    container.setAttribute('data-rendered', 'true');
+}
+
+// Debounced mass-update — only touches already-rendered dropdowns
+let _updateTimer = null;
+function updateAllMaterialQuantities() {
+    clearTimeout(_updateTimer);
+    _updateTimer = setTimeout(_doUpdateAllMaterialQuantities, 120);
+}
+
+function _doUpdateAllMaterialQuantities() {
+    document.querySelectorAll('.custom-select-options[data-rendered]').forEach(container => {
+        const match = container.id.match(/options_(\d+)_(\d+)/);
+        if (!match) return;
+        const sId = parseInt(match[1]), iId = parseInt(match[2]);
+        renderDropdownOptions(sId, iId, document.getElementById(`searchInput_${sId}_${iId}`)?.value || '');
     });
-    
-    // Update quantity input constraints for already selected products
     document.querySelectorAll('input[name*="[quantity]"]').forEach(quantityInput => {
         const match = quantityInput.name.match(/sections\[(\d+)\]\[items\]\[(\d+)\]/);
-        if (match) {
-            const sectionId = parseInt(match[1]);
-            const itemId = parseInt(match[2]);
-            const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
-            
-            if (productInput && productInput.value) {
-                const productId = parseInt(productInput.value);
-                const availableStock = getAvailableQuantity(productId, currentWarehouseId, sectionId, itemId);
-                
-                quantityInput.setAttribute('data-stock', availableStock);
-                quantityInput.setAttribute('max', availableStock > 0 ? availableStock : 999999);
-                
-                // Revalidate the current quantity
-                validateStock(sectionId, itemId);
-            }
-        }
+        if (!match) return;
+        const sectionId = parseInt(match[1]), itemId = parseInt(match[2]);
+        const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+        if (!productInput?.value) return;
+        const stock = getAvailableQuantity(parseInt(productInput.value), currentWarehouseId, sectionId, itemId);
+        quantityInput.setAttribute('data-stock', stock);
+        quantityInput.setAttribute('max', stock > 0 ? stock : 999999);
+        validateStock(sectionId, itemId);
     });
 }
 
@@ -558,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Set service price
             const priceInput = document.querySelector(`[data-section="${newSectionIndex}"] input[name="sections[${newSectionIndex}][service_price]"]`);
             if (priceInput && section.service_price) {
-                priceInput.value = section.service_price;
+                priceInput.value = section.service_price ? parseInt(section.service_price) : '';
             }
             
             // Clear the automatically added first item
@@ -598,6 +633,32 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         // If no existing sections, add one empty section
         addSection();
+    }
+    // Unlock autosave after initial data population
+    // Pre-select the matching saved contact in the dropdown (display only — fields already filled by Blade)
+    if (typeof savedContacts !== 'undefined' && savedContacts.length > 0) {
+        const currentType = document.querySelector('input[name="client_type"]:checked')?.value;
+        const currentName = (document.getElementById('client_name')?.value || '').trim();
+        const currentCompany = (document.getElementById('company_name')?.value || '').trim();
+        const currentPib = (document.getElementById('pib')?.value || '').trim();
+        const matched = savedContacts.find(c => {
+            if (c.type !== currentType) return false;
+            if (c.type === 'fizicko_lice') return currentName && c.client_name === currentName;
+            return (currentPib && c.pib === currentPib) || (currentCompany && c.company_name === currentCompany);
+        });
+        if (matched) {
+            const displayName = matched.type === 'fizicko_lice' ? matched.client_name : matched.company_name;
+            const el = document.getElementById('contact_selected_text');
+            if (el) { el.textContent = displayName; el.classList.add('selected'); }
+            const saveCheckbox = document.getElementById('save-contact-checkbox');
+            if (saveCheckbox) saveCheckbox.style.display = 'none';
+        }
+    }
+    _pageLoading = false;
+    const form = document.getElementById('workOrderForm');
+    if (form) {
+        form.addEventListener('input', triggerAutosave);
+        form.addEventListener('change', triggerAutosave);
     }
 });
 
@@ -674,7 +735,7 @@ function addSection() {
                         name="sections[${sectionIndex}][service_price]" 
                         class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="npr. 5000"
-                        step="0.01"
+                        step="1"
                         min="0"
                     >
                     <p class="mt-1 text-xs text-gray-500">Opciono - Cena ove usluge</p>
@@ -704,6 +765,7 @@ function removeSection(sectionId) {
         section.remove();
         // Update all material quantities after removing a section
         updateAllMaterialQuantities();
+        triggerAutosave();
     }
 }
 
@@ -750,44 +812,7 @@ function addItem(sectionId) {
                                 oninput="filterProducts(${sectionId}, ${itemId})">
                         </div>
                         <div class="custom-select-options" id="options_${sectionId}_${itemId}">
-                            ${products.map(product => {
-                                const stock = getAvailableQuantity(product.id, currentWarehouseId);
-                                const stockClass = stock === 0 ? 'text-red-600' : (stock < 10 ? 'text-yellow-600' : 'text-green-600');
-                                const stockBg = stock === 0 ? 'bg-red-100' : (stock < 10 ? 'bg-yellow-100' : 'bg-green-100');
-                                const productName = product.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                                const productUnit = product.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                                const displayText = `${productName} - ${product.price} RSD/${productUnit}`;
-                                return `
-                                <div class="custom-select-option" 
-                                    data-value="${product.id}" 
-                                    data-price="${product.price}"
-                                    data-stock="${stock}"
-                                    data-text="${displayText}"
-                                    data-search="${product.name.toLowerCase()}"
-                                    data-product-name="${productName}"
-                                    data-product-unit="${productUnit}"
-                                    onclick="selectProduct(${sectionId}, ${itemId}, ${product.id}, this.getAttribute('data-text'), ${product.price}, ${stock})">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="font-medium text-gray-900">${productName}</div>
-                                            <div class="text-xs text-gray-500">${product.price} RSD/${productUnit}</div>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold ${stockBg} ${stockClass}">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                                </svg>
-                                                ${stock}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `}).join('')}
+                            <!-- rendered lazily on first open -->
                         </div>
                     </div>
                 </div>
@@ -800,7 +825,7 @@ function addItem(sectionId) {
                         name="sections[${sectionId}][items][${itemId}][quantity]" 
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
                         min="1"
-                        value="1"
+                        placeholder="0"
                         oninput="validateStock(${sectionId}, ${itemId}); updateItemPrice(${sectionId}, ${itemId}); updateAllMaterialQuantities();"
                         onchange="updateItemPrice(${sectionId}, ${itemId})"
                     >
@@ -816,6 +841,7 @@ function addItem(sectionId) {
     `;
     
     container.insertAdjacentHTML('beforeend', itemHtml);
+    triggerAutosave();
     return itemId; // Return the item ID for populating existing data
 }
 
@@ -825,44 +851,31 @@ function removeItem(sectionId, itemId) {
         item.remove();
         // Update all material quantities after removing an item
         updateAllMaterialQuantities();
+        triggerAutosave();
     }
 }
 
 function updateItemPrice(sectionId, itemId) {
-    const hiddenInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
-    const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
     const priceDisplay = document.getElementById(`itemPrice_${sectionId}_${itemId}`);
-    
-    if (hiddenInput && quantityInput && priceDisplay) {
-        const productId = hiddenInput.value;
-        const selectedOption = document.querySelector(`#options_${sectionId}_${itemId} [data-value="${productId}"]`);
-        const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) || 0 : 0;
-        const quantity = parseInt(quantityInput.value) || 0;
-        const total = price * quantity;
-        
-        priceDisplay.textContent = total.toFixed(2) + ' RSD';
-    }
+    const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+    const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
+    if (!priceDisplay || !productInput || !quantityInput) return;
+    const product = productMap[parseInt(productInput.value)];
+    const price = product ? parseFloat(product.price) || 0 : 0;
+    priceDisplay.textContent = (price * (parseInt(quantityInput.value) || 0)).toFixed(2) + ' RSD';
 }
 
 // Custom dropdown functions
 function toggleDropdown(sectionId, itemId) {
     const dropdown = document.getElementById(`dropdown_${sectionId}_${itemId}`);
-    const allDropdowns = document.querySelectorAll('.custom-select-dropdown');
-    
-    // Close all other dropdowns
-    allDropdowns.forEach(dd => {
-        if (dd.id !== `dropdown_${sectionId}_${itemId}`) {
-            dd.classList.remove('active');
-        }
+    document.querySelectorAll('.custom-select-dropdown').forEach(dd => {
+        if (dd.id !== `dropdown_${sectionId}_${itemId}`) dd.classList.remove('active');
     });
-    
     dropdown.classList.toggle('active');
-    
-    // Focus search input when opening
     if (dropdown.classList.contains('active')) {
-        setTimeout(() => {
-            document.getElementById(`searchInput_${sectionId}_${itemId}`).focus();
-        }, 100);
+        const container = document.getElementById(`options_${sectionId}_${itemId}`);
+        if (!container.getAttribute('data-rendered')) renderDropdownOptions(sectionId, itemId, '');
+        setTimeout(() => document.getElementById(`searchInput_${sectionId}_${itemId}`)?.focus(), 50);
     }
 }
 
@@ -873,6 +886,7 @@ function selectProduct(sectionId, itemId, productId, productText, price, stock) 
     const quantityInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
     
     hiddenInput.value = productId;
+    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     valueDisplay.textContent = productText;
     valueDisplay.classList.add('selected');
     dropdown.classList.remove('active');
@@ -944,18 +958,8 @@ function validateStock(sectionId, itemId) {
 }
 
 function filterProducts(sectionId, itemId) {
-    const searchInput = document.getElementById(`searchInput_${sectionId}_${itemId}`);
-    const searchTerm = searchInput.value.toLowerCase();
-    const options = document.querySelectorAll(`#options_${sectionId}_${itemId} .custom-select-option`);
-    
-    options.forEach(option => {
-        const searchText = option.getAttribute('data-search');
-        if (searchText.includes(searchTerm)) {
-            option.style.display = 'block';
-        } else {
-            option.style.display = 'none';
-        }
-    });
+    const term = document.getElementById(`searchInput_${sectionId}_${itemId}`)?.value || '';
+    renderDropdownOptions(sectionId, itemId, term);
 }
 
 // Close dropdowns when clicking outside
@@ -1020,7 +1024,9 @@ function toggleWarehouseDropdown() {
 }
 
 function selectWarehouseOption(value, text) {
-    document.getElementById('warehouse_value').value = value;
+    const warehouseInput = document.getElementById('warehouse_value');
+    warehouseInput.value = value;
+    warehouseInput.dispatchEvent(new Event('change', { bubbles: true }));
     document.getElementById('warehouse_selected_text').textContent = text;
     
     // Remove selected class from all options
@@ -1041,9 +1047,79 @@ function selectWarehouseOption(value, text) {
     
     // Update current warehouse ID
     currentWarehouseId = value;
-    
+
+    // Invalidate all lazy-rendered caches so stock values are refreshed
+    document.querySelectorAll('.custom-select-options[data-rendered]').forEach(c => c.removeAttribute('data-rendered'));
+
     // Update all material quantities for the new warehouse
     updateAllMaterialQuantities();
+}
+
+// ─── Autosave ─────────────────────────────────────────────────────────────────
+let _pageLoading = true;
+let _autosaveTimer = null;
+let _autosaveBusy = false;
+
+function triggerAutosave() {
+    if (_pageLoading) return;
+    clearTimeout(_autosaveTimer);
+    _autosaveTimer = setTimeout(runAutosave, 2000);
+}
+
+function runAutosave() {
+    if (_autosaveBusy) { triggerAutosave(); return; }
+    _autosaveBusy = true;
+    setAutosaveStatus('saving');
+    const form = document.getElementById('workOrderForm');
+    const formData = new FormData(form);
+    formData.delete('_method'); // strip PUT spoofing so the POST route matches
+    fetch('{{ route("worker.work-orders.autosave-edit", $workOrder) }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: formData,
+    })
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+        setAutosaveStatus('saved', data.saved_at);
+        showAutosaveToast();
+    })
+    .catch(() => setAutosaveStatus('error'))
+    .finally(() => { _autosaveBusy = false; });
+}
+
+function setAutosaveStatus(state, time) {
+    const el = document.getElementById('autosave-status');
+    if (!el) return;
+    const spin = '<svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
+    const check = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+    const warn  = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+    if (state === 'saving') {
+        el.innerHTML = spin + ' Čuvanje izmena...';
+        el.className = 'self-center flex items-center gap-1.5 text-xs text-gray-400 sm:mr-auto';
+    } else if (state === 'saved') {
+        el.innerHTML = check + ' Sačuvano u ' + (time || '');
+        el.className = 'self-center flex items-center gap-1.5 text-xs text-green-500 sm:mr-auto';
+    } else {
+        el.innerHTML = warn + ' Greška pri čuvanju';
+        el.className = 'self-center flex items-center gap-1.5 text-xs text-red-400 sm:mr-auto';
+    }
+}
+
+function showAutosaveToast() {
+    let toast = document.getElementById('autosave-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'autosave-toast';
+        toast.style.cssText = 'position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;align-items:center;gap:0.4rem;background:#166534;color:#dcfce7;font-size:0.7rem;font-weight:600;padding:0.45rem 0.85rem;border-radius:0.6rem;box-shadow:0 4px 14px rgba(0,0,0,0.18);opacity:0;transition:opacity 0.25s ease;pointer-events:none;';
+        toast.innerHTML = '<svg style="width:0.8rem;height:0.8rem;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Izmene sačuvane';
+        document.body.appendChild(toast);
+    }
+    clearTimeout(toast._t);
+    toast.style.opacity = '1';
+    toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
 }
 
 </script>

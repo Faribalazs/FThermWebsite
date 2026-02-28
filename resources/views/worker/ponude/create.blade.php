@@ -62,6 +62,7 @@
 
             <form action="{{ route('worker.ponude.store') }}" method="POST" class="p-3 sm:p-8" id="ponudaForm">
                 @csrf
+                <input type="hidden" name="draft_id" id="draft_id" value="">
 
                 <!-- Contact Selector -->
                 @include('worker.partials.contact-selector')
@@ -207,7 +208,7 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Kilometraža (km)</label>
                             <input type="number" name="km_to_destination" value="{{ old('km_to_destination') }}"
                                 class="form-input w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
-                                placeholder="npr. 25" step="0.1" min="0">
+                                placeholder="npr. 25" step="1" min="0">
                             <p class="mt-1 text-xs text-gray-500">Opciono</p>
                         </div>
                         <div>
@@ -252,7 +253,10 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-gray-200">
+                <div class="flex items-center justify-end mb-2 min-h-[20px]">
+                    <span id="autosave-status" class="flex items-center gap-1.5 text-xs text-gray-400"></span>
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-200">
                     <a href="{{ route('worker.ponude.index') }}"
                         class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -271,6 +275,40 @@
     <script>
         let sectionIndex = 0;
         const products = @json($products);
+        const productMap = Object.fromEntries(products.map(p => [p.id, p]));
+        const MAX_VISIBLE = 80;
+
+        function renderDropdownOptions(sectionId, itemId, filter) {
+            const container = document.getElementById(`options_${sectionId}_${itemId}`);
+            if (!container) return;
+            const term = (filter || '').toLowerCase().trim();
+            const list = term ? products.filter(p => p.name.toLowerCase().includes(term)) : products;
+            const visible = list.slice(0, MAX_VISIBLE);
+            container.innerHTML = visible.map(p => {
+                const n = p.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                const u = p.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                return `<div class="custom-select-option"
+                    data-value="${p.id}" data-price="${p.price}"
+                    data-text="${n} - ${p.price} RSD/${u}"
+                    data-search="${p.name.toLowerCase()}"
+                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        </div>
+                        <div>
+                            <div class="font-medium text-gray-900">${n}</div>
+                            <div class="text-xs text-gray-500">${p.price} RSD/${u}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            if (list.length > MAX_VISIBLE && !term) {
+                container.insertAdjacentHTML('beforeend',
+                    `<div class="px-4 py-2 text-xs text-gray-500 text-center border-t">Prikazano ${MAX_VISIBLE} od ${list.length} – koristite pretragu za više</div>`);
+            }
+            container.setAttribute('data-rendered', 'true');
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             toggleClientFields();
@@ -330,7 +368,7 @@
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Cena usluge (RSD)</label>
                             <input type="number" name="sections[${sectionIndex}][service_price]"
                                 class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                placeholder="npr. 5000" step="0.01" min="0">
+                                placeholder="npr. 5000" step="1" min="0">
                             <p class="mt-1 text-xs text-gray-500">Opciono</p>
                         </div>
                     </div>
@@ -347,6 +385,7 @@
 
         function removeSection(sectionId) {
             document.querySelector(`[data-section="${sectionId}"]`)?.remove();
+            triggerAutosave();
         }
 
         let itemCounters = {};
@@ -357,25 +396,7 @@
             const itemId = itemCounters[sectionId];
             const container = document.getElementById(`itemsContainer_${sectionId}`);
 
-            const options = products.map(p => {
-                const n = p.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                const u = p.unit.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                return `<div class="custom-select-option"
-                    data-value="${p.id}" data-price="${p.price}"
-                    data-text="${n} - ${p.price} RSD/${u}"
-                    data-search="${p.name.toLowerCase()}"
-                    onclick="selectProduct(${sectionId}, ${itemId}, ${p.id}, '${n} - ${p.price} RSD/${u}', ${p.price})">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900">${n}</div>
-                            <div class="text-xs text-gray-500">${p.price} RSD/${u}</div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
+
 
             const html = `
                 <div class="item-row bg-white border border-gray-300 rounded-lg p-3" data-item="${itemId}">
@@ -398,7 +419,7 @@
                                     <input type="text" class="custom-select-search-input" id="searchInput_${sectionId}_${itemId}"
                                         placeholder="Pretraži materijale..." oninput="filterProducts(${sectionId}, ${itemId})">
                                 </div>
-                                <div class="custom-select-options" id="options_${sectionId}_${itemId}">${options}</div>
+                                <div class="custom-select-options" id="options_${sectionId}_${itemId}"><!-- lazy --></div>
                             </div>
                         </div>
                     </div>
@@ -418,10 +439,12 @@
                     </div>
                 </div>`;
             container.insertAdjacentHTML('beforeend', html);
+            triggerAutosave();
         }
 
         function removeItem(sectionId, itemId) {
             document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"]`)?.remove();
+            triggerAutosave();
         }
 
         function updateItemPrice(sectionId, itemId) {
@@ -429,10 +452,9 @@
             const qtyInput = document.querySelector(`[data-section="${sectionId}"] [data-item="${itemId}"] input[type="number"]`);
             const priceDisplay = document.getElementById(`itemPrice_${sectionId}_${itemId}`);
             if (!hiddenInput || !qtyInput || !priceDisplay) return;
-            const selectedOption = document.querySelector(`#options_${sectionId}_${itemId} [data-value="${hiddenInput.value}"]`);
-            const price = selectedOption ? parseFloat(selectedOption.getAttribute('data-price')) || 0 : 0;
-            const qty = parseInt(qtyInput.value) || 0;
-            priceDisplay.textContent = (price * qty).toFixed(2) + ' RSD';
+            const product = productMap[parseInt(hiddenInput.value)];
+            const price = product ? parseFloat(product.price) || 0 : 0;
+            priceDisplay.textContent = (price * (parseInt(qtyInput.value) || 0)).toFixed(2) + ' RSD';
         }
 
         function toggleDropdown(sectionId, itemId) {
@@ -442,12 +464,16 @@
             });
             dropdown.classList.toggle('active');
             if (dropdown.classList.contains('active')) {
-                setTimeout(() => document.getElementById(`searchInput_${sectionId}_${itemId}`).focus(), 100);
+                const container = document.getElementById(`options_${sectionId}_${itemId}`);
+                if (!container.getAttribute('data-rendered')) renderDropdownOptions(sectionId, itemId, '');
+                setTimeout(() => document.getElementById(`searchInput_${sectionId}_${itemId}`)?.focus(), 50);
             }
         }
 
         function selectProduct(sectionId, itemId, productId, productText, price) {
-            document.getElementById(`productInput_${sectionId}_${itemId}`).value = productId;
+            const productInput = document.getElementById(`productInput_${sectionId}_${itemId}`);
+            productInput.value = productId;
+            productInput.dispatchEvent(new Event('change', { bubbles: true }));
             const valueDisplay = document.getElementById(`selectValue_${sectionId}_${itemId}`);
             valueDisplay.textContent = productText;
             valueDisplay.classList.add('selected');
@@ -456,15 +482,86 @@
         }
 
         function filterProducts(sectionId, itemId) {
-            const term = document.getElementById(`searchInput_${sectionId}_${itemId}`).value.toLowerCase();
-            document.querySelectorAll(`#options_${sectionId}_${itemId} .custom-select-option`).forEach(opt => {
-                opt.style.display = opt.getAttribute('data-search').includes(term) ? 'block' : 'none';
-            });
+            const term = document.getElementById(`searchInput_${sectionId}_${itemId}`)?.value || '';
+            renderDropdownOptions(sectionId, itemId, term);
         }
 
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.custom-select-wrapper')) {
                 document.querySelectorAll('.custom-select-dropdown').forEach(dd => dd.classList.remove('active'));
+            }
+        });
+
+        // ─── Autosave as draft ────────────────────────────────────────────
+        let _autosaveTimer = null;
+        let _autosaveBusy = false;
+
+        function triggerAutosave() {
+            clearTimeout(_autosaveTimer);
+            _autosaveTimer = setTimeout(runAutosave, 2000);
+        }
+
+        function runAutosave() {
+            if (_autosaveBusy) { triggerAutosave(); return; }
+            _autosaveBusy = true;
+            setAutosaveStatus('saving');
+            const form = document.getElementById('ponudaForm');
+            const formData = new FormData(form);
+            fetch('{{ route("worker.ponude.autosave") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData,
+            })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(data => {
+                document.getElementById('draft_id').value = data.id;
+                setAutosaveStatus('saved', data.saved_at);
+                showAutosaveToast();
+            })
+            .catch(() => setAutosaveStatus('error'))
+            .finally(() => { _autosaveBusy = false; });
+        }
+
+        function setAutosaveStatus(state, time) {
+            const el = document.getElementById('autosave-status');
+            if (!el) return;
+            const spin = '<svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>';
+            const check = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            const warn  = '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            if (state === 'saving') {
+                el.innerHTML = spin + ' Čuvanje nacrta...';
+                el.className = 'flex items-center gap-1.5 text-xs text-gray-400';
+            } else if (state === 'saved') {
+                el.innerHTML = check + ' Nacrt sačuvan u ' + (time || '');
+                el.className = 'flex items-center gap-1.5 text-xs text-green-500';
+            } else {
+                el.innerHTML = warn + ' Greška pri čuvanju nacrta';
+                el.className = 'flex items-center gap-1.5 text-xs text-red-400';
+            }
+        }
+
+        function showAutosaveToast() {
+            let toast = document.getElementById('autosave-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'autosave-toast';
+                toast.style.cssText = 'position:fixed;bottom:1.25rem;right:1.25rem;z-index:9999;display:flex;align-items:center;gap:0.4rem;background:#166534;color:#dcfce7;font-size:0.7rem;font-weight:600;padding:0.45rem 0.85rem;border-radius:0.6rem;box-shadow:0 4px 14px rgba(0,0,0,0.18);opacity:0;transition:opacity 0.25s ease;pointer-events:none;';
+                toast.innerHTML = '<svg style="width:0.8rem;height:0.8rem;flex-shrink:0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Nacrt sačuvan';
+                document.body.appendChild(toast);
+            }
+            clearTimeout(toast._t);
+            toast.style.opacity = '1';
+            toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('ponudaForm');
+            if (form) {
+                form.addEventListener('input', triggerAutosave);
+                form.addEventListener('change', triggerAutosave);
             }
         });
     </script>

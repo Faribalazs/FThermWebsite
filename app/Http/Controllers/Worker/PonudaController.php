@@ -41,6 +41,11 @@ class PonudaController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
@@ -58,9 +63,75 @@ class PonudaController extends Controller
 
     public function create()
     {
-        $products = InternalProduct::orderBy('name')->get();
+        $products = InternalProduct::select('id', 'name', 'unit', 'price')
+            ->orderBy('name')->get();
         $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
         return view('worker.ponude.create', compact('products', 'contacts'));
+    }
+
+    public function autosave(Request $request)
+    {
+        $draftId = $request->input('draft_id');
+        $ponuda = null;
+
+        if ($draftId) {
+            $ponuda = Ponuda::where('id', $draftId)
+                ->where('worker_id', auth('worker')->id())
+                ->where('status', 'draft')
+                ->first();
+        }
+
+        $attrs = [
+            'worker_id'         => auth('worker')->id(),
+            'client_type'       => $request->input('client_type') ?: 'fizicko_lice',
+            'client_name'       => $request->input('client_name') ?: null,
+            'client_address'    => $request->input('client_address') ?: null,
+            'company_name'      => $request->input('company_name') ?: null,
+            'pib'               => $request->input('pib') ?: null,
+            'maticni_broj'      => $request->input('maticni_broj') ?: null,
+            'company_address'   => $request->input('company_address') ?: null,
+            'client_phone'      => $request->input('client_phone') ?: null,
+            'client_email'      => $request->input('client_email') ?: null,
+            'location'          => $request->input('location') ?: null,
+            'km_to_destination' => $request->input('km_to_destination') ?: null,
+            'hourly_rate'       => $request->input('hourly_rate') ?: null,
+            'notes'             => $request->input('notes') ?: null,
+            'status'            => 'draft',
+        ];
+
+        if ($ponuda) {
+            $ponuda->update($attrs);
+        } else {
+            $ponuda = Ponuda::create($attrs);
+        }
+
+        // Wipe and rebuild sections / items
+        $ponuda->load('sections.items');
+        foreach ($ponuda->sections as $section) {
+            $section->items()->delete();
+        }
+        $ponuda->sections()->delete();
+
+        foreach ($request->input('sections', []) as $sectionData) {
+            if (empty($sectionData['title'])) continue;
+            $section = $ponuda->sections()->create([
+                'title'         => $sectionData['title'],
+                'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                'service_price' => $sectionData['service_price'] ?: null,
+            ]);
+            foreach ($sectionData['items'] ?? [] as $itemData) {
+                if (empty($itemData['product_id'])) continue;
+                $product = InternalProduct::find($itemData['product_id']);
+                if (!$product) continue;
+                $section->items()->create([
+                    'product_id'    => $itemData['product_id'],
+                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                    'price_at_time' => $product->price,
+                ]);
+            }
+        }
+
+        return response()->json(['id' => $ponuda->id, 'saved_at' => now()->format('H:i:s')]);
     }
 
     public function store(Request $request)
@@ -108,23 +179,57 @@ class PonudaController extends Controller
         DB::beginTransaction();
 
         try {
-            $ponuda = Ponuda::create([
-                'worker_id'         => auth('worker')->id(),
-                'client_type'       => $validated['client_type'],
-                'client_name'       => $validated['client_name'] ?? null,
-                'client_address'    => $validated['client_address'] ?? null,
-                'company_name'      => $validated['company_name'] ?? null,
-                'pib'               => $validated['pib'] ?? null,
-                'maticni_broj'      => $validated['maticni_broj'] ?? null,
-                'company_address'   => $validated['company_address'] ?? null,
-                'client_phone'      => $validated['client_phone'] ?? null,
-                'client_email'      => $validated['client_email'] ?? null,
-                'location'          => $validated['location'],
-                'km_to_destination' => $validated['km_to_destination'] ?? null,
-                'hourly_rate'       => $validated['hourly_rate'] ?? null,
-                'notes'             => $validated['notes'] ?? null,
-                'status'            => 'draft',
-            ]);
+            // Reuse existing draft if one was being autosaved
+            $draftId = $request->input('draft_id');
+            $ponuda = null;
+            if ($draftId) {
+                $ponuda = Ponuda::where('id', $draftId)
+                    ->where('worker_id', auth('worker')->id())
+                    ->where('status', 'draft')
+                    ->first();
+                if ($ponuda) {
+                    $ponuda->load('sections.items');
+                    foreach ($ponuda->sections as $section) {
+                        $section->items()->delete();
+                    }
+                    $ponuda->sections()->delete();
+                    $ponuda->update([
+                        'client_type'       => $validated['client_type'],
+                        'client_name'       => $validated['client_name'] ?? null,
+                        'client_address'    => $validated['client_address'] ?? null,
+                        'company_name'      => $validated['company_name'] ?? null,
+                        'pib'               => $validated['pib'] ?? null,
+                        'maticni_broj'      => $validated['maticni_broj'] ?? null,
+                        'company_address'   => $validated['company_address'] ?? null,
+                        'client_phone'      => $validated['client_phone'] ?? null,
+                        'client_email'      => $validated['client_email'] ?? null,
+                        'location'          => $validated['location'],
+                        'km_to_destination' => $validated['km_to_destination'] ?? null,
+                        'hourly_rate'       => $validated['hourly_rate'] ?? null,
+                        'notes'             => $validated['notes'] ?? null,
+                        'status'            => 'active',
+                    ]);
+                }
+            }
+            if (!$ponuda) {
+                $ponuda = Ponuda::create([
+                    'worker_id'         => auth('worker')->id(),
+                    'client_type'       => $validated['client_type'],
+                    'client_name'       => $validated['client_name'] ?? null,
+                    'client_address'    => $validated['client_address'] ?? null,
+                    'company_name'      => $validated['company_name'] ?? null,
+                    'pib'               => $validated['pib'] ?? null,
+                    'maticni_broj'      => $validated['maticni_broj'] ?? null,
+                    'company_address'   => $validated['company_address'] ?? null,
+                    'client_phone'      => $validated['client_phone'] ?? null,
+                    'client_email'      => $validated['client_email'] ?? null,
+                    'location'          => $validated['location'],
+                    'km_to_destination' => $validated['km_to_destination'] ?? null,
+                    'hourly_rate'       => $validated['hourly_rate'] ?? null,
+                    'notes'             => $validated['notes'] ?? null,
+                    'status'            => 'active',
+                ]);
+            }
 
             foreach ($validated['sections'] as $sectionData) {
                 $section = $ponuda->sections()->create([
@@ -216,7 +321,8 @@ class PonudaController extends Controller
             abort(403);
         }
         $ponuda->load(['sections.items.product']);
-        $products = InternalProduct::orderBy('name')->get();
+        $products = InternalProduct::select('id', 'name', 'unit', 'price')
+            ->orderBy('name')->get();
         $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
         return view('worker.ponude.edit', compact('ponuda', 'products', 'contacts'));
     }
@@ -284,6 +390,7 @@ class PonudaController extends Controller
                 'km_to_destination' => $validated['km_to_destination'] ?? null,
                 'hourly_rate'       => $validated['hourly_rate'] ?? null,
                 'notes'             => $validated['notes'] ?? null,
+                'status'            => 'active',
             ]);
 
             // Replace all sections/items
@@ -327,7 +434,7 @@ class PonudaController extends Controller
 
     public function destroy(Ponuda $ponuda)
     {
-        if ($ponuda->worker_id !== auth('worker')->id()) {
+        if ((int)$ponuda->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
         $ponuda->delete();

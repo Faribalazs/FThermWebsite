@@ -46,9 +46,14 @@ class WorkOrderController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        // Status filter (has_invoice)
+        // Status filter
         if ($request->filled('status')) {
-            $query->where('has_invoice', $request->status === 'invoiced');
+            if ($request->status === 'draft') {
+                $query->where('status', 'draft');
+            } else {
+                $query->where('status', '!=', 'draft')
+                      ->where('has_invoice', $request->status === 'invoiced');
+            }
         }
 
         // Price range filter
@@ -78,11 +83,132 @@ class WorkOrderController extends Controller
 
     public function create()
     {
-        $products = InternalProduct::with(['inventories.warehouse'])->orderBy('name')->get();
+        $products = InternalProduct::with(['inventories:id,internal_product_id,warehouse_id,quantity'])
+            ->select('id', 'name', 'unit', 'price')
+            ->orderBy('name')
+            ->get();
         $warehouses = Warehouse::active()->orderBy('name')->get();
         $primaryWarehouseId = auth('worker')->user()->primary_warehouse_id;
         $contacts = \App\Models\Contact::where('created_by', auth('worker')->id())->orderBy('type')->orderBy('client_name')->orderBy('company_name')->get();
         return view('worker.work-orders.create', compact('products', 'warehouses', 'primaryWarehouseId', 'contacts'));
+    }
+
+    public function autosave(Request $request)
+    {
+        $draftId = $request->input('draft_id');
+        $workOrder = null;
+
+        if ($draftId) {
+            $workOrder = WorkOrder::where('id', $draftId)
+                ->where('worker_id', auth('worker')->id())
+                ->where('status', 'draft')
+                ->first();
+        }
+
+        $attrs = [
+            'worker_id'         => auth('worker')->id(),
+            'warehouse_id'      => $request->input('warehouse_id') ?: null,
+            'client_type'       => $request->input('client_type') ?: 'fizicko_lice',
+            'client_name'       => $request->input('client_name') ?: null,
+            'client_address'    => $request->input('client_address') ?: null,
+            'company_name'      => $request->input('company_name') ?: null,
+            'pib'               => $request->input('pib') ?: null,
+            'maticni_broj'      => $request->input('maticni_broj') ?: null,
+            'company_address'   => $request->input('company_address') ?: null,
+            'client_phone'      => $request->input('client_phone') ?: null,
+            'client_email'      => $request->input('client_email') ?: null,
+            'location'          => $request->input('location') ?: null,
+            'km_to_destination' => $request->input('km_to_destination') ?: null,
+            'hourly_rate'       => $request->input('hourly_rate') ?: null,
+            'status'            => 'draft',
+        ];
+
+        if ($workOrder) {
+            $workOrder->update($attrs);
+        } else {
+            $workOrder = WorkOrder::create($attrs);
+        }
+
+        // Wipe and rebuild sections / items (no inventory deduction for drafts)
+        $workOrder->load('sections.items');
+        foreach ($workOrder->sections as $section) {
+            $section->items()->delete();
+        }
+        $workOrder->sections()->delete();
+
+        foreach ($request->input('sections', []) as $sectionData) {
+            if (empty($sectionData['title'])) continue;
+            $section = $workOrder->sections()->create([
+                'title'         => $sectionData['title'],
+                'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                'service_price' => $sectionData['service_price'] ?: null,
+            ]);
+            foreach ($sectionData['items'] ?? [] as $itemData) {
+                if (empty($itemData['product_id'])) continue;
+                $product = InternalProduct::find($itemData['product_id']);
+                if (!$product) continue;
+                $section->items()->create([
+                    'product_id'    => $itemData['product_id'],
+                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                    'price_at_time' => $product->price,
+                ]);
+            }
+        }
+
+        return response()->json(['id' => $workOrder->id, 'saved_at' => now()->format('H:i:s')]);
+    }
+
+    public function autosaveEdit(Request $request, WorkOrder $workOrder)
+    {
+        // Ensure the worker owns this work order
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Update header fields without touching status or performing inventory deduction
+        $workOrder->update([
+            'warehouse_id'      => $request->input('warehouse_id') ?: $workOrder->warehouse_id,
+            'client_type'       => $request->input('client_type') ?: $workOrder->client_type,
+            'client_name'       => $request->input('client_name') ?: null,
+            'client_address'    => $request->input('client_address') ?: null,
+            'company_name'      => $request->input('company_name') ?: null,
+            'pib'               => $request->input('pib') ?: null,
+            'maticni_broj'      => $request->input('maticni_broj') ?: null,
+            'company_address'   => $request->input('company_address') ?: null,
+            'client_phone'      => $request->input('client_phone') ?: null,
+            'client_email'      => $request->input('client_email') ?: null,
+            'location'          => $request->input('location') ?: null,
+            'km_to_destination' => $request->input('km_to_destination') ?: null,
+            'hourly_rate'       => $request->input('hourly_rate') ?: null,
+        ]);
+
+        // Wipe and rebuild sections / items (no inventory deduction for autosave)
+        $workOrder->load('sections.items');
+        foreach ($workOrder->sections as $section) {
+            $section->items()->delete();
+        }
+        $workOrder->sections()->delete();
+
+        foreach ($request->input('sections', []) as $sectionData) {
+            if (empty($sectionData['title'])) continue;
+            $section = $workOrder->sections()->create([
+                'title'         => $sectionData['title'],
+                'hours_spent'   => $sectionData['hours_spent'] ?: null,
+                'service_price' => $sectionData['service_price'] ?: null,
+            ]);
+            foreach ($sectionData['items'] ?? [] as $itemData) {
+                if (empty($itemData['product_id'])) continue;
+                $product = InternalProduct::find($itemData['product_id']);
+                if (!$product) continue;
+                $section->items()->create([
+                    'product_id'    => $itemData['product_id'],
+                    'quantity'      => max(1, (int) ($itemData['quantity'] ?? 1)),
+                    'price_at_time' => $product->price,
+                ]);
+            }
+        }
+
+        return response()->json(['saved_at' => now()->format('H:i:s')]);
     }
 
     public function store(Request $request)
@@ -150,23 +276,57 @@ class WorkOrderController extends Controller
                 }
             }
 
-            $workOrder = WorkOrder::create([
-                'worker_id' => auth('worker')->id(),
-                'warehouse_id' => $validated['warehouse_id'],
-                'client_type' => $validated['client_type'],
-                'client_name' => $validated['client_name'] ?? null,
-                'client_address' => $validated['client_address'] ?? null,
-                'company_name' => $validated['company_name'] ?? null,
-                'pib' => $validated['pib'] ?? null,
-                'maticni_broj' => $validated['maticni_broj'] ?? null,
-                'company_address' => $validated['company_address'] ?? null,
-                'client_phone' => $validated['client_phone'] ?? null,
-                'client_email' => $validated['client_email'] ?? null,
-                'location' => $validated['location'],
-                'km_to_destination' => $validated['km_to_destination'] ?? null,
-                'status' => 'completed',
-                'hourly_rate' => $validated['hourly_rate'] ?? null,
-            ]);
+            // Reuse existing draft if one was being autosaved
+            $draftId = $request->input('draft_id');
+            $workOrder = null;
+            if ($draftId) {
+                $workOrder = WorkOrder::where('id', $draftId)
+                    ->where('worker_id', auth('worker')->id())
+                    ->where('status', 'draft')
+                    ->first();
+                if ($workOrder) {
+                    $workOrder->load('sections.items');
+                    foreach ($workOrder->sections as $section) {
+                        $section->items()->delete();
+                    }
+                    $workOrder->sections()->delete();
+                    $workOrder->update([
+                        'warehouse_id'      => $validated['warehouse_id'],
+                        'client_type'       => $validated['client_type'],
+                        'client_name'       => $validated['client_name'] ?? null,
+                        'client_address'    => $validated['client_address'] ?? null,
+                        'company_name'      => $validated['company_name'] ?? null,
+                        'pib'               => $validated['pib'] ?? null,
+                        'maticni_broj'      => $validated['maticni_broj'] ?? null,
+                        'company_address'   => $validated['company_address'] ?? null,
+                        'client_phone'      => $validated['client_phone'] ?? null,
+                        'client_email'      => $validated['client_email'] ?? null,
+                        'location'          => $validated['location'],
+                        'km_to_destination' => $validated['km_to_destination'] ?? null,
+                        'status'            => 'completed',
+                        'hourly_rate'       => $validated['hourly_rate'] ?? null,
+                    ]);
+                }
+            }
+            if (!$workOrder) {
+                $workOrder = WorkOrder::create([
+                    'worker_id'         => auth('worker')->id(),
+                    'warehouse_id'      => $validated['warehouse_id'],
+                    'client_type'       => $validated['client_type'],
+                    'client_name'       => $validated['client_name'] ?? null,
+                    'client_address'    => $validated['client_address'] ?? null,
+                    'company_name'      => $validated['company_name'] ?? null,
+                    'pib'               => $validated['pib'] ?? null,
+                    'maticni_broj'      => $validated['maticni_broj'] ?? null,
+                    'company_address'   => $validated['company_address'] ?? null,
+                    'client_phone'      => $validated['client_phone'] ?? null,
+                    'client_email'      => $validated['client_email'] ?? null,
+                    'location'          => $validated['location'],
+                    'km_to_destination' => $validated['km_to_destination'] ?? null,
+                    'status'            => 'completed',
+                    'hourly_rate'       => $validated['hourly_rate'] ?? null,
+                ]);
+            }
 
             foreach ($validated['sections'] as $sectionData) {
                 $section = $workOrder->sections()->create([
@@ -271,7 +431,7 @@ class WorkOrderController extends Controller
     public function show(WorkOrder $workOrder)
     {
         // Ensure worker can only view their own work orders
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -282,7 +442,7 @@ class WorkOrderController extends Controller
     public function edit(WorkOrder $workOrder)
     {
         // Ensure worker can only edit their own work orders
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -298,7 +458,9 @@ class WorkOrderController extends Controller
         }
         
         // Get all internal products with all warehouse inventories
-        $products = InternalProduct::with(['inventories.warehouse'])->orderBy('name')->get();
+        $products = InternalProduct::with(['inventories:id,internal_product_id,warehouse_id,quantity'])
+            ->select('id', 'name', 'unit', 'price')
+            ->orderBy('name')->get();
         
         // Adjust inventory quantities to include what's used in this work order
         // This shows the "available" stock as if this work order didn't exist yet
@@ -324,7 +486,7 @@ class WorkOrderController extends Controller
     public function update(Request $request, WorkOrder $workOrder)
     {
         // Ensure worker can only update their own work orders
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -416,6 +578,7 @@ class WorkOrderController extends Controller
                 'client_email' => $validated['client_email'] ?? null,
                 'location' => $validated['location'],
                 'km_to_destination' => $validated['km_to_destination'] ?? null,
+                'status' => 'completed',
             ]);
 
             // Delete old sections and items
@@ -488,7 +651,7 @@ class WorkOrderController extends Controller
 
     public function generateInvoice(Request $request, WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -559,7 +722,7 @@ class WorkOrderController extends Controller
 
     public function showInvoice(WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -597,7 +760,7 @@ class WorkOrderController extends Controller
 
     public function downloadInvoice(WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -639,7 +802,7 @@ class WorkOrderController extends Controller
 
     public function sendToEfaktura(WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -671,7 +834,7 @@ class WorkOrderController extends Controller
 
     public function destroy(WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 
@@ -683,7 +846,7 @@ class WorkOrderController extends Controller
 
     public function exportPdf(WorkOrder $workOrder)
     {
-        if ($workOrder->worker_id !== auth('worker')->id()) {
+        if ((int)$workOrder->worker_id !== (int)auth('worker')->id()) {
             abort(403);
         }
 

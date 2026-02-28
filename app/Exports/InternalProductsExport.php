@@ -5,18 +5,29 @@ namespace App\Exports;
 use App\Models\InternalProduct;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class InternalProductsExport implements FromCollection, WithHeadings, WithMapping, WithStyles
+class InternalProductsExport implements FromCollection, WithHeadings, WithStyles, WithStrictNullComparison
 {
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
     {
-        return InternalProduct::all();
+        return InternalProduct::with('inventory')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($product) {
+                return [
+                    $product->name,
+                    $product->unit,
+                    $product->price,
+                    $product->low_stock_threshold,
+                    (int)($product->inventory?->quantity ?? 0),
+                ];
+            });
     }
 
     /**
@@ -29,20 +40,7 @@ class InternalProductsExport implements FromCollection, WithHeadings, WithMappin
             'Jedinica',
             'Cena (RSD)',
             'Nizak Limit Zaliha',
-        ];
-    }
-
-    /**
-     * @param InternalProduct $product
-     * @return array
-     */
-    public function map($product): array
-    {
-        return [
-            $product->name,
-            $product->unit,
-            $product->price,
-            $product->low_stock_threshold,
+            'Stanje',
         ];
     }
 
@@ -52,8 +50,8 @@ class InternalProductsExport implements FromCollection, WithHeadings, WithMappin
     public function styles(Worksheet $sheet)
     {
         return [
-            // Style the first row as bold text
             1 => ['font' => ['bold' => true, 'size' => 12]],
         ];
     }
 }
+

@@ -296,7 +296,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Paušalna usluga</p>
-                                    <p class="text-lg sm:text-xl font-bold text-gray-900 mt-0.5">{{ number_format($section->service_price, 2) }} <span class="text-sm font-normal text-gray-500">RSD</span></p>
+                                    <p class="text-lg sm:text-xl font-bold text-gray-900 mt-0.5">{{ number_format($section->service_price, 0) }} <span class="text-sm font-normal text-gray-500">RSD</span></p>
                                 </div>
                             </div>
                         </div>

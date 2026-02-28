@@ -5,6 +5,19 @@
 @section('content')
 <div class="p-3 sm:p-4 md:p-6">
     <div class="max-w-7xl mx-auto">
+
+        {{-- Success / Error flash --}}
+        @if(session('success'))
+            <div class="mb-4 px-4 py-3 bg-green-100 border border-green-300 text-green-800 rounded-lg text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mb-4 px-4 py-3 bg-red-100 border border-red-300 text-red-800 rounded-lg text-sm">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <!-- Header -->
         <div class="mb-4 sm:mb-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -26,7 +39,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <a href="{{ route('worker.warehouses.export', $warehouse) }}" 
                        class="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,6 +47,13 @@
                         </svg>
                         Izvezi u Excel
                     </a>
+                    <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')"
+                       class="inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Uvezi Excel
+                    </button>
                 </div>
             </div>
             
@@ -155,6 +175,43 @@
                 </div>
             @endif
         </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-gray-900">Uvezi stanje iz Excel fajla</h2>
+            <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">
+            Fajl mora biti Excel (.xlsx / .xls) ili CSV sa kolonama <strong>Naziv</strong> i <strong>Stanje</strong>.
+            Koristite <em>Izvezi u Excel</em> da preuzmete predložak sa svim materijalima.
+        </p>
+        <form action="{{ route('worker.warehouses.import', $warehouse) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1" for="import_file">Excel / CSV fajl</label>
+                <input type="file" id="import_file" name="file" accept=".xlsx,.xls,.csv"
+                       class="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg px-3 py-2 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                    Otkaži
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                    Uvezi
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

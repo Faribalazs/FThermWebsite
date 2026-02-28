@@ -40,6 +40,7 @@
         const radio = document.querySelector(`input[name="client_type"][value="${contact.type}"]`);
         if (radio) {
             radio.checked = true;
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
             toggleClientFields();
         }
 
@@ -66,16 +67,17 @@
     }
 
     function setFieldValue(fieldName, value) {
-        // Set all fields with this name (some forms have duplicates in fizicko/pravno sections)
-        const fields = document.querySelectorAll(`input[name="${fieldName}"], textarea[name="${fieldName}"]`);
-        fields.forEach(field => {
+        // Collect all matching elements (by name and by id), deduplicated
+        const seen = new Set();
+        const selector = `input[name="${fieldName}"], textarea[name="${fieldName}"], [id="${fieldName}"]`;
+        document.querySelectorAll(selector).forEach(field => {
+            if (seen.has(field)) return;
+            seen.add(field);
             field.value = value || '';
+            // Dispatch both events so form input/change listeners (autosave) fire
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
         });
-        // Also try by ID
-        const byId = document.getElementById(fieldName);
-        if (byId) {
-            byId.value = value || '';
-        }
     }
 </script>
 @endif
