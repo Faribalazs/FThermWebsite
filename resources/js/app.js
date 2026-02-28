@@ -49,7 +49,7 @@ function initializeDatepickers() {
                 }
             },
             onReady: function(selectedDates, dateStr, instance) {
-                // Add "Today" button footer
+                // Add footer with "Today" and "Close" buttons
                 const footer = document.createElement('div');
                 footer.className = 'flatpickr-footer';
                 
@@ -65,8 +65,19 @@ function initializeDatepickers() {
                     // Trigger Alpine reactivity
                     input.dispatchEvent(new Event('change'));
                 });
+
+                const closeBtn = document.createElement('button');
+                closeBtn.type = 'button';
+                closeBtn.className = 'fp-close-btn';
+                closeBtn.textContent = 'Zatvori';
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    instance.close();
+                });
                 
                 footer.appendChild(todayBtn);
+                footer.appendChild(closeBtn);
                 instance.calendarContainer.appendChild(footer);
             },
             onOpen: function(selectedDates, dateStr, instance) {

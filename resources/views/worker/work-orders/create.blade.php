@@ -1055,10 +1055,12 @@
         }
 
         // ─── Autosave as draft ────────────────────────────────────────────
+        let _pageLoading = true;
         let _autosaveTimer = null;
         let _autosaveBusy = false;
 
         function triggerAutosave() {
+            if (_pageLoading) return;
             clearTimeout(_autosaveTimer);
             _autosaveTimer = setTimeout(runAutosave, 2000);
         }
@@ -1080,6 +1082,11 @@
             .then(r => r.ok ? r.json() : Promise.reject())
             .then(data => {
                 document.getElementById('draft_id').value = data.id;
+                // Replace the browser URL so a page refresh opens the edit page
+                // instead of re-creating a new draft from the create page.
+                if (data.edit_url && window.location.href !== data.edit_url) {
+                    history.replaceState({ draftId: data.id }, '', data.edit_url);
+                }
                 setAutosaveStatus('saved', data.saved_at);
                 showAutosaveToast();
             })
@@ -1125,6 +1132,7 @@
                 form.addEventListener('input', triggerAutosave);
                 form.addEventListener('change', triggerAutosave);
             }
+            _pageLoading = false;
         });
     </script>
     @include('worker.partials.contact-selector-js')

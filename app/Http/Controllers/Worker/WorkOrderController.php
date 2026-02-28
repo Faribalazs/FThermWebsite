@@ -155,7 +155,11 @@ class WorkOrderController extends Controller
             }
         }
 
-        return response()->json(['id' => $workOrder->id, 'saved_at' => now()->format('H:i:s')]);
+        return response()->json([
+            'id'       => $workOrder->id,
+            'saved_at' => now()->format('H:i:s'),
+            'edit_url' => route('worker.work-orders.edit', $workOrder),
+        ]);
     }
 
     public function autosaveEdit(Request $request, WorkOrder $workOrder)

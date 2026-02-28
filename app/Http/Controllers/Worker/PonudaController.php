@@ -131,7 +131,11 @@ class PonudaController extends Controller
             }
         }
 
-        return response()->json(['id' => $ponuda->id, 'saved_at' => now()->format('H:i:s')]);
+        return response()->json([
+            'id'       => $ponuda->id,
+            'saved_at' => now()->format('H:i:s'),
+            'edit_url' => route('worker.ponude.edit', $ponuda),
+        ]);
     }
 
     public function store(Request $request)
