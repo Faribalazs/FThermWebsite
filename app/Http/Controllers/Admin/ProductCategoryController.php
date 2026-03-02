@@ -40,25 +40,26 @@ class ProductCategoryController extends Controller
             'active' => $request->has('active'),
         ]);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno kreirana');
+        return redirect()->route('admin.product-categories.index')->with('success', 'Kategorija uspešno kreirana');
     }
 
-    public function edit(ProductCategory $category)
+    public function edit(ProductCategory $product_category)
     {
+        $category = $product_category;
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, ProductCategory $category)
+    public function update(Request $request, ProductCategory $product_category)
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
             'name_sr' => 'required|string|max:255',
             'name_hu' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:product_categories,slug,' . $category->id,
+            'slug' => 'required|string|max:255|unique:product_categories,slug,' . $product_category->id,
             'active' => 'boolean',
         ]);
 
-        $category->update([
+        $product_category->update([
             'name' => [
                 'en' => $validated['name_en'],
                 'sr' => $validated['name_sr'],
@@ -68,12 +69,12 @@ class ProductCategoryController extends Controller
             'active' => $request->has('active'),
         ]);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno ažurirana');
+        return redirect()->route('admin.product-categories.index')->with('success', 'Kategorija uspešno ažurirana');
     }
 
-    public function destroy(ProductCategory $category)
+    public function destroy(ProductCategory $product_category)
     {
-        $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Kategorija uspešno obrisana');
+        $product_category->delete();
+        return redirect()->route('admin.product-categories.index')->with('success', 'Kategorija uspešno obrisana');
     }
 }

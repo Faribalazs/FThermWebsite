@@ -14,20 +14,22 @@ class HomepageContentController extends Controller
         return view('admin.homepage.index', compact('contents'));
     }
 
-    public function edit(HomepageContent $homepage)
+    public function create()
     {
-        return view('admin.homepage.edit', compact('homepage'));
+        return view('admin.homepage.create');
     }
 
-    public function update(Request $request, HomepageContent $homepage)
+    public function store(Request $request)
     {
         $validated = $request->validate([
+            'key' => 'required|string|max:255|unique:homepage_contents,key',
             'value_en' => 'required|string',
             'value_sr' => 'required|string',
             'value_hu' => 'required|string',
         ]);
 
-        $homepage->update([
+        HomepageContent::create([
+            'key' => $validated['key'],
             'value' => [
                 'en' => $validated['value_en'],
                 'sr' => $validated['value_sr'],
@@ -35,6 +37,38 @@ class HomepageContentController extends Controller
             ],
         ]);
 
-        return redirect()->route('admin.homepage.index')->with('success', 'Sadržaj uspešno ažuriran');
+        return redirect()->route('admin.homepage-contents.index')->with('success', 'Sekcija uspešno kreirana.');
+    }
+
+    public function edit(HomepageContent $homepage_content)
+    {
+        $homepage = $homepage_content;
+        return view('admin.homepage.edit', compact('homepage'));
+    }
+
+    public function update(Request $request, HomepageContent $homepage_content)
+    {
+        $validated = $request->validate([
+            'value_en' => 'required|string',
+            'value_sr' => 'required|string',
+            'value_hu' => 'required|string',
+        ]);
+
+        $homepage_content->update([
+            'value' => [
+                'en' => $validated['value_en'],
+                'sr' => $validated['value_sr'],
+                'hu' => $validated['value_hu'],
+            ],
+        ]);
+
+        return redirect()->route('admin.homepage-contents.index')->with('success', 'Sadržaj uspešno ažuriran.');
+    }
+
+    public function destroy(HomepageContent $homepage_content)
+    {
+        $homepage_content->delete();
+
+        return redirect()->route('admin.homepage-contents.index')->with('success', 'Sekcija uspešno obrisana.');
     }
 }

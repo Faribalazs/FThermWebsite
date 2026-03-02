@@ -44,13 +44,13 @@ class DashboardController extends Controller
         $draftWorkOrders = WorkOrder::where('worker_id', $workerId)
             ->where('status', 'draft')
             ->latest()
-            ->get(['id', 'client_name', 'location', 'created_at', 'total_amount']);
+            ->get(['id', 'client_type', 'client_name', 'company_name', 'location', 'created_at', 'total_amount']);
 
         // Draft ponude
         $draftPonude = Ponuda::where('worker_id', $workerId)
             ->where('status', 'draft')
             ->latest()
-            ->get(['id', 'client_name', 'location', 'created_at', 'total_amount']);
+            ->get(['id', 'client_type', 'client_name', 'company_name', 'location', 'created_at', 'total_amount']);
 
         // Statistics
         $totalProducts = InternalProduct::count();

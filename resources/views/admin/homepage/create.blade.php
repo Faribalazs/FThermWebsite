@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Izmeni sadržaj')
+@section('title', 'Nova sekcija')
 
 @section('content')
 <div class="animate-fade-in-up">
@@ -19,19 +19,45 @@
         <div class="flex items-center gap-3">
             <div class="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl shadow-lg">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{{ ucfirst(str_replace('_', ' ', $homepage->key)) }}</h1>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Ključ: <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-mono font-medium bg-gray-100 text-gray-600 border border-gray-200">{{ $homepage->key }}</span></p>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Nova Sekcija</h1>
+                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kreirajte novu sekciju sadržaja za naslovnu stranu</p>
             </div>
         </div>
     </div>
 
-    <form action="{{ route('admin.homepage-contents.update', $homepage) }}" method="POST">
+    <form action="{{ route('admin.homepage-contents.store') }}" method="POST">
         @csrf
-        @method('PUT')
+
+        <!-- Key Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-4 sm:mb-6">
+            <div class="px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 rounded-t-2xl">
+                <h2 class="text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+                    <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                    Identifikacija sekcije
+                </h2>
+            </div>
+            <div class="p-4 sm:p-6">
+                <label for="key" class="block text-sm font-semibold text-gray-700 mb-1.5">Ključ sekcije <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <input type="text" id="key" name="key" required
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white font-mono text-sm"
+                        placeholder="npr. hero_title, about_description" value="{{ old('key') }}">
+                </div>
+                <p class="mt-1.5 text-[10px] sm:text-xs text-gray-400">Koristite mala slova i donje crte (npr. hero_title). Ovo je jedinstveni identifikator.</p>
+                @error('key') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            </div>
+        </div>
 
         <!-- Language Tabs Card -->
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-4 sm:mb-6" x-data="{ langTab: 'sr' }">
@@ -63,21 +89,21 @@
             <!-- Serbian Tab -->
             <div x-show="langTab === 'sr'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="p-4 sm:p-6">
                 <label for="value_sr" class="block text-sm font-semibold text-gray-700 mb-1.5">Sadržaj <span class="text-red-500">*</span></label>
-                <textarea id="value_sr" name="value_sr" rows="8" required class="tinymce-editor">{{ old('value_sr', $homepage->value['sr'] ?? '') }}</textarea>
+                <textarea id="value_sr" name="value_sr" rows="8" required class="tinymce-editor" placeholder="Unesite srpski sadržaj...">{{ old('value_sr') }}</textarea>
                 @error('value_sr') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <!-- English Tab -->
             <div x-show="langTab === 'en'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="p-4 sm:p-6">
                 <label for="value_en" class="block text-sm font-semibold text-gray-700 mb-1.5">Sadržaj <span class="text-red-500">*</span></label>
-                <textarea id="value_en" name="value_en" rows="8" required class="tinymce-editor">{{ old('value_en', $homepage->value['en'] ?? '') }}</textarea>
+                <textarea id="value_en" name="value_en" rows="8" required class="tinymce-editor" placeholder="Enter English content...">{{ old('value_en') }}</textarea>
                 @error('value_en') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <!-- Hungarian Tab -->
             <div x-show="langTab === 'hu'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" class="p-4 sm:p-6">
                 <label for="value_hu" class="block text-sm font-semibold text-gray-700 mb-1.5">Sadržaj <span class="text-red-500">*</span></label>
-                <textarea id="value_hu" name="value_hu" rows="8" required class="tinymce-editor">{{ old('value_hu', $homepage->value['hu'] ?? '') }}</textarea>
+                <textarea id="value_hu" name="value_hu" rows="8" required class="tinymce-editor" placeholder="Adja meg a magyar tartalmat...">{{ old('value_hu') }}</textarea>
                 @error('value_hu') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
         </div>
@@ -89,9 +115,9 @@
             </a>
             <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-200 font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
-                Ažuriraj sadržaj
+                Kreiraj sekciju
             </button>
         </div>
     </form>

@@ -579,6 +579,6 @@ class PonudaController extends Controller
             : $ponuda->client_name;
         $fileName = 'Ponuda-' . str_replace(' ', '-', $clientName) . '-' . $ponuda->id . '.pdf';
 
-        return $pdf->download($fileName);
+        return $pdf->stream($fileName);
     }
 }

@@ -859,7 +859,7 @@ class WorkOrderController extends Controller
             ->setOption('isRemoteEnabled', true)
             ->setOption('defaultFont', 'DejaVu Sans');
         
-        return $pdf->download('Faktura-' . $workOrder->invoice_number . '.pdf');
+        return $pdf->stream('Faktura-' . $workOrder->invoice_number . '.pdf');
     }
 
     public function sendToEfaktura(WorkOrder $workOrder)
@@ -926,6 +926,6 @@ class WorkOrderController extends Controller
             : $workOrder->client_name;
         $fileName = 'RadniNalog-' . str_replace(' ', '-', $clientName) . '-' . $workOrder->id . '.pdf';
         
-        return $pdf->download($fileName);
+        return $pdf->stream($fileName);
     }
 }

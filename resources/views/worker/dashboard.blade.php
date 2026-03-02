@@ -261,7 +261,13 @@
                         @foreach($draftWorkOrders as $draft)
                         <div class="flex items-center justify-between p-3 sm:p-4 bg-primary-50 border-l-4 border-primary-400 rounded-r-xl hover:bg-primary-100 transition-colors">
                             <div class="flex-1 min-w-0 mr-3">
-                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $draft->client_name ?: '(bez klijenta)' }}</p>
+                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">
+                                    @if($draft->client_type === 'pravno_lice')
+                                        {{ $draft->company_name ?: '(bez klijenta)' }}
+                                    @else
+                                        {{ $draft->client_name ?: '(bez klijenta)' }}
+                                    @endif
+                                </p>
                                 <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $draft->location ?: '—' }}</p>
                                 <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5">{{ $draft->created_at->diffForHumans() }}</p>
                             </div>
@@ -308,7 +314,13 @@
                         @foreach($draftPonude as $draft)
                         <div class="flex items-center justify-between p-3 sm:p-4 bg-primary-50 border-l-4 border-primary-400 rounded-r-xl hover:bg-primary-100 transition-colors">
                             <div class="flex-1 min-w-0 mr-3">
-                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">{{ $draft->client_name ?: '(bez klijenta)' }}</p>
+                                <p class="text-sm sm:text-base font-bold text-gray-900 truncate">
+                                    @if($draft->client_type === 'pravno_lice')
+                                        {{ $draft->company_name ?: '(bez klijenta)' }}
+                                    @else
+                                        {{ $draft->client_name ?: '(bez klijenta)' }}
+                                    @endif
+                                </p>
                                 <p class="text-xs sm:text-sm text-gray-500 truncate">{{ $draft->location ?: '—' }}</p>
                                 <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5">{{ $draft->created_at->diffForHumans() }}</p>
                             </div>

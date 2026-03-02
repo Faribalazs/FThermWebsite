@@ -56,15 +56,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($services as $service)
             <div class="group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100 hover:border-primary-200 transform hover:-translate-y-2">
-                @if($service->icon)
-                <div class="text-5xl mb-6">{{ $service->icon }}</div>
-                @else
                 <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition shadow-lg">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                 </div>
-                @endif
                 <h3 class="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition">{{ translate($service->title) }}</h3>
                 <p class="text-gray-600 leading-relaxed">{{ translate($service->description) }}</p>
             </div>
