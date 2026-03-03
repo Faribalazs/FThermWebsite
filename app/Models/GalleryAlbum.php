@@ -3,18 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Service extends Model
+class GalleryAlbum extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'title',
         'description',
-        'icon',
-        'order',
+        'slug',
         'active',
+        'order',
     ];
 
     protected $casts = [
@@ -22,4 +20,9 @@ class Service extends Model
         'description' => 'array',
         'active' => 'boolean',
     ];
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(GalleryImage::class, 'album_id')->orderBy('order');
+    }
 }

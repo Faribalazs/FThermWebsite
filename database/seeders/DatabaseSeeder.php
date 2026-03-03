@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             MaterialSeeder::class,
             CompanySettingsSeeder::class,
             ContactSeeder::class,
+            SlideSeeder::class,
+            GallerySeeder::class,
         ]);
     }
 }

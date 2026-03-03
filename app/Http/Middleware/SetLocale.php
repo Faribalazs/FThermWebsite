@@ -15,13 +15,16 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->get('lang') ?? session('locale', config('app.locale'));
-        
+        $locale = $request->route('locale')
+            ?? $request->get('lang')
+            ?? session('locale', config('app.locale'));
+
         if (in_array($locale, ['en', 'sr', 'hu'])) {
             app()->setLocale($locale);
             session(['locale' => $locale]);
+            \Illuminate\Support\Facades\URL::defaults(['locale' => $locale]);
         }
-        
+
         return $next($request);
     }
 }

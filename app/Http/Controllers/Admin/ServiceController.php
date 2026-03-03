@@ -28,6 +28,7 @@ class ServiceController extends Controller
             'description_en' => 'required|string',
             'description_sr' => 'required|string',
             'description_hu' => 'required|string',
+            'icon' => 'nullable|string',
             'order' => 'required|integer',
             'active' => 'boolean',
         ]);
@@ -43,6 +44,7 @@ class ServiceController extends Controller
                 'sr' => $validated['description_sr'],
                 'hu' => $validated['description_hu'],
             ],
+            'icon' => $validated['icon'] ?? null,
             'order' => $validated['order'],
             'active' => $request->has('active'),
         ]);
@@ -64,6 +66,7 @@ class ServiceController extends Controller
             'description_en' => 'required|string',
             'description_sr' => 'required|string',
             'description_hu' => 'required|string',
+            'icon' => 'nullable|string',
             'order' => 'required|integer',
             'active' => 'boolean',
         ]);
@@ -79,6 +82,7 @@ class ServiceController extends Controller
                 'sr' => $validated['description_sr'],
                 'hu' => $validated['description_hu'],
             ],
+            'icon' => $validated['icon'] ?? null,
             'order' => $validated['order'],
             'active' => $request->has('active'),
         ]);

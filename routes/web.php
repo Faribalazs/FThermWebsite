@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProductCategoryController;
@@ -12,15 +13,27 @@ use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\HomepageContentController;
 use Illuminate\Support\Facades\Route;
 
-// Public Routes
+// Maintenance
 Route::get('/maintenance', function () {
     return view('maintenance');
 })->name('maintenance');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+// Redirect root to default locale
+Route::get('/', function () {
+    return redirect('/' . config('app.locale'));
+});
+
+// Public locale-prefixed routes
+Route::prefix('{locale}')
+    ->whereIn('locale', ['sr', 'en', 'hu'])
+    ->group(function () {
+        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+        Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
+        Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+        Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+        Route::get('/gallery/{slug}', [GalleryController::class, 'show'])->name('gallery.show');
+    });
 
 // Auth Routes
 Route::middleware('auth')->group(function () {
@@ -51,7 +64,16 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     
     // Homepage Content Management
     Route::resource('homepage-contents', HomepageContentController::class);
-    
+
+    // Slides Management
+    Route::resource('slides', App\Http\Controllers\Admin\SlideController::class)->except(['show']);
+
+    // Gallery Management
+    Route::resource('gallery', App\Http\Controllers\Admin\GalleryAlbumController::class)->except(['show']);
+    Route::post('gallery/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'uploadImage'])->name('gallery.images.upload');
+    Route::delete('gallery/images/{image}', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImage'])->name('gallery.images.delete');
+    Route::post('gallery/{gallery}/images/reorder', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'reorderImages'])->name('gallery.images.reorder');
+
     // Worker Management
     Route::resource('workers', App\Http\Controllers\Admin\WorkerController::class);
     Route::patch('workers/{worker}/ban', [App\Http\Controllers\Admin\WorkerController::class, 'ban'])->name('workers.ban');

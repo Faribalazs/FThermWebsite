@@ -105,6 +105,32 @@
             </div>
         </div>
 
+        <!-- Icon Card -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6" x-data="{ svgContent: '' }">
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                <h2 class="text-sm sm:text-base font-bold text-gray-900">Ikonica</h2>
+                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">SVG path sadržaj ikonice (unutrašnjost &lt;svg&gt; taga)</p>
+            </div>
+            <div class="p-4 sm:p-6">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <div class="flex-1">
+                        <label for="icon" class="block text-sm font-bold text-gray-700 mb-1.5">SVG Path sadržaj</label>
+                        <textarea id="icon" name="icon" rows="5" x-model="svgContent"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
+                            placeholder='<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 10V3L4 14h7v7l9-11h-7z"/>'>{{ old('icon') }}</textarea>
+                        <p class="mt-1.5 text-xs text-gray-400">Kopirajte &lt;path&gt; elemente sa <a href="https://heroicons.com" target="_blank" class="text-primary-600 hover:underline">heroicons.com</a> i nalepite ih ovde.</p>
+                        @error('icon') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="flex-shrink-0">
+                        <p class="text-sm font-bold text-gray-700 mb-3">Pregled</p>
+                        <div class="w-20 h-20 rounded-2xl bg-primary-50 flex items-center justify-center border-2 border-dashed border-primary-200">
+                            <svg class="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="svgContent"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Card -->
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6">
             <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">

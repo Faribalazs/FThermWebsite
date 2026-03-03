@@ -5,21 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Service extends Model
+class Slide extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
+        'image',
         'title',
         'description',
-        'icon',
+        'button_text',
+        'button_link',
+        'text_position_x',
+        'text_position_y',
         'order',
         'active',
     ];
 
     protected $casts = [
-        'title' => 'array',
+        'title'       => 'array',
         'description' => 'array',
-        'active' => 'boolean',
+        'button_text' => 'array',
+        'active'      => 'boolean',
     ];
 }

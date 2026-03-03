@@ -38,14 +38,22 @@ if (!function_exists('current_locale')) {
 
 if (!function_exists('change_locale_url')) {
     /**
-     * Generate URL with different locale
-     * 
+     * Generate URL with a different locale prefix.
+     *
      * @param string $locale
      * @return string
      */
     function change_locale_url(string $locale): string
     {
-        return url()->current() . '?lang=' . $locale;
+        $segments = explode('/', trim(request()->path(), '/'));
+
+        if (in_array($segments[0] ?? '', ['en', 'sr', 'hu'])) {
+            $segments[0] = $locale;
+        } else {
+            array_unshift($segments, $locale);
+        }
+
+        return url(implode('/', $segments));
     }
 }
 
