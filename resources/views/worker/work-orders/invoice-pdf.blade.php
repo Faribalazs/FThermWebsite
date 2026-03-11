@@ -235,42 +235,65 @@
                 @php
                     $rowNumber = 1;
                     $materialsTotal = 0;
+                    $servicesTotal = 0;
+                    $groupedSections = $workOrder->sections->groupBy('title');
                 @endphp
 
-                @foreach ($workOrder->sections as $section)
-                    @foreach ($section->items as $item)
-                        @php
-                            $itemTotal = $item->subtotal;
-                            $materialsTotal += $itemTotal;
-                        @endphp
+                @foreach ($groupedSections as $sectionTitle => $sectionGroup)
+                    @php
+                        $totalMultiplier = $sectionGroup->sum(fn($s) => max(1, (int)($s->multiplier ?? 1)));
+                        $hasServicePrice = $sectionGroup->contains(fn($s) => $s->service_price && $s->service_price > 0);
+                        $servicePrice = $sectionGroup->first(fn($s) => $s->service_price && $s->service_price > 0)?->service_price ?? 0;
+
+                        // Aggregate items by product_id across group
+                        $aggregatedItems = collect();
+                        foreach ($sectionGroup as $sec) {
+                            $secMult = max(1, (int)($sec->multiplier ?? 1));
+                            foreach ($sec->items as $item) {
+                                $pid = $item->product_id;
+                                if ($aggregatedItems->has($pid)) {
+                                    $existing = $aggregatedItems[$pid];
+                                    $existing['quantity'] += $item->quantity * $secMult;
+                                    $existing['total']    += $item->subtotal * $secMult;
+                                    $aggregatedItems->put($pid, $existing);
+                                } else {
+                                    $aggregatedItems->put($pid, [
+                                        'name'          => $item->product->name,
+                                        'unit'          => $item->product->unit,
+                                        'quantity'      => $item->quantity * $secMult,
+                                        'price_at_time' => $item->price_at_time,
+                                        'total'         => $item->subtotal * $secMult,
+                                    ]);
+                                }
+                            }
+                        }
+                    @endphp
+
+                    @foreach ($aggregatedItems as $aItem)
+                        @php $materialsTotal += $aItem['total']; @endphp
                         <tr>
                             <td class="center">{{ $rowNumber }}</td>
-                            <td>{{ $item->product->name }}</td>
-                            <td class="center">{{ $item->product->unit }}</td>
-                            <td class="right">{{ number_format($item->quantity, 2) }}</td>
-                            <td class="right">{{ number_format($item->price_at_time, 2) }}</td>
-                            <td class="right">{{ number_format($itemTotal, 2) }}</td>
+                            <td>{{ $aItem['name'] }}</td>
+                            <td class="center">{{ $aItem['unit'] }}</td>
+                            <td class="right">{{ number_format($aItem['quantity'], 2) }}</td>
+                            <td class="right">{{ number_format($aItem['price_at_time'], 2) }}</td>
+                            <td class="right">{{ number_format($aItem['total'], 2) }}</td>
                         </tr>
                         @php $rowNumber++; @endphp
                     @endforeach
-                @endforeach
 
-                @php
-                    $servicesTotal = 0;
-                @endphp
-
-                @foreach ($workOrder->sections as $section)
-                    @if ($section->service_price && $section->service_price > 0)
+                    @if ($hasServicePrice)
                         @php
-                            $servicesTotal += $section->service_price;
+                            $sectionServiceTotal = $servicePrice * $totalMultiplier;
+                            $servicesTotal += $sectionServiceTotal;
                         @endphp
                         <tr>
                             <td class="center">{{ $rowNumber }}</td>
-                            <td>{{ $section->title }} - Usluge rada</td>
+                            <td>{{ $sectionTitle }} - Usluge rada</td>
                             <td class="center">paušal</td>
-                            <td class="right">1.00</td>
-                            <td class="right">{{ number_format($section->service_price, 0) }}</td>
-                            <td class="right">{{ number_format($section->service_price, 0) }}</td>
+                            <td class="right">{{ $totalMultiplier }}</td>
+                            <td class="right">{{ number_format($servicePrice, 0) }}</td>
+                            <td class="right">{{ number_format($sectionServiceTotal, 0) }}</td>
                         </tr>
                         @php $rowNumber++; @endphp
                     @endif

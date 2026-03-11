@@ -150,6 +150,71 @@
                         </div>
                     @enderror
                 </div>
+
+                <!-- Starting Quantity (optional) -->
+                @if($warehouses->isNotEmpty())
+                <div class="border border-gray-200 rounded-xl p-4 sm:p-5 bg-gray-50/50">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
+                        </svg>
+                        Početna Količina <span class="text-gray-400 font-normal">(opciono)</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Warehouse -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1.5" for="starting_warehouse_id">
+                                Skladište
+                            </label>
+                            <select
+                                class="form-input w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-base transition-all @error('starting_warehouse_id') border-red-400 bg-red-50 @enderror"
+                                id="starting_warehouse_id"
+                                name="starting_warehouse_id"
+                            >
+                                <option value="">— Izaberi skladište —</option>
+                                @foreach($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}" {{ old('starting_warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                        {{ $warehouse->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('starting_warehouse_id')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <!-- Quantity -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1.5" for="starting_quantity">
+                                Količina
+                            </label>
+                            <input
+                                class="form-input w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-base transition-all @error('starting_quantity') border-red-400 bg-red-50 @enderror"
+                                id="starting_quantity"
+                                type="number"
+                                name="starting_quantity"
+                                value="{{ old('starting_quantity') }}"
+                                placeholder="0"
+                                min="0"
+                                inputmode="numeric"
+                            >
+                            @error('starting_quantity')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Form Actions — sticky on mobile -->

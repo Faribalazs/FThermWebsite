@@ -22,7 +22,7 @@ class WorkOrderController extends Controller
     public function index(Request $request)
     {
         $query = WorkOrder::where('worker_id', auth('worker')->id())
-            ->withCount('sections');
+            ->withSum('sections', 'multiplier');
 
         // Search filter
         if ($request->filled('search')) {
@@ -152,6 +152,7 @@ class WorkOrderController extends Controller
                     'title'         => $sectionTitle,
                     'hours_spent'   => $sectionData['hours_spent'] ?: null,
                     'service_price' => $sectionData['service_price'] ?: null,
+                    'multiplier'    => max(1, (int) ($sectionData['multiplier'] ?? 1)),
                 ]);
                 foreach ($sectionData['items'] ?? [] as $itemData) {
                     if (empty($itemData['product_id'])) continue;
@@ -222,6 +223,7 @@ class WorkOrderController extends Controller
                     'title'         => $sectionTitle,
                     'hours_spent'   => $sectionData['hours_spent'] ?: null,
                     'service_price' => $sectionData['service_price'] ?: null,
+                    'multiplier'    => max(1, (int) ($sectionData['multiplier'] ?? 1)),
                 ]);
                 foreach ($sectionData['items'] ?? [] as $itemData) {
                     if (empty($itemData['product_id'])) continue;
@@ -263,6 +265,7 @@ class WorkOrderController extends Controller
             'sections.*.title' => 'required|string|max:255',
             'sections.*.hours_spent' => 'nullable|numeric|min:0',
             'sections.*.service_price' => 'nullable|numeric|min:0',
+            'sections.*.multiplier' => 'nullable|integer|min:1|max:99',
             'sections.*.items' => 'nullable|array',
             'sections.*.items.*.product_id' => 'nullable|exists:internal_products,id',
             'sections.*.items.*.quantity' => 'nullable|integer|min:1',
@@ -302,11 +305,12 @@ class WorkOrderController extends Controller
             // Check inventory availability before creating work order
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
+                    $multiplier = max(1, (int) ($sectionData['multiplier'] ?? 1));
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
                         $inventory = $inventoryMap->get($itemData['product_id']);
                         $currentStock = $inventory ? $inventory->quantity : 0;
-                        $neededQty = max(1, (int) ($itemData['quantity'] ?? 1));
+                        $neededQty = max(1, (int) ($itemData['quantity'] ?? 1)) * $multiplier;
                         if ($currentStock < $neededQty) {
                             $product = $productMap->get($itemData['product_id']);
                             throw new \Exception("Nedovoljno zaliha za materijal '{$product->name}' u skladištu '{$warehouse->name}'. Dostupno: {$currentStock}, Potrebno: {$neededQty}");
@@ -368,51 +372,56 @@ class WorkOrderController extends Controller
             }
 
             foreach ($validated['sections'] as $sectionData) {
-                $section = $workOrder->sections()->create([
-                    'title' => $sectionData['title'],
-                    'hours_spent' => $sectionData['hours_spent'] ?? null,
-                    'service_price' => $sectionData['service_price'] ?? null,
-                ]);
+                $multiplier = max(1, (int) ($sectionData['multiplier'] ?? 1));
+                for ($m = 0; $m < $multiplier; $m++) {
+                    $section = $workOrder->sections()->create([
+                        'title' => $sectionData['title'],
+                        'hours_spent' => $sectionData['hours_spent'] ?? null,
+                        'service_price' => $sectionData['service_price'] ?? null,
+                    ]);
 
-                if (!empty($sectionData['items'])) {
-                    foreach ($sectionData['items'] as $itemData) {
-                        if (empty($itemData['product_id'])) continue;
-                        $product = $productMap->get($itemData['product_id']);
-                        if (!$product) continue;
-                        $qty = max(1, (int) ($itemData['quantity'] ?? 1));
-                        $section->items()->create([
-                            'product_id' => $itemData['product_id'],
-                            'quantity' => $qty,
-                            'price_at_time' => $product->price,
-                        ]);
-
-                        // Update inventory - deduct the used quantity
-                        $inventory = $inventoryMap->get($itemData['product_id']);
-                        if ($inventory) {
-                            $inventory->quantity -= $qty;
-                            $inventory->updated_by = auth('worker')->id();
-                            $inventory->save();
-                        } else {
-                            // Create inventory record with negative quantity if it doesn't exist
-                            Inventory::create([
-                                'internal_product_id' => $itemData['product_id'],
-                                'warehouse_id' => $validated['warehouse_id'],
-                                'quantity' => -$qty,
-                                'updated_by' => auth('worker')->id(),
+                    if (!empty($sectionData['items'])) {
+                        foreach ($sectionData['items'] as $itemData) {
+                            if (empty($itemData['product_id'])) continue;
+                            $product = $productMap->get($itemData['product_id']);
+                            if (!$product) continue;
+                            $qty = max(1, (int) ($itemData['quantity'] ?? 1));
+                            $section->items()->create([
+                                'product_id' => $itemData['product_id'],
+                                'quantity' => $qty,
+                                'price_at_time' => $product->price,
                             ]);
+
+                            // Update inventory - deduct the used quantity
+                            $inventory = $inventoryMap->get($itemData['product_id']);
+                            if ($inventory) {
+                                $inventory->quantity -= $qty;
+                                $inventory->updated_by = auth('worker')->id();
+                                $inventory->save();
+                            } else {
+                                // Create inventory record with negative quantity if it doesn't exist
+                                Inventory::create([
+                                    'internal_product_id' => $itemData['product_id'],
+                                    'warehouse_id' => $validated['warehouse_id'],
+                                    'quantity' => -$qty,
+                                    'updated_by' => auth('worker')->id(),
+                                ]);
+                            }
                         }
                     }
-                }
+                } // end multiplier loop
             }
 
             $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $workOrder->load('sections.items');
             $total = $workOrder->calculateGrandTotal($kmPrice);
             $workOrder->update(['total_amount' => $total]);
 
             // Log activity
             $itemCount = 0;
             foreach ($validated['sections'] as $section) {
-                $itemCount += count($section['items'] ?? []);
+                $multiplier = max(1, (int) ($section['multiplier'] ?? 1));
+                $itemCount += count($section['items'] ?? []) * $multiplier;
             }
             
             $clientDisplay = $validated['client_type'] === 'pravno_lice' 
@@ -548,6 +557,7 @@ class WorkOrderController extends Controller
             'sections.*.title' => 'required|string|max:255',
             'sections.*.hours_spent' => 'nullable|numeric|min:0',
             'sections.*.service_price' => 'nullable|numeric|min:0',
+            'sections.*.multiplier' => 'nullable|integer|min:1|max:99',
             'sections.*.items' => 'nullable|array',
             'sections.*.items.*.product_id' => 'nullable|exists:internal_products,id',
             'sections.*.items.*.quantity' => 'required_with:sections.*.items.*.product_id|integer|min:1',
@@ -567,9 +577,10 @@ class WorkOrderController extends Controller
             $newItems = [];
             foreach ($validated['sections'] as $sectionData) {
                 if (!empty($sectionData['items'])) {
+                    $multiplier = max(1, (int) ($sectionData['multiplier'] ?? 1));
                     foreach ($sectionData['items'] as $itemData) {
                         if (empty($itemData['product_id'])) continue;
-                        $newItems[$itemData['product_id']] = ($newItems[$itemData['product_id']] ?? 0) + max(1, (int) ($itemData['quantity'] ?? 1));
+                        $newItems[$itemData['product_id']] = ($newItems[$itemData['product_id']] ?? 0) + max(1, (int) ($itemData['quantity'] ?? 1)) * $multiplier;
                     }
                 }
             }
@@ -640,44 +651,48 @@ class WorkOrderController extends Controller
 
             // Create new sections and items
             foreach ($validated['sections'] as $sectionData) {
-                $section = $workOrder->sections()->create([
-                    'title' => $sectionData['title'],
-                    'hours_spent' => $sectionData['hours_spent'] ?? null,
-                    'service_price' => $sectionData['service_price'] ?? null,
-                ]);
+                $multiplier = max(1, (int) ($sectionData['multiplier'] ?? 1));
+                for ($m = 0; $m < $multiplier; $m++) {
+                    $section = $workOrder->sections()->create([
+                        'title' => $sectionData['title'],
+                        'hours_spent' => $sectionData['hours_spent'] ?? null,
+                        'service_price' => $sectionData['service_price'] ?? null,
+                    ]);
 
-                if (!empty($sectionData['items'])) {
-                    foreach ($sectionData['items'] as $itemData) {
-                        if (empty($itemData['product_id'])) continue;
-                        $product = $productMap->get($itemData['product_id']);
-                        if (!$product) continue;
-                        $qty = max(1, (int) ($itemData['quantity'] ?? 1));
-                        $section->items()->create([
-                            'product_id' => $itemData['product_id'],
-                            'quantity' => $qty,
-                            'price_at_time' => $product->price,
-                        ]);
-
-                        // Deduct from inventory
-                        $inventory = $inventoryNewMap->get($itemData['product_id']);
-                        if ($inventory) {
-                            $inventory->quantity -= $qty;
-                            $inventory->updated_by = auth('worker')->id();
-                            $inventory->save();
-                        } else {
-                            Inventory::create([
-                                'internal_product_id' => $itemData['product_id'],
-                                'warehouse_id' => $validated['warehouse_id'],
-                                'quantity' => -$qty,
-                                'updated_by' => auth('worker')->id(),
+                    if (!empty($sectionData['items'])) {
+                        foreach ($sectionData['items'] as $itemData) {
+                            if (empty($itemData['product_id'])) continue;
+                            $product = $productMap->get($itemData['product_id']);
+                            if (!$product) continue;
+                            $qty = max(1, (int) ($itemData['quantity'] ?? 1));
+                            $section->items()->create([
+                                'product_id' => $itemData['product_id'],
+                                'quantity' => $qty,
+                                'price_at_time' => $product->price,
                             ]);
+
+                            // Deduct from inventory
+                            $inventory = $inventoryNewMap->get($itemData['product_id']);
+                            if ($inventory) {
+                                $inventory->quantity -= $qty;
+                                $inventory->updated_by = auth('worker')->id();
+                                $inventory->save();
+                            } else {
+                                Inventory::create([
+                                    'internal_product_id' => $itemData['product_id'],
+                                    'warehouse_id' => $validated['warehouse_id'],
+                                    'quantity' => -$qty,
+                                    'updated_by' => auth('worker')->id(),
+                                ]);
+                            }
                         }
                     }
-                }
+                } // end multiplier loop
             }
 
             // Update total amount
             $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
+            $workOrder->load('sections.items');
             $total = $workOrder->calculateGrandTotal($kmPrice);
             $workOrder->update(['total_amount' => $total]);
 

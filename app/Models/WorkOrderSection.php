@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkOrderSection extends Model
 {
-    protected $fillable = ['work_order_id', 'title', 'hours_spent', 'service_price'];
+    protected $fillable = ['work_order_id', 'title', 'hours_spent', 'service_price', 'multiplier'];
 
     protected $casts = [
         'work_order_id' => 'integer',
         'hours_spent'   => 'decimal:2',
         'service_price' => 'decimal:2',
+        'multiplier'    => 'integer',
     ];
 
     public function workOrder()

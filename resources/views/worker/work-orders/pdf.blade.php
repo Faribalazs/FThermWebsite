@@ -152,6 +152,10 @@
             text-align: right;
         }
         
+        /* Service Price Row */
+        .service-price-row {
+        }
+        
         /* Totals */
         .totals {
             margin-top: 12px;
@@ -276,12 +280,38 @@
         </div>
 
         <!-- Work Sections -->
-        @foreach($workOrder->sections as $section)
+        @php
+            $groupedSections = $workOrder->sections->groupBy('title');
+        @endphp
+        @foreach($groupedSections as $sectionTitle => $sectionGroup)
+        @php
+            $totalMultiplier = $sectionGroup->sum(fn($s) => max(1, (int)($s->multiplier ?? 1)));
+            $totalHours = $sectionGroup->sum(fn($s) => (float)($s->hours_spent ?? 0));
+            $hasServicePrice = $sectionGroup->contains(fn($s) => $s->service_price && $s->service_price > 0);
+            // Aggregate items by product_id
+            $aggregatedItems = collect();
+            foreach ($sectionGroup as $sec) {
+                foreach ($sec->items as $item) {
+                    $pid = $item->product_id;
+                    if ($aggregatedItems->has($pid)) {
+                        $existing = $aggregatedItems[$pid];
+                        $existing['quantity'] += $item->quantity;
+                        $aggregatedItems->put($pid, $existing);
+                    } else {
+                        $aggregatedItems->put($pid, [
+                            'name'     => $item->product->name,
+                            'unit'     => $item->product->unit,
+                            'quantity' => $item->quantity,
+                        ]);
+                    }
+                }
+            }
+        @endphp
         <div class="section">
             <div class="section-header">
-                {{ $section->title }}
-                @if($section->hours_spent)
-                    <span style="float: right; font-weight: normal; font-size: 9px;">Vreme: {{ number_format($section->hours_spent, 2) }}h</span>
+                {{ $sectionTitle }}
+                @if($totalHours > 0)
+                    <span style="float: right; font-weight: normal; font-size: 9px;">Vreme: {{ number_format($totalHours, 2) }}h</span>
                 @endif
             </div>
 
@@ -293,12 +323,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($section->items as $item)
+                    @foreach($aggregatedItems as $aItem)
                     <tr>
-                        <td>{{ $item->product->name }}</td>
-                        <td class="text-right">{{ $item->quantity }} {{ $item->product->unit }}</td>
+                        <td>{{ $aItem['name'] }}</td>
+                        <td class="text-right">{{ $aItem['quantity'] }} {{ $aItem['unit'] }}</td>
                     </tr>
                     @endforeach
+                    @if($hasServicePrice)
+                    <tr class="service-price-row">
+                        <td><strong>Usluga rada (paušal)</strong></td>
+                        <td class="text-right">{{ $totalMultiplier }}x</td>
+                    </tr>
+                    @endif
                 </tbody>
             </table>
         </div>

@@ -421,16 +421,18 @@ class EfakturaService
         $lineNumber = 1;
 
         foreach ($workOrder->sections as $section) {
+            $sectionMultiplier = max(1, (int) ($section->multiplier ?? 1));
+
             // Material items
             foreach ($section->items as $item) {
                 $this->addInvoiceLine($doc, $invoice, [
                     'id' => $lineNumber++,
                     'name' => $item->product->name ?? 'Materijal',
                     'description' => $section->title . ' - ' . ($item->product->name ?? ''),
-                    'quantity' => (float) $item->quantity,
+                    'quantity' => (float) $item->quantity * $sectionMultiplier,
                     'unit' => $this->mapUnitCode($item->product->unit ?? 'kom'),
                     'price' => (float) $item->price_at_time,
-                    'amount' => (float) $item->subtotal,
+                    'amount' => (float) $item->subtotal * $sectionMultiplier,
                 ]);
             }
 
@@ -440,10 +442,10 @@ class EfakturaService
                     'id' => $lineNumber++,
                     'name' => 'Usluga: ' . $section->title,
                     'description' => 'Usluga rada - ' . $section->title,
-                    'quantity' => 1,
+                    'quantity' => $sectionMultiplier,
                     'unit' => 'HUR', // Hour (service)
                     'price' => (float) $section->service_price,
-                    'amount' => (float) $section->service_price,
+                    'amount' => (float) $section->service_price * $sectionMultiplier,
                 ]);
             }
         }
@@ -560,25 +562,7 @@ class EfakturaService
     protected function calculateGrandTotal(WorkOrder $workOrder): float
     {
         $workOrder->loadMissing(['sections.items.product']);
-
-        $materialsTotal = 0;
-        $servicesTotal = 0;
-
-        foreach ($workOrder->sections as $section) {
-            foreach ($section->items as $item) {
-                $materialsTotal += $item->subtotal;
-            }
-            if ($section->service_price && $section->service_price > 0) {
-                $servicesTotal += $section->service_price;
-            }
-        }
-
-        $travelCost = 0;
         $kmPrice = (float) (Setting::where('key', 'km_price')->value('value') ?? 0);
-        if ($workOrder->km_to_destination && $kmPrice > 0) {
-            $travelCost = $workOrder->km_to_destination * $kmPrice;
-        }
-
-        return $materialsTotal + $servicesTotal + $travelCost;
+        return $workOrder->calculateGrandTotal($kmPrice);
     }
 }

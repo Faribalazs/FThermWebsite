@@ -196,7 +196,7 @@
                                             {{ $order->created_at->diffForHumans() }}
                                         </span>
                                         <span class="text-[11px] sm:text-xs font-semibold text-gray-500">
-                                            {{ $order->sections->count() }} usluga
+                                            {{ $order->sections->sum('multiplier') ?: $order->sections->count() }} usluga
                                         </span>
                                     </div>
                                 </div>

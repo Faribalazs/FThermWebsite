@@ -3,24 +3,11 @@
 @section('title', 'Faktura #' . $workOrder->invoice_number)
 
 @php
-    $materialsTotal = 0;
-    foreach ($workOrder->sections as $section) {
-        foreach ($section->items as $item) {
-            $materialsTotal += $item->subtotal;
-        }
-    }
-    $servicesTotal = 0;
-    foreach ($workOrder->sections as $section) {
-        if ($section->service_price && $section->service_price > 0) {
-            $servicesTotal += $section->service_price;
-        }
-    }
-    $travelCost = 0;
-    if ($workOrder->km_to_destination && $kmPrice > 0) {
-        $travelCost = $workOrder->km_to_destination * $kmPrice;
-    }
-    $grandTotal = $materialsTotal + $servicesTotal + $travelCost;
-    $lineNumber = 0;
+    $materialsTotal = $workOrder->calculateMaterialTotal();
+    $servicesTotal  = $workOrder->calculateServiceTotal();
+    $travelCost     = $workOrder->calculateTravelCost($kmPrice);
+    $grandTotal     = $materialsTotal + $servicesTotal + $travelCost;
+    $lineNumber     = 0;
 @endphp
 
 @section('content')
@@ -205,47 +192,79 @@
                     Stavke
                 </h2>
 
-                @foreach ($workOrder->sections as $section)
+                @php
+                    $groupedSections = $workOrder->sections->groupBy('title');
+                @endphp
+                @foreach ($groupedSections as $sectionTitle => $sectionGroup)
+                @php
+                    $totalMultiplier = $sectionGroup->sum(fn($s) => max(1, (int)($s->multiplier ?? 1)));
+                    $totalHours      = $sectionGroup->sum(fn($s) => (float)($s->hours_spent ?? 0));
+                    $hasServicePrice = $sectionGroup->contains(fn($s) => $s->service_price && $s->service_price > 0);
+                    $servicePrice    = $sectionGroup->first(fn($s) => $s->service_price && $s->service_price > 0)?->service_price ?? 0;
+                    $aggregatedItems = collect();
+                    foreach ($sectionGroup as $sec) {
+                        $secMult = max(1, (int)($sec->multiplier ?? 1));
+                        foreach ($sec->items as $item) {
+                            $pid = $item->product_id;
+                            if ($aggregatedItems->has($pid)) {
+                                $existing = $aggregatedItems[$pid];
+                                $existing['quantity'] += $item->quantity * $secMult;
+                                $existing['total']    += $item->subtotal * $secMult;
+                                $aggregatedItems->put($pid, $existing);
+                            } else {
+                                $aggregatedItems->put($pid, [
+                                    'name'          => $item->product->name,
+                                    'unit'          => $item->product->unit,
+                                    'quantity'      => $item->quantity * $secMult,
+                                    'price_at_time' => $item->price_at_time,
+                                    'total'         => $item->subtotal * $secMult,
+                                ]);
+                            }
+                        }
+                    }
+                    $hasItems = $aggregatedItems->count() > 0;
+                @endphp
                 <div class="mb-5 last:mb-0">
                     {{-- Section heading --}}
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-1.5">
                         <h3 class="text-sm sm:text-base font-bold text-gray-800 flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0"></span>
-                            {{ $section->title }}
+                            {{ $sectionTitle }}
                         </h3>
-                        @if($section->hours_spent)
+                        @if($totalHours > 0)
                         <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full text-xs font-semibold w-fit">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            {{ number_format($section->hours_spent, 2) }}h
+                            {{ number_format($totalHours, 2) }}h
                         </span>
                         @endif
                     </div>
 
-                    @if($section->items->count() > 0)
-                    @php $sectionStartLine = $lineNumber; @endphp
+                    @if($hasItems)
+                    @php $sectionStartLine = $lineNumber; $itemIdx = 0; @endphp
 
                     {{-- Mobile: Item cards --}}
                     <div class="sm:hidden space-y-3">
-                        @foreach ($section->items as $item)
+                        @foreach ($aggregatedItems as $aItem)
+                        @php $itemIdx++; @endphp
                         <div class="bg-gray-50/80 rounded-xl p-4 border border-gray-100">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-0.5">
-                                        <span class="flex items-center justify-center w-5 h-5 rounded-full bg-primary-100 text-primary-700 text-[10px] font-bold flex-shrink-0">{{ $sectionStartLine + $loop->iteration }}</span>
-                                        <p class="text-sm font-semibold text-gray-900 leading-tight">{{ $item->product->name }}</p>
+                                        <span class="flex items-center justify-center w-5 h-5 rounded-full bg-primary-100 text-primary-700 text-[10px] font-bold flex-shrink-0">{{ $sectionStartLine + $itemIdx }}</span>
+                                        <p class="text-sm font-semibold text-gray-900 leading-tight">{{ $aItem['name'] }}</p>
                                     </div>
                                 </div>
-                                <p class="text-sm font-bold text-gray-900 whitespace-nowrap">{{ number_format($item->subtotal, 2) }} <span class="text-[11px] font-normal text-gray-500">RSD</span></p>
+                                <p class="text-sm font-bold text-gray-900 whitespace-nowrap">{{ number_format($aItem['total'], 2) }} <span class="text-[11px] font-normal text-gray-500">RSD</span></p>
                             </div>
                             <div class="flex items-center gap-4 mt-3 pt-3 border-t border-gray-200/60">
                                 <div>
                                     <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Količina</p>
-                                    <p class="text-sm font-semibold text-gray-700">{{ $item->quantity }} <span class="text-xs text-gray-400 font-normal">{{ $item->product->unit }}</span></p>
+                                    <p class="text-sm font-semibold text-gray-700">{{ $aItem['quantity'] }} <span class="text-xs text-gray-400 font-normal">{{ $aItem['unit'] }}</span></p>
                                 </div>
                                 <div class="w-px h-6 bg-gray-200"></div>
                                 <div>
                                     <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Jed. cena</p>
-                                    <p class="text-sm font-semibold text-gray-700">{{ number_format($item->price_at_time, 2) }} <span class="text-xs text-gray-400 font-normal">RSD</span></p>
+                                    <p class="text-sm font-semibold text-gray-700">{{ number_format($aItem['price_at_time'], 2) }} <span class="text-xs text-gray-400 font-normal">RSD</span></p>
                                 </div>
                             </div>
                         </div>
@@ -265,30 +284,33 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100">
-                                @foreach ($section->items as $item)
+                                @php $itemIdx = 0; @endphp
+                                @foreach ($aggregatedItems as $aItem)
+                                @php $itemIdx++; @endphp
                                 <tr class="hover:bg-gray-50/50 transition-colors">
-                                    <td class="px-5 py-3 text-xs text-gray-400 font-mono">{{ $sectionStartLine + $loop->iteration }}</td>
+                                    <td class="px-5 py-3 text-xs text-gray-400 font-mono">{{ $sectionStartLine + $itemIdx }}</td>
                                     <td class="px-5 py-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ $item->product->name }}</p>
-                                        <p class="text-xs text-gray-500 mt-0.5">{{ $item->product->unit }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $aItem['name'] }}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">{{ $aItem['unit'] }}</p>
                                     </td>
                                     <td class="px-5 py-3 text-center">
-                                        <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 bg-gray-100 rounded-md text-sm font-semibold text-gray-700">{{ $item->quantity }}</span>
+                                        <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 bg-gray-100 rounded-md text-sm font-semibold text-gray-700">{{ $aItem['quantity'] }}</span>
                                     </td>
-                                    <td class="px-5 py-3 text-right text-sm text-gray-600">{{ number_format($item->price_at_time, 2) }}</td>
-                                    <td class="px-5 py-3 text-right text-sm font-bold text-gray-900 whitespace-nowrap">{{ number_format($item->subtotal, 2) }}</td>
+                                    <td class="px-5 py-3 text-right text-sm text-gray-600">{{ number_format($aItem['price_at_time'], 2) }}</td>
+                                    <td class="px-5 py-3 text-right text-sm font-bold text-gray-900 whitespace-nowrap">{{ number_format($aItem['total'], 2) }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
 
-                    @php $lineNumber += $section->items->count(); @endphp
+                    @php $lineNumber += $aggregatedItems->count(); @endphp
+                    @endif
 
-                    @elseif($section->service_price && $section->service_price > 0)
+                    @if($hasServicePrice)
                     {{-- Service price card --}}
                     @php $lineNumber++; @endphp
-                    <div class="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 p-4 sm:p-5">
+                    <div class="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 p-4 sm:p-5{{ $hasItems ? ' mt-3' : '' }}">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
@@ -296,13 +318,19 @@
                                 </div>
                                 <div>
                                     <p class="text-xs text-blue-600 font-semibold uppercase tracking-wider">Paušalna usluga</p>
-                                    <p class="text-lg sm:text-xl font-bold text-gray-900 mt-0.5">{{ number_format($section->service_price, 0) }} <span class="text-sm font-normal text-gray-500">RSD</span></p>
+                                    <p class="text-lg sm:text-xl font-bold text-gray-900 mt-0.5">{{ number_format($servicePrice * $totalMultiplier, 0) }} <span class="text-sm font-normal text-gray-500">RSD</span></p>
                                 </div>
                             </div>
+                            @if($totalMultiplier > 1)
+                            <span class="inline-flex items-center gap-1 bg-blue-100 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold">
+                                {{ $totalMultiplier }}×
+                            </span>
+                            @endif
                         </div>
                     </div>
+                    @endif
 
-                    @else
+                    @if(!$hasItems && !$hasServicePrice)
                     <div class="rounded-xl border border-dashed border-gray-300 p-4 text-center">
                         <p class="text-sm text-gray-400 italic">Nema stavki u ovoj sekciji</p>
                     </div>

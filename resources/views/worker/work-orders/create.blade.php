@@ -688,7 +688,7 @@
                 >
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                         <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -722,6 +722,24 @@
                         min="0"
                     >
                     <p class="mt-1 text-xs text-gray-500">Opciono - Cena ove usluge</p>
+                </div>
+                <div>
+                    <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                        <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                        Multiplikator
+                    </label>
+                    <input 
+                        type="number" 
+                        name="sections[${sectionIndex}][multiplier]" 
+                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="npr. 3"
+                        step="1"
+                        min="1"
+                        max="99"
+                    >
+                    <p class="mt-1 text-xs text-gray-500">Opciono - Koliko puta ponoviti uslugu</p>
                 </div>
             </div>
 

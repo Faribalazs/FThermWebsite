@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Worker;
 use App\Http\Controllers\Controller;
 use App\Models\InternalProduct;
 use App\Models\ActivityLog;
+use App\Models\Inventory;
+use App\Models\Warehouse;
 use App\Exports\InternalProductsExport;
 use App\Imports\InternalProductsImport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -44,7 +47,8 @@ class InternalProductController extends Controller
 
     public function create()
     {
-        return view('worker.products.create');
+        $warehouses = Warehouse::active()->orderBy('name')->get();
+        return view('worker.products.create', compact('warehouses'));
     }
 
     public function store(Request $request)
@@ -54,25 +58,45 @@ class InternalProductController extends Controller
             'unit' => 'required|string|max:50',
             'price' => 'required|numeric|min:0',
             'low_stock_threshold' => 'required|integer|min:0',
+            'starting_quantity' => 'nullable|integer|min:0',
+            'starting_warehouse_id' => 'nullable|exists:warehouses,id|required_with:starting_quantity',
         ]);
 
-        $product = InternalProduct::create([
-            'name' => $validated['name'],
-            'unit' => $validated['unit'],
-            'price' => $validated['price'],
-            'low_stock_threshold' => $validated['low_stock_threshold'],
-            'created_by' => auth('worker')->id(),
-        ]);
+        DB::beginTransaction();
 
-        // Log activity
-        ActivityLog::log(
-            auth('worker')->id(),
-            'create',
-            'product',
-            $product->id,
-            "Kreirao novi materijal: {$product->name}",
-            $validated
-        );
+        try {
+            $product = InternalProduct::create([
+                'name' => $validated['name'],
+                'unit' => $validated['unit'],
+                'price' => $validated['price'],
+                'low_stock_threshold' => $validated['low_stock_threshold'],
+                'created_by' => auth('worker')->id(),
+            ]);
+
+            if (!empty($validated['starting_quantity']) && $validated['starting_quantity'] > 0) {
+                Inventory::create([
+                    'internal_product_id' => $product->id,
+                    'warehouse_id' => $validated['starting_warehouse_id'],
+                    'quantity' => $validated['starting_quantity'],
+                    'updated_by' => auth('worker')->id(),
+                ]);
+            }
+
+            // Log activity
+            ActivityLog::log(
+                auth('worker')->id(),
+                'create',
+                'product',
+                $product->id,
+                "Kreirao novi materijal: {$product->name}",
+                $validated
+            );
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'Greška: ' . $e->getMessage());
+        }
 
         return redirect()->route('worker.products.index')->with('success', 'Materijal uspešno kreiran.');
     }

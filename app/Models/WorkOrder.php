@@ -62,8 +62,9 @@ class WorkOrder extends Model
     {
         $total = 0;
         foreach ($this->sections as $section) {
+            $multiplier = max(1, (int) ($section->multiplier ?? 1));
             foreach ($section->items as $item) {
-                $total += $item->quantity * $item->price_at_time;
+                $total += $item->quantity * $item->price_at_time * $multiplier;
             }
         }
         return $total;
@@ -74,7 +75,8 @@ class WorkOrder extends Model
         $total = 0;
         foreach ($this->sections as $section) {
             if ($section->service_price && $section->service_price > 0) {
-                $total += $section->service_price;
+                $multiplier = max(1, (int) ($section->multiplier ?? 1));
+                $total += $section->service_price * $multiplier;
             }
         }
         return $total;
@@ -87,7 +89,9 @@ class WorkOrder extends Model
 
     public function calculateTotalHours()
     {
-        return $this->sections->sum('hours_spent');
+        return $this->sections->sum(function ($section) {
+            return ($section->hours_spent ?? 0) * max(1, (int) ($section->multiplier ?? 1));
+        });
     }
 
     public function calculateLaborCost()
