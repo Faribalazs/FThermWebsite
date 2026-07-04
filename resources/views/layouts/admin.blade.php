@@ -142,7 +142,7 @@
                     <span class="text-white font-medium text-xs lg:text-sm truncate">{{ Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : '' }}</span>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <a href="{{ route('home') }}" target="_blank" class="flex items-center gap-1 flex-1 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-industrial-700 rounded-lg transition-all justify-center">
+                    <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" target="_blank" class="flex items-center gap-1 flex-1 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-industrial-700 rounded-lg transition-all justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                         </svg>
@@ -332,7 +332,7 @@
                                 </div>
                                 <span class="font-medium">Podešavanja</span>
                             </a>
-                            <a href="{{ route('home') }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-gray-700">
+                            <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-gray-700">
                                 <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                                 </div>

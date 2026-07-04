@@ -22,7 +22,7 @@ class ShopController extends Controller
         return view('shop.index', compact('products', 'categories'));
     }
 
-    public function show(Product $product)
+    public function show(string $locale, Product $product)
     {
         $product->load('category', 'images');
         $related_products = Product::where('active', true)

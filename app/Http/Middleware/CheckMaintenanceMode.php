@@ -43,7 +43,7 @@ class CheckMaintenanceMode
 
         // If maintenance mode is OFF, but user is trying to access maintenance page, redirect to home
         if ($request->is('maintenance')) {
-            return redirect()->route('home');
+            return redirect()->route('home', ['locale' => app()->getLocale()]);
         }
 
         return $next($request);

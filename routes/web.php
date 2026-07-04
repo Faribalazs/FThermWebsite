@@ -23,6 +23,14 @@ Route::get('/', function () {
     return redirect('/' . config('app.locale'));
 });
 
+// Redirect common typo /rs -> /sr
+Route::get('/rs', function () {
+    return redirect('/sr', 301);
+});
+Route::get('/rs/{any}', function ($any) {
+    return redirect('/sr/' . $any, 301);
+})->where('any', '.*');
+
 // Public locale-prefixed routes
 Route::prefix('{locale}')
     ->whereIn('locale', ['sr', 'en', 'hu'])
