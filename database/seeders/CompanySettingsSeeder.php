@@ -22,6 +22,7 @@ class CompanySettingsSeeder extends Seeder
             'company_email' => 'farkas.tibor@ftherm.rs',
             'company_sifra_delatnosti' => '4322',
             'km_price' => '50',
+            'shop_enabled' => 'true',
         ];
 
         foreach ($settings as $key => $value) {

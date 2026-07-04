@@ -19,6 +19,47 @@
         </div>
     </div>
 
+    <!-- Notification Email Settings -->
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-4 sm:mb-6">
+        <div class="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                <h3 class="text-sm sm:text-base font-bold text-gray-900">Email obaveštenja</h3>
+            </div>
+        </div>
+
+        <form action="{{ route('admin.inquiries.notification-email.update') }}" method="POST" class="p-4 sm:p-6">
+            @csrf
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label for="inquiry_notification_email" class="block text-sm font-semibold text-gray-700 mb-2">Primaoc email obaveštenja</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input
+                            type="email"
+                            id="inquiry_notification_email"
+                            name="inquiry_notification_email"
+                            value="{{ old('inquiry_notification_email', $notificationEmail) }}"
+                            placeholder="npr. info@ftherm.rs"
+                            class="h-10 flex-1 rounded-xl border-gray-200 focus:border-primary-500 focus:ring-primary-500 text-sm shadow-sm">
+                        <button type="submit" class="inline-flex h-10 items-center justify-center gap-2 px-4 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold shadow-sm transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Sačuvaj email
+                        </button>
+                    </div>
+                    @error('inquiry_notification_email')
+                        <p class="mt-2 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @else
+                        <p class="mt-2 text-xs text-gray-500">Na ovu adresu stiže email kada neko pošalje kontakt formu. Ostavite prazno da isključite email obaveštenja.</p>
+                    @enderror
+                </div>
+            </div>
+        </form>
+    </div>
+
     <!-- Stats Bar -->
     <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
         @php

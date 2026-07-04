@@ -10,6 +10,10 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
+        if (!shop_enabled()) {
+            abort(404);
+        }
+
         $query = Product::where('active', true)->with('category', 'primaryImage');
 
         if ($request->has('category') && $request->category != '') {
@@ -24,6 +28,10 @@ class ShopController extends Controller
 
     public function show(string $locale, Product $product)
     {
+        if (!shop_enabled()) {
+            abort(404);
+        }
+
         $product->load('category', 'images');
         $related_products = Product::where('active', true)
             ->where('category_id', $product->category_id)

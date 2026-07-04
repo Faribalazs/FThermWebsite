@@ -13,10 +13,13 @@ class HomeController extends Controller
     public function index()
     {
         $services = Service::where('active', true)->orderBy('order')->get();
-        $featured_products = Product::where('active', true)->orderBy('order')->take(6)->get();
+        $shopEnabled = shop_enabled();
+        $featured_products = $shopEnabled
+            ? Product::where('active', true)->orderBy('order')->take(6)->get()
+            : collect();
         $hero = HomepageContent::whereIn('key', ['hero_title', 'hero_subtitle', 'hero_cta'])->get()->keyBy('key');
         $slides = Slide::where('active', true)->orderBy('order')->get();
 
-        return view('home', compact('services', 'featured_products', 'hero', 'slides'));
+        return view('home', compact('services', 'featured_products', 'hero', 'slides', 'shopEnabled'));
     }
 }

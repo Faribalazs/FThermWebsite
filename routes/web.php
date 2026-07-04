@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\HomepageContentController;
+use App\Http\Controllers\Admin\CatalogSettingController;
 use Illuminate\Support\Facades\Route;
 
 // Maintenance
@@ -65,9 +66,14 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/images', [ProductController::class, 'uploadImage'])->name('products.images.upload');
     Route::delete('products/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
+
+    // Catalog Settings
+    Route::get('catalog-settings', [CatalogSettingController::class, 'index'])->name('catalog-settings.index');
+    Route::post('catalog-settings', [CatalogSettingController::class, 'update'])->name('catalog-settings.update');
     
     // Inquiries Management
     Route::resource('inquiries', InquiryController::class)->only(['index', 'show', 'destroy']);
+    Route::post('inquiries/notification-email', [InquiryController::class, 'updateNotificationEmail'])->name('inquiries.notification-email.update');
     Route::patch('inquiries/{inquiry}/mark-read', [InquiryController::class, 'markAsRead'])->name('inquiries.mark-read');
     
     // Homepage Content Management

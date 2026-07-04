@@ -331,6 +331,7 @@
     </style>
 
     <!-- Featured Products Section -->
+    @if ($shopEnabled && $featured_products->count())
     <section class="py-20 md:py-28 bg-gray-50">
         <div class="max-w-[1440px] mx-auto px-4 lg:px-10">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
@@ -403,6 +404,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     <!-- Why Choose Us Section -->
     <section

@@ -56,57 +56,98 @@
                     <span class="text-sm lg:text-base">Kontrolna tabla</span>
                 </a>
 
-                <div class="px-4 lg:px-6 mt-6 mb-2">
-                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Website</div>
+                @php
+                    $catalogOpen = request()->routeIs('admin.product-categories.*') || request()->routeIs('admin.products.*') || request()->routeIs('admin.catalog-settings.*');
+                    $contentOpen = request()->routeIs('admin.homepage-contents.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.gallery.*');
+                @endphp
+
+                <div class="mt-6">
+                    <button type="button" data-dropdown-toggle="admin-catalog-menu" aria-expanded="{{ $catalogOpen ? 'true' : 'false' }}" class="w-full flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ $catalogOpen ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        <span class="text-sm lg:text-base">Katalog</span>
+                        <svg data-dropdown-chevron class="w-4 h-4 ml-auto transition-transform {{ $catalogOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <div id="admin-catalog-menu" class="{{ $catalogOpen ? '' : 'hidden' }} overflow-hidden transition-all duration-200 ease-out" style="height: {{ $catalogOpen ? 'auto' : '0px' }}; opacity: {{ $catalogOpen ? '1' : '0' }};">
+                        <div class="py-1">
+                            <a href="{{ route('admin.product-categories.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.product-categories.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Kategorije</span>
+                            </a>
+
+                            <a href="{{ route('admin.products.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.products.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Proizvodi</span>
+                            </a>
+
+                            <a href="{{ route('admin.catalog-settings.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.catalog-settings.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Podešavanja</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <a href="{{ route('admin.services.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.services.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Usluge</span>
-                </a>
+                <div class="mt-4">
+                    <button type="button" data-dropdown-toggle="admin-content-menu" aria-expanded="{{ $contentOpen ? 'true' : 'false' }}" class="w-full flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ $contentOpen ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span class="text-sm lg:text-base">Sadržaj</span>
+                        <svg data-dropdown-chevron class="w-4 h-4 ml-auto transition-transform {{ $contentOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
 
-                <a href="{{ route('admin.product-categories.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.product-categories.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Kategorije</span>
-                </a>
+                    <div id="admin-content-menu" class="{{ $contentOpen ? '' : 'hidden' }} overflow-hidden transition-all duration-200 ease-out" style="height: {{ $contentOpen ? 'auto' : '0px' }}; opacity: {{ $contentOpen ? '1' : '0' }};">
+                        <div class="py-1">
+                            <a href="{{ route('admin.homepage-contents.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Sadržaj naslovne</span>
+                            </a>
 
-                <a href="{{ route('admin.products.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.products.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Proizvodi</span>
-                </a>
+                            <a href="{{ route('admin.services.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.services.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Usluge</span>
+                            </a>
+
+                            <a href="{{ route('admin.slides.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.slides.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Slajdovi</span>
+                            </a>
+
+                            <a href="{{ route('admin.gallery.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.gallery.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Galerija</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <a href="{{ route('admin.inquiries.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.inquiries.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
                     <span class="text-sm lg:text-base">Upiti</span>
-                </a>
-
-                <a href="{{ route('admin.homepage-contents.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Sadržaj naslove</span>
-                </a>
-
-                <a href="{{ route('admin.slides.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.slides.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Slajdovi</span>
-                </a>
-
-                <a href="{{ route('admin.gallery.index') }}" class="flex items-center px-4 lg:px-6 py-3 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.gallery.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                    </svg>
-                    <span class="text-sm lg:text-base">Galerija</span>
                 </a>
 
                 <div class="px-4 lg:px-6 mt-6 mb-2">
@@ -142,12 +183,6 @@
                     <span class="text-white font-medium text-xs lg:text-sm truncate">{{ Auth::guard('admin')->user() ? Auth::guard('admin')->user()->name : '' }}</span>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" target="_blank" class="flex items-center gap-1 flex-1 px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-industrial-700 rounded-lg transition-all justify-center">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                        </svg>
-                        <span class="text-xs">Sajt</span>
-                    </a>
                     <form method="POST" action="{{ route('admin.logout') }}" class="flex-1">
                         @csrf
                         <button type="submit" class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-red-600 rounded-lg transition-all justify-center">
@@ -296,47 +331,82 @@
                             </button>
                         </div>
                         <div class="space-y-1 max-h-96 overflow-y-auto">
-                            <a href="{{ route('admin.services.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.services.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
-                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.services.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <button type="button" data-dropdown-toggle="mobile-catalog-menu" aria-expanded="{{ $catalogOpen ? 'true' : 'false' }}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ $catalogOpen ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                <div class="w-10 h-10 rounded-full {{ $catalogOpen ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                 </div>
-                                <span class="font-medium">Usluge</span>
-                            </a>
-                            <a href="{{ route('admin.product-categories.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.product-categories.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
-                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.product-categories.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                <span class="font-medium">Katalog</span>
+                                <svg data-dropdown-chevron class="w-4 h-4 ml-auto transition-transform {{ $catalogOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <div id="mobile-catalog-menu" class="{{ $catalogOpen ? '' : 'hidden' }} overflow-hidden transition-all duration-200 ease-out" style="height: {{ $catalogOpen ? 'auto' : '0px' }}; opacity: {{ $catalogOpen ? '1' : '0' }};">
+                                <div class="space-y-1 pl-4">
+                                    <a href="{{ route('admin.product-categories.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.product-categories.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.product-categories.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Kategorije</span>
+                                    </a>
+                                    <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.products.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.products.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Proizvodi</span>
+                                    </a>
+                                    <a href="{{ route('admin.catalog-settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.catalog-settings.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.catalog-settings.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Podešavanja</span>
+                                    </a>
                                 </div>
-                                <span class="font-medium">Kategorije</span>
-                            </a>
-                            <a href="{{ route('admin.homepage-contents.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
-                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </div>
-                                <span class="font-medium">Sadržaj naslove</span>
-                            </a>
-                            <a href="{{ route('admin.slides.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.slides.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
-                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.slides.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </div>
-                                <span class="font-medium">Slajdovi</span>
-                            </a>
-                            <a href="{{ route('admin.gallery.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.gallery.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
-                                <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.gallery.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                            </div>
+
+                            <button type="button" data-dropdown-toggle="mobile-content-menu" aria-expanded="{{ $contentOpen ? 'true' : 'false' }}" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ $contentOpen ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                <div class="w-10 h-10 rounded-full {{ $contentOpen ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                 </div>
-                                <span class="font-medium">Galerija</span>
-                            </a>
+                                <span class="font-medium">Sadržaj</span>
+                                <svg data-dropdown-chevron class="w-4 h-4 ml-auto transition-transform {{ $contentOpen ? 'rotate-180' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <div id="mobile-content-menu" class="{{ $contentOpen ? '' : 'hidden' }} overflow-hidden transition-all duration-200 ease-out" style="height: {{ $contentOpen ? 'auto' : '0px' }}; opacity: {{ $contentOpen ? '1' : '0' }};">
+                                <div class="space-y-1 pl-4">
+                                    <a href="{{ route('admin.homepage-contents.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.homepage-contents.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Sadržaj naslovne</span>
+                                    </a>
+                                    <a href="{{ route('admin.services.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.services.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.services.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Usluge</span>
+                                    </a>
+                                    <a href="{{ route('admin.slides.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.slides.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.slides.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Slajdovi</span>
+                                    </a>
+                                    <a href="{{ route('admin.gallery.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.gallery.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.gallery.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Galerija</span>
+                                    </a>
+                                </div>
+                            </div>
                             <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
                                 <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.settings.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                 </div>
                                 <span class="font-medium">Podešavanja</span>
-                            </a>
-                            <a href="{{ route('home', ['locale' => app()->getLocale()]) }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-gray-700">
-                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </div>
-                                <span class="font-medium">Pogledaj sajt</span>
                             </a>
                             <form method="POST" action="{{ route('admin.logout') }}" class="mt-4 pt-4 border-t border-gray-200">
                                 @csrf
@@ -374,6 +444,61 @@
                     link.addEventListener('click', function() { if (window.innerWidth < 1024) closeSidebar(); });
                 });
             }
+
+            document.querySelectorAll('[data-dropdown-toggle]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const menu = document.getElementById(this.getAttribute('data-dropdown-toggle'));
+                    const chevron = this.querySelector('[data-dropdown-chevron]');
+
+                    if (!menu) return;
+
+                    const isOpen = this.getAttribute('aria-expanded') === 'true';
+
+                    if (isOpen) {
+                        menu.style.height = `${menu.scrollHeight}px`;
+                        menu.offsetHeight;
+                        menu.style.height = '0px';
+                        menu.style.opacity = '0';
+                        menu.addEventListener('transitionend', function handleClose(event) {
+                            if (event.propertyName !== 'height') return;
+                            if (button.getAttribute('aria-expanded') === 'false') {
+                                menu.classList.add('hidden');
+                            }
+                            menu.removeEventListener('transitionend', handleClose);
+                        });
+                        setTimeout(() => {
+                            if (this.getAttribute('aria-expanded') === 'false') {
+                                menu.classList.add('hidden');
+                            }
+                        }, 250);
+                    } else {
+                        menu.classList.remove('hidden');
+                        menu.style.height = '0px';
+                        menu.style.opacity = '0';
+                        menu.offsetHeight;
+                        menu.style.height = `${menu.scrollHeight}px`;
+                        menu.style.opacity = '1';
+                        menu.addEventListener('transitionend', function handleOpen(event) {
+                            if (event.propertyName !== 'height') return;
+                            if (button.getAttribute('aria-expanded') === 'true') {
+                                menu.style.height = 'auto';
+                            }
+                            menu.removeEventListener('transitionend', handleOpen);
+                        });
+                        setTimeout(() => {
+                            if (this.getAttribute('aria-expanded') === 'true') {
+                                menu.style.height = 'auto';
+                            }
+                        }, 250);
+                    }
+
+                    this.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+
+                    if (chevron) {
+                        chevron.classList.toggle('rotate-180', !isOpen);
+                    }
+                });
+            });
 
             // Mobile More Menu
             const moreMenuBtn = document.getElementById('mobile-more-menu-btn');

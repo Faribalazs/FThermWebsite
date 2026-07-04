@@ -17,6 +17,9 @@
 </head>
 
 <body class="bg-white font-sans antialiased" x-data="{ mobileMenu: false }" x-cloak>
+    @php
+        $shopEnabled = shop_enabled();
+    @endphp
 
     <!-- Mobile Menu Backdrop -->
     <div x-show="mobileMenu" @click="mobileMenu = false" x-transition:enter="transition-opacity ease-out duration-300"
@@ -72,17 +75,19 @@
                 </span>
                 {{ __('frontend.nav_services') }}
             </a>
-            <a href="{{ route('shop.index') }}" @click="mobileMenu = false"
-                class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-base font-semibold transition-all group {{ request()->routeIs('shop.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-700' }}">
-                <span
-                    class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 {{ request()->routeIs('shop.*') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-primary-100' }} transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                </span>
-                {{ __('frontend.nav_products') }}
-            </a>
+            @if ($shopEnabled)
+                <a href="{{ route('shop.index') }}" @click="mobileMenu = false"
+                    class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-base font-semibold transition-all group {{ request()->routeIs('shop.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-700' }}">
+                    <span
+                        class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 {{ request()->routeIs('shop.*') ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-primary-100' }} transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </span>
+                    {{ __('frontend.nav_products') }}
+                </a>
+            @endif
             <a href="{{ route('gallery.index', current_locale()) }}" @click="mobileMenu = false"
                 class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-base font-semibold transition-all group {{ request()->routeIs('gallery.*') ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-700' }}">
                 <span
@@ -169,12 +174,14 @@
                         <span
                             class="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 rounded-full transition-all duration-200 w-0 group-hover:w-5"></span>
                     </a>
-                    <a href="{{ route('shop.index') }}"
-                        class="relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 group {{ request()->routeIs('shop.*') ? 'text-primary-700' : 'text-gray-600 hover:text-primary-700' }}">
-                        {{ __('frontend.nav_products') }}
-                        <span
-                            class="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 rounded-full transition-all duration-200 {{ request()->routeIs('shop.*') ? 'w-5' : 'w-0 group-hover:w-5' }}"></span>
-                    </a>
+                    @if ($shopEnabled)
+                        <a href="{{ route('shop.index') }}"
+                            class="relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 group {{ request()->routeIs('shop.*') ? 'text-primary-700' : 'text-gray-600 hover:text-primary-700' }}">
+                            {{ __('frontend.nav_products') }}
+                            <span
+                                class="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-primary-500 rounded-full transition-all duration-200 {{ request()->routeIs('shop.*') ? 'w-5' : 'w-0 group-hover:w-5' }}"></span>
+                        </a>
+                    @endif
                     <a href="{{ route('gallery.index', current_locale()) }}"
                         class="relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 group {{ request()->routeIs('gallery.*') ? 'text-primary-700' : 'text-gray-600 hover:text-primary-700' }}">
                         {{ __('frontend.nav_gallery') }}
@@ -370,14 +377,16 @@
                                 {{ __('frontend.nav_services') }}
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ route('shop.index') }}"
-                                class="text-industrial-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2.5 group py-1.5">
-                                <span
-                                    class="w-1.5 h-1.5 rounded-full bg-primary-700 group-hover:bg-primary-400 transition-colors flex-shrink-0"></span>
-                                {{ __('frontend.nav_products') }}
-                            </a>
-                        </li>
+                        @if ($shopEnabled)
+                            <li>
+                                <a href="{{ route('shop.index') }}"
+                                    class="text-industrial-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2.5 group py-1.5">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full bg-primary-700 group-hover:bg-primary-400 transition-colors flex-shrink-0"></span>
+                                    {{ __('frontend.nav_products') }}
+                                </a>
+                            </li>
+                        @endif
                         <li>
                             <a href="{{ route('gallery.index', current_locale()) }}"
                                 class="text-industrial-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2.5 group py-1.5">

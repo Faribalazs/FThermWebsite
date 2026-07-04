@@ -57,6 +57,24 @@ if (!function_exists('change_locale_url')) {
     }
 }
 
+if (!function_exists('shop_enabled')) {
+    /**
+     * Whether the public shop/catalog section is visible.
+     */
+    function shop_enabled(): bool
+    {
+        static $enabled = null;
+
+        if ($enabled !== null) {
+            return $enabled;
+        }
+
+        $value = \App\Models\Setting::where('key', 'shop_enabled')->value('value');
+
+        return $enabled = !in_array($value, ['false', '0', 0, false], true);
+    }
+}
+
 if (!function_exists('number_to_words_serbian')) {
     /**
      * Convert number to words in Serbian
