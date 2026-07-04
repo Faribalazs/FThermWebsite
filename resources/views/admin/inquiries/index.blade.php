@@ -140,12 +140,14 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="space-y-1">
-                                <a href="mailto:{{ $inquiry->email }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1.5 hover:underline">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                    </svg>
-                                    {{ $inquiry->email }}
-                                </a>
+                                @if($inquiry->email)
+                                    <a href="mailto:{{ $inquiry->email }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1.5 hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ $inquiry->email }}
+                                    </a>
+                                @endif
                                 @if($inquiry->phone)
                                 <a href="tel:{{ $inquiry->phone }}" class="text-sm text-gray-500 hover:text-primary-600 font-medium flex items-center gap-1.5 hover:underline">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,12 +246,14 @@
 
                 <!-- Contact info -->
                 <div class="space-y-1.5 text-xs text-gray-500">
-                    <div class="flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="truncate">{{ $inquiry->email }}</span>
-                    </div>
+                    @if($inquiry->email)
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="truncate">{{ $inquiry->email }}</span>
+                        </div>
+                    @endif
                     @if($inquiry->phone)
                     <div class="flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

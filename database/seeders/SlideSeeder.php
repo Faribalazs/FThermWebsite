@@ -11,16 +11,16 @@ class SlideSeeder extends Seeder
     {
         $slides = [
             [
-                'image'           => 'images/slider/slide1.jpg',
+                'image'           => 'images/ftherm/slider/ac-installation-hero.webp',
                 'title'           => [
-                    'sr' => 'Profesionalna HVAC Rešenja',
-                    'en' => 'Professional HVAC Solutions',
-                    'hu' => 'Professzionális HVAC Megoldások',
+                    'sr' => 'Kompletna rešenja za grejanje i hlađenje',
+                    'en' => 'Complete heating and cooling solutions',
+                    'hu' => 'Komplett hűtés-fűtés megoldások',
                 ],
                 'description'     => [
-                    'sr' => 'Stručna montaža toplotnih pumpi i sistema grejanja za vaš dom i poslovni prostor.',
-                    'en' => 'Expert installation of heat pumps and heating systems for your home and business.',
-                    'hu' => 'Szakszerű hőszivattyú és fűtési rendszer telepítés otthonába és üzlethelyiségébe.',
+                    'sr' => 'Ugradnja klima uređaja, servis, čišćenje, toplotne pumpe i tehničke instalacije za domove i poslovne prostore.',
+                    'en' => 'Air conditioning, service, cleaning, heat pumps and technical installations for homes and business spaces.',
+                    'hu' => 'Klímaszerelés, szerviz, tisztítás, hőszivattyúk és műszaki rendszerek otthonoknak és vállalkozásoknak.',
                 ],
                 'button_text'     => [
                     'sr' => 'Zatražite ponudu',
@@ -34,39 +34,39 @@ class SlideSeeder extends Seeder
                 'active'          => true,
             ],
             [
-                'image'           => 'images/slider/slide2.jpg',
+                'image'           => 'images/ftherm/slider/heat-pump-hero.webp',
                 'title'           => [
-                    'sr' => 'Energetski Efikasni Sistemi',
-                    'en' => 'Energy Efficient Systems',
-                    'hu' => 'Energiahatékony Rendszerek',
+                    'sr' => 'Toplotne pumpe i moderni sistemi',
+                    'en' => 'Heat pumps and modern systems',
+                    'hu' => 'Hőszivattyúk és modern rendszerek',
                 ],
                 'description'     => [
-                    'sr' => 'Smanjite troškove energije uz naše moderne, ekološki prihvatljive HVAC sisteme.',
-                    'en' => 'Reduce your energy costs with our modern, eco-friendly HVAC systems.',
-                    'hu' => 'Csökkentse energiaköltségeit korszerű, környezetbarát HVAC rendszereinkkel.',
+                    'sr' => 'Planiranje i izvođenje sistema koji kombinuju udobnost, pouzdanost i ekonomičan rad tokom cele godine.',
+                    'en' => 'Planning and installation of systems built for comfort, reliability and efficient year-round operation.',
+                    'hu' => 'Kényelmes, megbízható és takarékos működésre tervezett rendszerek tervezése és kivitelezése.',
                 ],
                 'button_text'     => [
-                    'sr' => 'Pogledajte proizvode',
-                    'en' => 'View Products',
-                    'hu' => 'Termékek megtekintése',
+                    'sr' => 'Zatražite ponudu',
+                    'en' => 'Request a Quote',
+                    'hu' => 'Ajánlatot kérek',
                 ],
-                'button_link'     => '/sr/shop',
+                'button_link'     => '#contact',
                 'text_position_x' => 'left',
-                'text_position_y' => 'bottom',
+                'text_position_y' => 'center',
                 'order'           => 2,
                 'active'          => true,
             ],
             [
-                'image'           => 'images/slider/slide3.jpg',
+                'image'           => 'images/ftherm/slider/technical-systems-hero.webp',
                 'title'           => [
-                    'sr' => 'Servis i Održavanje',
-                    'en' => 'Service & Maintenance',
-                    'hu' => 'Szerviz és Karbantartás',
+                    'sr' => 'Precizne tehničke instalacije',
+                    'en' => 'Precise technical installations',
+                    'hu' => 'Precíz műszaki kivitelezés',
                 ],
                 'description'     => [
-                    'sr' => 'Brz i pouzdan servis vaših uređaja od strane naših iskusnih tehničara.',
-                    'en' => 'Fast and reliable service for your equipment by our experienced technicians.',
-                    'hu' => 'Gyors és megbízható szerviz tapasztalt technikusainktól.',
+                    'sr' => 'Grejanje, vodoinstalacije, razvod, rashladna tehnika i održavanje izvedeni uredno i pregledno.',
+                    'en' => 'Heating, plumbing, pipework, refrigeration and maintenance delivered cleanly and transparently.',
+                    'hu' => 'Fűtés, vízszerelés, csövezés, hűtéstechnika és karbantartás rendezett kivitelezéssel.',
                 ],
                 'button_text'     => [
                     'sr' => 'Naše usluge',
@@ -74,15 +74,18 @@ class SlideSeeder extends Seeder
                     'hu' => 'Szolgáltatásaink',
                 ],
                 'button_link'     => '#services',
-                'text_position_x' => 'right',
-                'text_position_y' => 'bottom',
+                'text_position_x' => 'left',
+                'text_position_y' => 'center',
                 'order'           => 3,
                 'active'          => true,
             ],
         ];
 
         foreach ($slides as $data) {
-            Slide::create($data);
+            Slide::updateOrCreate(
+                ['order' => $data['order']],
+                $data
+            );
         }
     }
 }

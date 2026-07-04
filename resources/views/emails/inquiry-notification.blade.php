@@ -22,18 +22,38 @@
                                     <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Ime</td>
                                     <td style="padding:10px 0;color:#111827;font-size:14px;">{{ $inquiry->name }}</td>
                                 </tr>
-                                <tr>
-                                    <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Email</td>
-                                    <td style="padding:10px 0;color:#111827;font-size:14px;">
-                                        <a href="mailto:{{ $inquiry->email }}" style="color:#09539a;text-decoration:none;">{{ $inquiry->email }}</a>
-                                    </td>
-                                </tr>
+                                @if ($inquiry->email)
+                                    <tr>
+                                        <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Email</td>
+                                        <td style="padding:10px 0;color:#111827;font-size:14px;">
+                                            <a href="mailto:{{ $inquiry->email }}" style="color:#09539a;text-decoration:none;">{{ $inquiry->email }}</a>
+                                        </td>
+                                    </tr>
+                                @endif
                                 @if ($inquiry->phone)
                                     <tr>
                                         <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Telefon</td>
                                         <td style="padding:10px 0;color:#111827;font-size:14px;">
                                             <a href="tel:{{ $inquiry->phone }}" style="color:#09539a;text-decoration:none;">{{ $inquiry->phone }}</a>
                                         </td>
+                                    </tr>
+                                @endif
+                                @if ($inquiry->service_type)
+                                    <tr>
+                                        <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Usluga</td>
+                                        <td style="padding:10px 0;color:#111827;font-size:14px;">{{ __('ftherm.contact.service_types.' . $inquiry->service_type) }}</td>
+                                    </tr>
+                                @endif
+                                @if ($inquiry->city)
+                                    <tr>
+                                        <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Lokacija</td>
+                                        <td style="padding:10px 0;color:#111827;font-size:14px;">{{ $inquiry->city }}</td>
+                                    </tr>
+                                @endif
+                                @if ($inquiry->preferred_contact)
+                                    <tr>
+                                        <td style="padding:10px 0;width:130px;color:#6b7280;font-size:13px;font-weight:bold;">Kontakt</td>
+                                        <td style="padding:10px 0;color:#111827;font-size:14px;">{{ __('ftherm.contact.preferred_methods.' . $inquiry->preferred_contact) }}</td>
                                     </tr>
                                 @endif
                                 <tr>

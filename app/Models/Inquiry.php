@@ -13,6 +13,9 @@ class Inquiry extends Model
         'name',
         'email',
         'phone',
+        'service_type',
+        'city',
+        'preferred_contact',
         'message',
         'is_read',
     ];

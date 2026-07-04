@@ -58,7 +58,7 @@
 
                 @php
                     $catalogOpen = request()->routeIs('admin.product-categories.*') || request()->routeIs('admin.products.*') || request()->routeIs('admin.catalog-settings.*');
-                    $contentOpen = request()->routeIs('admin.homepage-contents.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.gallery.*');
+                    $contentOpen = request()->routeIs('admin.homepage-contents.*') || request()->routeIs('admin.about-page.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.gallery.*');
                 @endphp
 
                 <div class="mt-6">
@@ -119,11 +119,25 @@
                                 <span class="text-sm lg:text-base">Sadržaj naslovne</span>
                             </a>
 
+                            <a href="{{ route('admin.about-page.edit') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.about-page.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">O nama</span>
+                            </a>
+
                             <a href="{{ route('admin.services.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.services.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
                                 <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
                                 <span class="text-sm lg:text-base">Usluge</span>
+                            </a>
+
+                            <a href="{{ route('admin.faqs.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.faqs.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 1.793-2 3.272-2 1.933 0 3.5 1.343 3.5 3 0 1.295-.957 2.398-2.3 2.817-.646.202-1.2.76-1.2 1.433V15m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Česta pitanja</span>
                             </a>
 
                             <a href="{{ route('admin.slides.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.slides.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
@@ -387,6 +401,12 @@
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                         </div>
                                         <span class="font-medium">Usluge</span>
+                                    </a>
+                                    <a href="{{ route('admin.faqs.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.faqs.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
+                                        <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.faqs.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 1.793-2 3.272-2 1.933 0 3.5 1.343 3.5 3 0 1.295-.957 2.398-2.3 2.817-.646.202-1.2.76-1.2 1.433V15m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                        <span class="font-medium">Česta pitanja</span>
                                     </a>
                                     <a href="{{ route('admin.slides.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors {{ request()->routeIs('admin.slides.*') ? 'bg-primary-50 text-primary-600' : 'text-gray-700' }}">
                                         <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.slides.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">

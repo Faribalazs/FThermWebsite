@@ -15,8 +15,10 @@ class ContactController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'required|string|max:50',
+            'service_type' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
             'message' => 'required|string',
         ]);
 
@@ -28,8 +30,11 @@ class ContactController extends Controller
             try {
                 Mail::send('emails.inquiry-notification', ['inquiry' => $inquiry], function ($message) use ($inquiry, $notificationEmail) {
                     $message->to($notificationEmail)
-                        ->replyTo($inquiry->email, $inquiry->name)
                         ->subject('Novi upit sa sajta - ' . $inquiry->name);
+
+                    if ($inquiry->email) {
+                        $message->replyTo($inquiry->email, $inquiry->name);
+                    }
                 });
             } catch (Throwable $exception) {
                 Log::error('Failed to send inquiry notification email.', [
@@ -40,6 +45,6 @@ class ContactController extends Controller
             }
         }
 
-        return back()->with('success', 'Thank you for contacting us! We will get back to you soon.');
+        return back()->with('success', __('ftherm.contact.success'));
     }
 }

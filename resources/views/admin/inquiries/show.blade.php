@@ -63,17 +63,19 @@
                 </div>
 
                 <!-- Email -->
-                <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
+                @if($inquiry->email)
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Email</p>
+                            <a href="mailto:{{ $inquiry->email }}" class="text-sm sm:text-base font-semibold text-primary-600 hover:text-primary-700 hover:underline mt-0.5 block truncate">{{ $inquiry->email }}</a>
+                        </div>
                     </div>
-                    <div class="min-w-0">
-                        <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Email</p>
-                        <a href="mailto:{{ $inquiry->email }}" class="text-sm sm:text-base font-semibold text-primary-600 hover:text-primary-700 hover:underline mt-0.5 block truncate">{{ $inquiry->email }}</a>
-                    </div>
-                </div>
+                @endif
 
                 <!-- Phone -->
                 @if($inquiry->phone)
@@ -88,6 +90,33 @@
                         <a href="tel:{{ $inquiry->phone }}" class="text-sm sm:text-base font-semibold text-primary-600 hover:text-primary-700 hover:underline mt-0.5 block">{{ $inquiry->phone }}</a>
                     </div>
                 </div>
+                @endif
+
+                @if($inquiry->service_type)
+                    <div class="flex items-start gap-3">
+                        <div>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Usluga</p>
+                            <p class="text-sm sm:text-base font-semibold text-gray-900 mt-0.5">{{ __('ftherm.contact.service_types.' . $inquiry->service_type) }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                @if($inquiry->city)
+                    <div class="flex items-start gap-3">
+                        <div>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Lokacija</p>
+                            <p class="text-sm sm:text-base font-semibold text-gray-900 mt-0.5">{{ $inquiry->city }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                @if($inquiry->preferred_contact)
+                    <div class="flex items-start gap-3">
+                        <div>
+                            <p class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">Željeni kontakt</p>
+                            <p class="text-sm sm:text-base font-semibold text-gray-900 mt-0.5">{{ __('ftherm.contact.preferred_methods.' . $inquiry->preferred_contact) }}</p>
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>

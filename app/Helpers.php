@@ -75,6 +75,22 @@ if (!function_exists('shop_enabled')) {
     }
 }
 
+if (!function_exists('setting_value')) {
+    /**
+     * Get a site setting value with a small request-level cache.
+     */
+    function setting_value(string $key, mixed $default = null): mixed
+    {
+        static $settings = [];
+
+        if (!array_key_exists($key, $settings)) {
+            $settings[$key] = \App\Models\Setting::where('key', $key)->value('value');
+        }
+
+        return $settings[$key] ?? $default;
+    }
+}
+
 if (!function_exists('number_to_words_serbian')) {
     /**
      * Convert number to words in Serbian

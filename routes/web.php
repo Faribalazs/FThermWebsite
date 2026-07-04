@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AboutPageController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\ServicePageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProductCategoryController;
@@ -12,6 +14,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\HomepageContentController;
 use App\Http\Controllers\Admin\CatalogSettingController;
+use App\Http\Controllers\Admin\AboutPageController as AdminAboutPageController;
+use App\Http\Controllers\Admin\FaqController;
 use Illuminate\Support\Facades\Route;
 
 // Maintenance
@@ -37,8 +41,11 @@ Route::prefix('{locale}')
     ->whereIn('locale', ['sr', 'en', 'hu'])
     ->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('/about', [AboutPageController::class, 'show'])->name('about');
+        Route::get('/o-nama', fn (string $locale) => redirect()->route('about', ['locale' => $locale], 301));
         Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
         Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
+        Route::get('/services/{service:slug}', [ServicePageController::class, 'show'])->name('services.show');
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
         Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
         Route::get('/gallery/{slug}', [GalleryController::class, 'show'])->name('gallery.show');
@@ -57,7 +64,7 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     
     // Services Management
-    Route::resource('services', ServiceController::class);
+    Route::resource('services', ServiceController::class)->except(['show']);
     
     // Product Categories Management
     Route::resource('product-categories', ProductCategoryController::class);
@@ -78,6 +85,13 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     
     // Homepage Content Management
     Route::resource('homepage-contents', HomepageContentController::class);
+
+    // About Page Management
+    Route::get('about-page', [AdminAboutPageController::class, 'edit'])->name('about-page.edit');
+    Route::put('about-page', [AdminAboutPageController::class, 'update'])->name('about-page.update');
+
+    // FAQ Management
+    Route::resource('faqs', FaqController::class)->except(['show']);
 
     // Slides Management
     Route::resource('slides', App\Http\Controllers\Admin\SlideController::class)->except(['show']);
