@@ -113,7 +113,7 @@ return [
     'gallery' => [
         'title' => 'References and our work',
         'text' => 'View previous work: air conditioning installation, heat pump systems, underfloor heating, plumbing and refrigeration projects.',
-        'cta' => 'Open gallery',
+        'cta' => 'View references',
         'placeholder' => 'Real project photos will be added here when available.',
     ],
 
@@ -150,7 +150,9 @@ return [
         'message' => 'Message',
         'privacy_consent' => 'I agree that FTHERM may process the submitted information to respond to my quote request.',
         'send' => 'Send request',
+        'success_title' => 'Request sent',
         'success' => 'Thank you! We received your message and will contact you soon.',
+        'success_button' => 'OK',
         'phone_or_email' => 'Please enter a phone number or an email address.',
         'map_placeholder' => 'Map placeholder',
         'service_types' => [

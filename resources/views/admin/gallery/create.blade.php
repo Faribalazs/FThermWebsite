@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Novi album')
+@section('title', 'Nova referenca')
 
 @section('content')
 <div class="animate-fade-in-up">
@@ -10,7 +10,7 @@
             <svg class="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
             </svg>
-            Nazad na galeriju
+            Nazad na reference
         </a>
     </div>
 
@@ -27,8 +27,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-lg sm:text-xl font-bold text-white">Novi album</h1>
-                        <p class="text-primary-100 text-xs sm:text-sm mt-0.5">Kreirajte novi galerijski album</p>
+                        <h1 class="text-lg sm:text-xl font-bold text-white">Nova referenca</h1>
+                        <p class="text-primary-100 text-xs sm:text-sm mt-0.5">Kreirajte novu referencu za javni sajt</p>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6" x-data="{ langTab: 'sr' }">
             <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
                 <h2 class="text-sm sm:text-base font-bold text-gray-900">Prevodi</h2>
-                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">Naziv i opis albuma na svim jezicima</p>
+                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5">Naziv i opis reference na svim jezicima</p>
             </div>
 
             <!-- Language Tabs -->
@@ -61,14 +61,14 @@
                             <input type="text" id="title_{{ $code }}" name="title_{{ $code }}" required
                                 value="{{ old('title_' . $code) }}"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                                placeholder="Unesite naziv albuma ({{ $label }})">
+                                placeholder="Unesite naziv reference ({{ $label }})">
                             @error('title_' . $code) <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label for="description_{{ $code }}" class="block text-sm font-bold text-gray-700 mb-1.5">Opis</label>
                             <textarea id="description_{{ $code }}" name="description_{{ $code }}" rows="4"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                                placeholder="Unesite opis albuma ({{ $label }})">{{ old('description_' . $code) }}</textarea>
+                                placeholder="Unesite opis reference ({{ $label }})">{{ old('description_' . $code) }}</textarea>
                             @error('description_' . $code) <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                         </div>
                     </div>
@@ -87,10 +87,10 @@
                 <div class="sm:col-span-2">
                     <label for="slug" class="block text-sm font-bold text-gray-700 mb-1.5">Slug (URL) <span class="text-red-500">*</span></label>
                     <div class="flex items-center">
-                        <span class="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-sm text-gray-500">/galerija/</span>
+                        <span class="px-3 py-2.5 bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl text-sm text-gray-500">/references/</span>
                         <input type="text" id="slug" name="slug" required value="{{ old('slug') }}"
                             class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                            placeholder="naziv-albuma">
+                            placeholder="naziv-reference">
                     </div>
                     @error('slug') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
@@ -110,8 +110,8 @@
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
                         </div>
                         <div>
-                            <span class="text-sm font-bold text-gray-700">Aktivan album</span>
-                            <p class="text-[11px] text-gray-400">Prikazati album na sajtu</p>
+                            <span class="text-sm font-bold text-gray-700">Aktivna referenca</span>
+                            <p class="text-[11px] text-gray-400">Prikazati referencu na sajtu</p>
                         </div>
                     </label>
                 </div>
@@ -127,7 +127,7 @@
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
-                Sačuvaj album
+                Sačuvaj referencu
             </button>
         </div>
     </form>

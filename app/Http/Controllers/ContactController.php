@@ -45,6 +45,8 @@ class ContactController extends Controller
             }
         }
 
-        return back()->with('success', __('ftherm.contact.success'));
+        return back()
+            ->with('success', __('ftherm.contact.success'))
+            ->with('contact_success', __('ftherm.contact.success'));
     }
 }

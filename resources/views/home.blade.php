@@ -10,6 +10,8 @@
     $companyEmail = setting_value('company_email');
     $companyAddress = setting_value('company_address');
     $telHref = $companyPhone ? 'tel:' . preg_replace('/[^\d+]/', '', $companyPhone) : null;
+    $facebookUrl = 'https://www.facebook.com/people/FTherm/100094193259896/';
+    $instagramUrl = 'https://www.instagram.com/ftherm.rs/';
     $trustItems = __('ftherm.trust.items');
     $fallbackFaqItems = __('ftherm.faq.items');
     $serviceTypes = __('ftherm.contact.service_types');
@@ -83,10 +85,6 @@
             place-items: center;
             width: min(17rem, 72vw);
             height: min(11rem, 46vw);
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.24);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
         }
 
         .loader-logo svg {
@@ -114,29 +112,6 @@
         .loader-logo svg path:last-of-type {
             stroke: var(--ft-red);
             animation-name: logoTrace, logoFillRed;
-        }
-
-        .loader-title {
-            font-weight: 900;
-            font-size: 1.05rem;
-            text-transform: uppercase;
-        }
-
-        .loader-line {
-            position: relative;
-            height: 3px;
-            margin-top: 1rem;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.16);
-        }
-
-        .loader-line::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            transform-origin: left;
-            background: linear-gradient(90deg, var(--ft-cyan), #ffffff, var(--ft-red));
-            animation: loaderLine 1.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         .hero-premium {
@@ -431,6 +406,27 @@
             transform: scaleX(1);
         }
 
+        .services-grid {
+            align-items: stretch;
+        }
+
+        .services-grid .service-card {
+            display: flex;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .services-grid .service-card__body {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+        }
+
+        .services-grid .service-card__cta {
+            margin-top: auto;
+            padding-top: 1.25rem;
+        }
+
         .premium-section {
             position: relative;
             overflow: hidden;
@@ -457,7 +453,6 @@
         .faq-section {
             isolation: isolate;
             background: var(--ft-blue);
-            background-image: linear-gradient(var(--ft-blue) 1%, #ffffff 100%);
         }
 
         .faq-section::after {
@@ -552,10 +547,7 @@
         }
 
         .contact-section {
-            background:
-                radial-gradient(circle at 12% 18%, rgba(103, 232, 249, 0.18), transparent 28%),
-                radial-gradient(circle at 90% 72%, rgba(221, 33, 49, 0.08), transparent 30%),
-                linear-gradient(180deg, #ffffff 0%, #f3f9ff 52%, #ffffff 100%);
+            background: #ffffff;
         }
 
         .contact-method-card {
@@ -571,6 +563,61 @@
             transform: translateY(-3px);
             border-color: rgba(9, 83, 154, 0.24);
             box-shadow: 0 30px 80px rgba(7, 21, 39, 0.12);
+        }
+
+        .contact-social-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .contact-social-card {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .contact-social-card__icon {
+            display: grid;
+            width: 3.25rem;
+            height: 3.25rem;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 8px;
+            color: #ffffff;
+            box-shadow: 0 16px 34px rgba(7, 21, 39, 0.15);
+        }
+
+        .contact-social-card__icon svg {
+            width: 1.35rem;
+            height: 1.35rem;
+        }
+
+        .contact-social-card--facebook .contact-social-card__icon {
+            background: linear-gradient(135deg, #1877f2, #09539a);
+        }
+
+        .contact-social-card--instagram .contact-social-card__icon {
+            background: linear-gradient(135deg, #833ab4, #e1306c 52%, #f77737);
+        }
+
+        .contact-social-card__label {
+            display: block;
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .contact-social-card__title {
+            display: block;
+            margin-top: 0.2rem;
+            color: #020617;
+            font-size: 1.02rem;
+            font-weight: 900;
+            line-height: 1.15;
         }
 
         .contact-form-shell {
@@ -622,13 +669,9 @@
             transform: translateY(0);
         }
 
-        @keyframes loaderLine {
-            from {
-                transform: scaleX(0);
-            }
-
-            to {
-                transform: scaleX(1);
+        @media (max-width: 640px) {
+            .contact-social-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -712,8 +755,6 @@
             <div class="loader-logo">
                 {!! file_get_contents(public_path('images/logo.svg')) !!}
             </div>
-            <div class="loader-title">FTHERM</div>
-            <div class="loader-line"></div>
         </div>
     </div>
 
@@ -856,7 +897,7 @@
                     <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.services.intro') }}</p>
                 </div>
 
-                <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="services-grid mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     @forelse ($services as $index => $service)
                         @php
                             $serviceTitle = translate($service->title);
@@ -876,11 +917,11 @@
                             <img src="{{ $serviceImage }}" alt="{{ $serviceAlt }}"
                                 class="h-40 w-full object-cover transition group-hover:scale-105" width="640"
                                 height="420" loading="{{ $index < 2 ? 'eager' : 'lazy' }}">
-                            <div class="p-5">
+                            <div class="service-card__body p-5">
                                 <h3 class="text-lg font-black text-slate-950">{{ $serviceTitle }}</h3>
                                 <p class="mt-3 text-sm leading-6 text-slate-600">{{ $serviceDescription }}</p>
                                 <a href="{{ $serviceUrl }}"
-                                    class="mt-5 inline-flex items-center gap-2 text-sm font-black text-sky-700 hover:text-[#DD2131]">
+                                    class="service-card__cta inline-flex items-center gap-2 text-sm font-black text-sky-700 hover:text-[#DD2131]">
                                     {{ __('ftherm.services.card_cta') }}
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -891,18 +932,20 @@
                         </article>
                     @empty
                         @foreach (__('ftherm.services.items') as $index => $service)
-                            <article class="service-card motion-reveal overflow-hidden p-5" data-reveal
+                            <article class="service-card motion-reveal overflow-hidden" data-reveal
                                 style="--delay: {{ ($index % 4) * 75 }}ms">
-                                <h3 class="text-lg font-black text-slate-950">{{ $service['title'] }}</h3>
-                                <p class="mt-3 text-sm leading-6 text-slate-600">{{ $service['description'] }}</p>
-                                <a href="#contact"
-                                    class="mt-5 inline-flex items-center gap-2 text-sm font-black text-sky-700 hover:text-[#DD2131]">
-                                    {{ __('ftherm.services.card_cta') }}
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </a>
+                                <div class="service-card__body p-5">
+                                    <h3 class="text-lg font-black text-slate-950">{{ $service['title'] }}</h3>
+                                    <p class="mt-3 text-sm leading-6 text-slate-600">{{ $service['description'] }}</p>
+                                    <a href="#contact"
+                                        class="service-card__cta inline-flex items-center gap-2 text-sm font-black text-sky-700 hover:text-[#DD2131]">
+                                        {{ __('ftherm.services.card_cta') }}
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
+                                    </a>
+                                </div>
                             </article>
                         @endforeach
                     @endforelse
@@ -948,14 +991,14 @@
                         <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.gallery.title') }}</h2>
                         <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.gallery.text') }}</p>
                     </div>
-                    <a href="{{ route('gallery.index', current_locale()) }}"
+                    <a href="{{ route('references.index', ['locale' => current_locale()]) }}"
                         class="ft-btn inline-flex w-fit border border-slate-300 px-5 py-3 font-black text-slate-800 transition hover:bg-slate-950 hover:text-white">{{ __('ftherm.gallery.cta') }}</a>
                 </div>
 
                 @if ($galleryAlbums->count())
                     <div class="mt-10 grid gap-5 md:grid-cols-3">
                         @foreach ($galleryAlbums as $album)
-                            <a href="{{ route('gallery.show', ['locale' => current_locale(), 'slug' => $album->slug]) }}"
+                            <a href="{{ route('references.show', ['locale' => current_locale(), 'slug' => $album->slug]) }}"
                                 class="reference-card motion-reveal group overflow-hidden" data-reveal
                                 style="--delay: {{ $loop->index * 80 }}ms">
                                 @if ($album->images->first())
@@ -1052,7 +1095,7 @@
                 <h2 class="motion-reveal text-3xl font-black text-white sm:text-5xl" data-reveal>
                     {{ __('ftherm.faq.title') }}</h2>
                 <div class="faq-shell motion-reveal mt-8"
-                    x-data="{ open: 0 }" data-reveal style="--delay: 100ms">
+                    x-data="{ open: null }" data-reveal style="--delay: 100ms">
                     @foreach ($displayFaqItems as $index => $item)
                         @php
                             $question = is_array($item) ? ($item['question'] ?? '') : translate($item->question ?? '');
@@ -1076,7 +1119,7 @@
                                 :class="open === {{ $index }} ? 'is-open' : ''"
                                 :aria-hidden="(open !== {{ $index }}).toString()">
                                 <div class="faq-answer__inner">
-                                    <p class="px-5 pb-5 leading-7 text-sky-100">{{ $answer }}</p>
+                                    <p class="p-5 leading-7 text-sky-100">{{ $answer }}</p>
                                 </div>
                             </div>
                         </article>
@@ -1130,16 +1173,43 @@
                                 </span>
                             </a>
                         @endif
+
+                        <div class="contact-social-grid">
+                            <a href="{{ $facebookUrl }}" target="_blank" rel="noopener noreferrer"
+                                class="contact-method-card contact-social-card contact-social-card--facebook"
+                                aria-label="FTHERM Facebook">
+                                <span class="contact-social-card__icon">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path fill="currentColor"
+                                            d="M14.2 8.2V6.7c0-.7.5-.9.9-.9h2.3V2.1L14.2 2c-3.6 0-4.4 2.7-4.4 4.4v1.8H7V12h2.8v10h4.1V12H17l.5-3.8h-3.3z" />
+                                    </svg>
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="contact-social-card__label">Facebook</span>
+                                    <span class="contact-social-card__title">FTherm</span>
+                                </span>
+                            </a>
+
+                            <a href="{{ $instagramUrl }}" target="_blank" rel="noopener noreferrer"
+                                class="contact-method-card contact-social-card contact-social-card--instagram"
+                                aria-label="FTHERM Instagram">
+                                <span class="contact-social-card__icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <rect width="18" height="18" x="3" y="3" rx="5" stroke-width="2" />
+                                        <circle cx="12" cy="12" r="4" stroke-width="2" />
+                                        <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
+                                    </svg>
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="contact-social-card__label">Instagram</span>
+                                    <span class="contact-social-card__title">@ftherm.rs</span>
+                                </span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="motion-reveal" data-reveal style="--delay: 120ms">
-                    @if (session('success'))
-                        <div
-                            class="mb-5 rounded border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
-                            {{ session('success') }}</div>
-                    @endif
-
                     <form action="{{ route('contact.store') }}" method="POST"
                         class="quote-form contact-form-shell grid gap-5 p-5 pt-8 sm:p-7 sm:pt-9">
                         @csrf

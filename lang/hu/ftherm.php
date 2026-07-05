@@ -113,7 +113,7 @@ return [
     'gallery' => [
         'title' => 'Referenciák és munkáink',
         'text' => 'Nézze meg korábbi kivitelezéseinket: klímaszerelés, hőszivattyús rendszerek, padlófűtés, vízszerelés és hűtéstechnikai munkák.',
-        'cta' => 'Galéria megnyitása',
+        'cta' => 'Referenciák megtekintése',
         'placeholder' => 'Valós projektfotók kerülnek ide, amint elérhetők.',
     ],
 
@@ -150,7 +150,9 @@ return [
         'message' => 'Üzenet',
         'privacy_consent' => 'Hozzájárulok, hogy az FTHERM az ajánlatkérésem megválaszolásához kezelje a megadott adataimat.',
         'send' => 'Ajánlatkérés küldése',
+        'success_title' => 'Ajánlatkérés elküldve',
         'success' => 'Köszönjük! Megkaptuk az üzenetét, hamarosan felvesszük Önnel a kapcsolatot.',
+        'success_button' => 'Rendben',
         'phone_or_email' => 'Adjon meg telefonszámot vagy email címet.',
         'map_placeholder' => 'Térkép helye',
         'service_types' => [

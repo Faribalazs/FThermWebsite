@@ -52,7 +52,7 @@ class GalleryAlbumController extends Controller
             'active' => $request->has('active'),
         ]);
 
-        return redirect()->route('admin.gallery.index')->with('success', 'Album uspešno kreiran');
+        return redirect()->route('admin.gallery.index')->with('success', 'Referenca uspešno kreirana');
     }
 
     public function edit(GalleryAlbum $gallery)
@@ -91,7 +91,7 @@ class GalleryAlbumController extends Controller
             'active' => $request->has('active'),
         ]);
 
-        return redirect()->route('admin.gallery.edit', $gallery)->with('success', 'Album uspešno ažuriran');
+        return redirect()->route('admin.gallery.edit', $gallery)->with('success', 'Referenca uspešno ažurirana');
     }
 
     public function destroy(GalleryAlbum $gallery)
@@ -102,7 +102,7 @@ class GalleryAlbumController extends Controller
         }
         $gallery->delete();
 
-        return redirect()->route('admin.gallery.index')->with('success', 'Album uspešno obrisan');
+        return redirect()->route('admin.gallery.index')->with('success', 'Referenca uspešno obrisana');
     }
 
     public function uploadImage(Request $request, GalleryAlbum $gallery)

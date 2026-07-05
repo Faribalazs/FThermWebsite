@@ -151,7 +151,7 @@
                                 <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
-                                <span class="text-sm lg:text-base">Galerija</span>
+                                <span class="text-sm lg:text-base">Reference</span>
                             </a>
                         </div>
                     </div>
@@ -418,7 +418,7 @@
                                         <div class="w-10 h-10 rounded-full {{ request()->routeIs('admin.gallery.*') ? 'bg-primary-100' : 'bg-gray-100' }} flex items-center justify-center">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                                         </div>
-                                        <span class="font-medium">Galerija</span>
+                                        <span class="font-medium">Reference</span>
                                     </a>
                                 </div>
                             </div>

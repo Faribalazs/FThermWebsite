@@ -113,7 +113,7 @@ return [
     'gallery' => [
         'title' => 'Reference i naši radovi',
         'text' => 'Pogledajte prethodne radove: ugradnja klima uređaja, sistemi sa toplotnim pumpama, podno grejanje, vodoinstalacije i rashladna tehnika.',
-        'cta' => 'Otvori galeriju',
+        'cta' => 'Pogledaj reference',
         'placeholder' => 'Stvarne fotografije projekata biće dodate kada budu dostupne.',
     ],
 
@@ -150,7 +150,9 @@ return [
         'message' => 'Poruka',
         'privacy_consent' => 'Saglasan/saglasna sam da FTHERM obradi unete podatke radi odgovora na moj upit.',
         'send' => 'Pošalji upit',
+        'success_title' => 'Upit je poslat',
         'success' => 'Hvala! Primili smo vašu poruku i uskoro ćemo vas kontaktirati.',
+        'success_button' => 'U redu',
         'phone_or_email' => 'Unesite telefon ili email adresu.',
         'map_placeholder' => 'Mesto za mapu',
         'service_types' => [

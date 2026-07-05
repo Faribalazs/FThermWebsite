@@ -13,7 +13,6 @@ class ServicePageController extends Controller
         $relatedServices = Service::where('active', true)
             ->whereKeyNot($service->getKey())
             ->orderBy('order')
-            ->take(4)
             ->get();
 
         return view('services.show', compact('service', 'relatedServices'));

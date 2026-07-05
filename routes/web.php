@@ -47,8 +47,10 @@ Route::prefix('{locale}')
         Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
         Route::get('/services/{service:slug}', [ServicePageController::class, 'show'])->name('services.show');
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-        Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
-        Route::get('/gallery/{slug}', [GalleryController::class, 'show'])->name('gallery.show');
+        Route::get('/references', [GalleryController::class, 'index'])->name('references.index');
+        Route::get('/references/{slug}', [GalleryController::class, 'show'])->name('references.show');
+        Route::get('/gallery', fn (string $locale) => redirect()->route('references.index', ['locale' => $locale], 301));
+        Route::get('/gallery/{slug}', fn (string $locale, string $slug) => redirect()->route('references.show', ['locale' => $locale, 'slug' => $slug], 301));
     });
 
 // Auth Routes
@@ -96,11 +98,17 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     // Slides Management
     Route::resource('slides', App\Http\Controllers\Admin\SlideController::class)->except(['show']);
 
-    // Gallery Management
-    Route::resource('gallery', App\Http\Controllers\Admin\GalleryAlbumController::class)->except(['show']);
-    Route::post('gallery/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'uploadImage'])->name('gallery.images.upload');
-    Route::delete('gallery/images/{image}', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImage'])->name('gallery.images.delete');
-    Route::post('gallery/{gallery}/images/reorder', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'reorderImages'])->name('gallery.images.reorder');
+    // References Management
+    Route::get('gallery', fn () => redirect()->route('admin.gallery.index', [], 301))->name('gallery.redirect');
+    Route::get('gallery/create', fn () => redirect()->route('admin.gallery.create', [], 301))->name('gallery.create.redirect');
+    Route::get('gallery/{gallery}/edit', fn (string $gallery) => redirect()->route('admin.gallery.edit', ['gallery' => $gallery], 301))->name('gallery.edit.redirect');
+    Route::resource('references', App\Http\Controllers\Admin\GalleryAlbumController::class)
+        ->parameters(['references' => 'gallery'])
+        ->names('gallery')
+        ->except(['show']);
+    Route::post('references/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'uploadImage'])->name('gallery.images.upload');
+    Route::delete('references/images/{image}', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImage'])->name('gallery.images.delete');
+    Route::post('references/{gallery}/images/reorder', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'reorderImages'])->name('gallery.images.reorder');
 
     // Worker Management
     Route::resource('workers', App\Http\Controllers\Admin\WorkerController::class);

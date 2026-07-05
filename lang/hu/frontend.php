@@ -83,14 +83,17 @@ return [
     'product_interested_desc' => 'Küldjön érdeklődést és további információval keresni fogjuk',
     'product_send_inquiry' => 'Érdeklődés küldése',
 
-    // Galéria
-    'nav_gallery' => 'Galéria',
-    'gallery_badge' => 'Portfólió',
-    'gallery_title' => 'Galériánk',
-    'gallery_subtitle' => 'Tekintse meg befejezett projektjeinket és munkáinkat',
-    'gallery_empty' => 'Nincs megjeleníthető album.',
-    'gallery_view_album' => 'Album megtekintése',
+    // Referenciák
+    'nav_gallery' => 'Referenciák',
+    'gallery_badge' => 'FTHERM referenciák',
+    'gallery_title' => 'Referenciák',
+    'gallery_subtitle' => 'Tekintse meg az FTHERM elkészült projektjeit, telepítéseit és munkáit.',
+    'gallery_projects' => 'referencia',
+    'gallery_reference_label' => 'Referencia',
+    'gallery_photos_title' => 'Referenciafotók',
+    'gallery_empty' => 'Még nincs megjeleníthető referencia.',
+    'gallery_view_album' => 'Referencia megtekintése',
     'gallery_photos' => 'fotó',
-    'gallery_no_images' => 'Ennek az albumnak nincs fotója.',
-    'gallery_back' => 'Vissza a galériához',
+    'gallery_no_images' => 'Ehhez a referenciához nincs fotó.',
+    'gallery_back' => 'Vissza a referenciákhoz',
 ];

@@ -83,14 +83,17 @@ return [
     'product_interested_desc' => 'Pošaljite nam upit i javićemo vam se sa više informacija',
     'product_send_inquiry' => 'Pošalji upit',
 
-    // Galerija
-    'nav_gallery' => 'Galerija',
-    'gallery_badge' => 'Portfolio',
-    'gallery_title' => 'Naša galerija',
-    'gallery_subtitle' => 'Pogledajte naše završene projekte i radove',
-    'gallery_empty' => 'Nema albuma za prikaz.',
-    'gallery_view_album' => 'Pogledaj album',
+    // Reference
+    'nav_gallery' => 'Reference',
+    'gallery_badge' => 'FTHERM reference',
+    'gallery_title' => 'Reference',
+    'gallery_subtitle' => 'Pogledajte završene projekte, instalacije i radove koje je FTHERM izveo.',
+    'gallery_projects' => 'referenci',
+    'gallery_reference_label' => 'Referenca',
+    'gallery_photos_title' => 'Fotografije reference',
+    'gallery_empty' => 'Trenutno nema referenci za prikaz.',
+    'gallery_view_album' => 'Pogledaj referencu',
     'gallery_photos' => 'fotografija',
-    'gallery_no_images' => 'Ovaj album nema fotografija.',
-    'gallery_back' => 'Nazad na galeriju',
+    'gallery_no_images' => 'Ova referenca nema fotografija.',
+    'gallery_back' => 'Nazad na reference',
 ];

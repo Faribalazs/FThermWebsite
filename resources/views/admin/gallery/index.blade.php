@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Galerija')
+@section('title', 'Reference')
 
 @section('content')
 <div class="animate-fade-in-up">
@@ -13,15 +13,15 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Galerija</h1>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte albumima i slikama</p>
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Reference</h1>
+                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte referencama i slikama</p>
             </div>
         </div>
         <a href="{{ route('admin.gallery.create') }}" class="inline-flex items-center px-4 sm:px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-xs sm:text-sm font-bold hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto justify-center">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
-            Novi album
+            Nova referenca
         </a>
     </div>
 
@@ -29,7 +29,7 @@
     <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-3 sm:p-4 text-center">
             <p class="text-lg sm:text-2xl font-black text-gray-900">{{ $albums->total() }}</p>
-            <p class="text-[10px] sm:text-xs text-gray-500 font-medium mt-0.5">Ukupno albuma</p>
+            <p class="text-[10px] sm:text-xs text-gray-500 font-medium mt-0.5">Ukupno referenci</p>
         </div>
         <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-3 sm:p-4 text-center">
             <p class="text-lg sm:text-2xl font-black text-green-600">{{ $albums->where('active', true)->count() }}</p>
@@ -92,7 +92,7 @@
                     </svg>
                 </a>
                 <form action="{{ route('admin.gallery.destroy', $album) }}" method="POST" class="inline"
-                      data-confirm="Da li ste sigurni da želite da obrišete album '{{ $album->title['sr'] ?? '' }}' i sve slike u njemu?"
+                      data-confirm="Da li ste sigurni da želite da obrišete referencu '{{ $album->title['sr'] ?? '' }}' i sve slike u njoj?"
                       data-type="delete">
                     @csrf
                     @method('DELETE')
@@ -112,8 +112,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
         </div>
-        <p class="text-gray-500 font-medium">Nema albuma</p>
-        <p class="text-gray-400 text-sm mt-1">Kreirajte prvi album klikom na dugme gore.</p>
+        <p class="text-gray-500 font-medium">Nema referenci</p>
+        <p class="text-gray-400 text-sm mt-1">Kreirajte prvu referencu klikom na dugme gore.</p>
     </div>
     @endforelse
 

@@ -83,14 +83,17 @@ return [
     'product_interested_desc' => 'Send us an inquiry and we\'ll get back to you with more information',
     'product_send_inquiry' => 'Send Inquiry',
 
-    // Gallery
-    'nav_gallery' => 'Gallery',
-    'gallery_badge' => 'Portfolio',
-    'gallery_title' => 'Our Gallery',
-    'gallery_subtitle' => 'Browse our completed projects and works',
-    'gallery_empty' => 'No albums to display.',
-    'gallery_view_album' => 'View album',
+    // References
+    'nav_gallery' => 'References',
+    'gallery_badge' => 'FTHERM references',
+    'gallery_title' => 'References',
+    'gallery_subtitle' => 'Browse completed projects, installations and technical work delivered by FTHERM.',
+    'gallery_projects' => 'references',
+    'gallery_reference_label' => 'Reference',
+    'gallery_photos_title' => 'Reference photos',
+    'gallery_empty' => 'No references to display yet.',
+    'gallery_view_album' => 'View reference',
     'gallery_photos' => 'photos',
-    'gallery_no_images' => 'This album has no photos.',
-    'gallery_back' => 'Back to gallery',
+    'gallery_no_images' => 'This reference has no photos.',
+    'gallery_back' => 'Back to references',
 ];

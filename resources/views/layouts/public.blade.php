@@ -9,8 +9,9 @@
     $shopEnabled = shop_enabled();
     $companyPhone = setting_value('company_phone');
     $companyEmail = setting_value('company_email');
-    $companyAddress = setting_value('company_address');
     $telHref = $companyPhone ? 'tel:' . preg_replace('/[^\d+]/', '', $companyPhone) : null;
+    $facebookUrl = 'https://www.facebook.com/people/FTherm/100094193259896/';
+    $instagramUrl = 'https://www.instagram.com/ftherm.rs/';
     $pageTitle = trim($__env->yieldContent('title')) ?: 'FTHERM';
     $metaDescription = trim($__env->yieldContent('meta_description')) ?: __('ftherm.seo.meta_description');
     $metaKeywords = trim($__env->yieldContent('meta_keywords')) ?: __('ftherm.seo.keywords');
@@ -40,9 +41,143 @@
     <style>
         [x-cloak] { display: none !important; }
 
+        .contact-success-popup {
+            width: min(92vw, 31rem) !important;
+            border: 1px solid rgba(9, 83, 154, 0.16) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 28px 80px rgba(7, 21, 39, 0.24) !important;
+        }
+
+        .contact-success-popup .swal2-title {
+            color: #071527 !important;
+            font-weight: 900 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .contact-success-popup .swal2-html-container {
+            color: #475569 !important;
+            font-weight: 600 !important;
+            line-height: 1.65 !important;
+        }
+
+        .contact-success-popup .swal2-success-ring {
+            border-color: rgba(9, 83, 154, 0.2) !important;
+        }
+
+        .contact-success-popup .swal2-success-line-tip,
+        .contact-success-popup .swal2-success-line-long {
+            background-color: #09539a !important;
+        }
+
+        .contact-success-confirm {
+            border-radius: 999px !important;
+            background: linear-gradient(135deg, #09539a, #0c93ea) !important;
+            padding: 0.85rem 1.65rem !important;
+            font-weight: 900 !important;
+            box-shadow: 0 14px 30px rgba(9, 83, 154, 0.25) !important;
+        }
+
         .site-topbar {
+            --site-topbar-bg: linear-gradient(135deg, rgba(7, 21, 39, 0.98), rgba(9, 83, 154, 0.96)), #071527;
             position: relative;
             z-index: 45;
+            isolation: isolate;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+            background: var(--site-topbar-bg);
+            box-shadow: 0 10px 30px rgba(7, 21, 39, 0.18);
+        }
+
+        .site-topbar::before {
+            display: none;
+        }
+
+        .site-topbar > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .site-topbar-contact {
+            display: inline-flex;
+            flex: 0 1 auto;
+            min-width: 0;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            background: rgba(255, 255, 255, 0.075);
+            padding: 0.42rem 0.82rem 0.42rem 0.5rem;
+            color: #dbeafe;
+            font-weight: 800;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 8px 20px rgba(2, 6, 23, 0.12);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+        }
+
+        .site-topbar-contact:hover {
+            transform: translateY(-1px);
+            border-color: rgba(103, 232, 249, 0.34);
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .site-topbar-contact__icon {
+            display: inline-grid;
+            width: 1.55rem;
+            height: 1.55rem;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 999px;
+            color: #ffffff;
+            box-shadow: 0 9px 18px rgba(2, 6, 23, 0.18);
+        }
+
+        .site-topbar-contact--phone .site-topbar-contact__icon {
+            background: linear-gradient(135deg, #dd2131, #a91624);
+        }
+
+        .site-topbar-contact--email .site-topbar-contact__icon {
+            background: linear-gradient(135deg, #0c93ea, #09539a);
+        }
+
+        .site-topbar-contact__text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .site-social-link {
+            display: inline-grid;
+            width: 2.35rem;
+            height: 2.35rem;
+            flex: 0 0 auto;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.075);
+            color: #ffffff;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                0 8px 20px rgba(2, 6, 23, 0.12);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .site-social-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(103, 232, 249, 0.34);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .site-social-link svg {
+            width: 1rem;
+            height: 1rem;
         }
 
         .site-header {
@@ -126,53 +261,120 @@
         }
 
         .site-footer {
+            --site-footer-bg: linear-gradient(135deg, rgba(7, 21, 39, 0.98), rgba(9, 83, 154, 0.96)), #071527;
             position: relative;
             isolation: isolate;
             overflow: hidden;
-            background:
-                radial-gradient(circle at 14% 18%, rgba(12, 147, 234, 0.24), transparent 32%),
-                radial-gradient(circle at 86% 22%, rgba(221, 33, 49, 0.16), transparent 28%),
-                linear-gradient(135deg, #071527 0%, #08192e 48%, #020617 100%);
+            margin-top: 0;
+            border-top: 0;
+            background: var(--site-footer-bg);
+            color: #ffffff;
+            padding: clamp(2.4rem, 4.8vw, 3.4rem) 0 clamp(0.9rem, 2vw, 1.5rem);
+            box-shadow: 0 -28px 70px rgba(7, 21, 39, 0.12);
+            clip-path: polygon(
+                0 26%,
+                10% 21%,
+                22% 16%,
+                34% 11%,
+                46% 8%,
+                50% 7%,
+                54% 8%,
+                66% 11%,
+                78% 16%,
+                90% 21%,
+                100% 26%,
+                100% 100%,
+                0 100%
+            );
         }
 
         .site-footer::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-            background-size: 72px 72px;
-            mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.72) 54%, transparent 100%);
-            pointer-events: none;
+            display: none;
         }
 
-        .footer-panel {
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.065);
-            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(18px);
+        .site-footer::after {
+            display: none;
         }
 
-        .footer-link {
-            transition: color 0.18s ease, transform 0.18s ease;
+        .footer-shell {
+            width: min(1440px, calc(100% - 2rem));
         }
 
-        .footer-link:hover {
-            transform: translateX(3px);
+        .site-footer > * {
+            position: relative;
+            z-index: 2;
         }
 
         .footer-action {
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.07);
+            min-width: 0;
+            max-width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 999px;
+            background: transparent;
+            color: #ffffff;
+            box-shadow: none;
             transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
         }
 
         .footer-action:hover {
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             border-color: rgba(103, 232, 249, 0.36);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .footer-action__icon {
+            display: inline-grid;
+            width: 1.9rem;
+            height: 1.9rem;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 999px;
+            color: #ffffff;
+        }
+
+        .footer-action__icon svg {
+            display: block;
+        }
+
+        .footer-action--phone .footer-action__icon {
+            background: linear-gradient(135deg, #dd2131, #a91624);
+        }
+
+        .footer-action--email .footer-action__icon {
+            background: linear-gradient(135deg, #0c93ea, #09539a);
+        }
+
+        .footer-action__text {
+            min-width: 0;
+            max-width: min(18rem, 68vw);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .footer-social-link {
+            display: inline-grid;
+            width: 2.45rem;
+            height: 2.45rem;
+            flex: 0 0 auto;
+            place-items: center;
+            padding: 0;
+        }
+
+        .footer-social-link svg {
+            display: block;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .footer-logo-mark {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+        }
+
+        .footer-logo-mark img {
+            filter: drop-shadow(0 10px 18px rgba(2, 6, 23, 0.18));
         }
 
         @media (max-width: 767px) {
@@ -182,6 +384,25 @@
 
             .site-nav-shell {
                 border-radius: 1.45rem;
+            }
+
+            .site-topbar-contact {
+                flex: 1 1 0;
+                padding-right: 0.66rem;
+                font-size: 0.72rem;
+            }
+
+            .site-footer {
+                clip-path: none;
+                padding-top: 1.35rem;
+            }
+
+            .footer-action:not(.footer-social-link) {
+                width: 100%;
+            }
+
+            .footer-logo-mark {
+                margin-inline: auto;
             }
         }
 
@@ -198,28 +419,46 @@
 </head>
 
 <body class="bg-white font-sans antialiased text-slate-900" x-data="{ mobileMenu: false, languageOpen: false }">
-    <div class="site-topbar bg-slate-950 text-white">
-        <div class="mx-auto flex max-w-[1440px] flex-col gap-2 px-4 py-2 text-xs sm:flex-row sm:items-center sm:justify-between lg:px-10">
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
-                @if ($companyPhone)
-                    <a href="{{ $telHref }}" class="inline-flex items-center gap-1.5 hover:text-white">
-                        <svg class="h-3.5 w-3.5 text-[#DD2131]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
+    @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
+        <div class="site-topbar text-white">
+            <div class="mx-auto flex max-w-[1440px] items-center justify-center px-4 py-2 text-xs lg:px-10">
+                <div class="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:gap-3">
+                    @if ($companyPhone)
+                        <a href="{{ $telHref }}" class="site-topbar-contact site-topbar-contact--phone" aria-label="{{ __('ftherm.contact.phone') }}: {{ $companyPhone }}">
+                            <span class="site-topbar-contact__icon">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
+                                </svg>
+                            </span>
+                            <span class="site-topbar-contact__text">{{ $companyPhone }}</span>
+                        </a>
+                    @endif
+                    @if ($companyEmail)
+                        <a href="mailto:{{ $companyEmail }}" class="site-topbar-contact site-topbar-contact--email" aria-label="{{ __('ftherm.contact.email') }}: {{ $companyEmail }}">
+                            <span class="site-topbar-contact__icon">
+                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <span class="site-topbar-contact__text">{{ $companyEmail }}</span>
+                        </a>
+                    @endif
+                    <a href="{{ $facebookUrl }}" target="_blank" rel="noopener noreferrer" class="site-social-link" aria-label="FTHERM Facebook">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path fill="currentColor" d="M14.2 8.2V6.7c0-.7.5-.9.9-.9h2.3V2.1L14.2 2c-3.6 0-4.4 2.7-4.4 4.4v1.8H7V12h2.8v10h4.1V12H17l.5-3.8h-3.3z" />
                         </svg>
-                        {{ $companyPhone }}
                     </a>
-                @endif
-                @if ($companyEmail)
-                    <a href="mailto:{{ $companyEmail }}" class="inline-flex items-center gap-1.5 hover:text-white">
-                        <svg class="h-3.5 w-3.5 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <a href="{{ $instagramUrl }}" target="_blank" rel="noopener noreferrer" class="site-social-link" aria-label="FTHERM Instagram">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect width="18" height="18" x="3" y="3" rx="5" stroke-width="2" />
+                            <circle cx="12" cy="12" r="4" stroke-width="2" />
+                            <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
                         </svg>
-                        {{ $companyEmail }}
                     </a>
-                @endif
+                </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <header class="site-header sticky top-0 z-40">
         <nav class="site-nav-shell mx-auto flex min-h-20 max-w-[1440px] items-center justify-between px-4 lg:px-10" aria-label="Main navigation">
@@ -234,7 +473,7 @@
                     <a href="{{ route('shop.index') }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.products') }}</a>
                 @endif
                 <a href="{{ route('about', ['locale' => current_locale()]) }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.about') }}</a>
-                <a href="{{ route('home') }}#references" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.references') }}</a>
+                <a href="{{ route('references.index', ['locale' => current_locale()]) }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.references') }}</a>
                 <a href="{{ route('home') }}#faq" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.faq') }}</a>
                 <a href="{{ route('home') }}#contact" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.contact') }}</a>
             </div>
@@ -276,9 +515,23 @@
         </nav>
     </header>
 
-    <div x-cloak x-show="mobileMenu" class="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+    <div x-cloak x-show="mobileMenu"
+        x-transition:enter="transition-opacity ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition-opacity ease-in duration-300"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed inset-0 z-50 overflow-hidden lg:hidden" role="dialog" aria-modal="true">
         <div class="absolute inset-0 bg-slate-950/60" @click="mobileMenu = false"></div>
-        <div x-show="mobileMenu" x-transition class="absolute right-0 top-0 flex h-full w-80 max-w-[88vw] flex-col overflow-hidden rounded-l-[2rem] bg-white shadow-2xl">
+        <div x-show="mobileMenu"
+            x-transition:enter="transform transition ease-out duration-300"
+            x-transition:enter-start="translate-x-full"
+            x-transition:enter-end="translate-x-0"
+            x-transition:leave="transform transition ease-in duration-300"
+            x-transition:leave-start="translate-x-0"
+            x-transition:leave-end="translate-x-full"
+            class="absolute right-0 top-0 flex h-full w-80 max-w-[88vw] flex-col overflow-hidden rounded-l-[2rem] bg-white shadow-2xl will-change-transform">
             <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-12 w-auto">
                 <button type="button" @click="mobileMenu = false" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700" aria-label="Close menu">
@@ -295,7 +548,7 @@
                         <a href="{{ route('shop.index') }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.products') }}</a>
                     @endif
                     <a href="{{ route('about', ['locale' => current_locale()]) }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.about') }}</a>
-                    <a href="{{ route('home') }}#references" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.references') }}</a>
+                    <a href="{{ route('references.index', ['locale' => current_locale()]) }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.references') }}</a>
                     <a href="{{ route('home') }}#faq" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.faq') }}</a>
                     <a href="{{ route('home') }}#contact" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.contact') }}</a>
                 </div>
@@ -322,101 +575,50 @@
         @yield('content')
     </main>
 
-    <footer class="site-footer text-white">
-        <div class="h-1 bg-gradient-to-r from-[#09539A] via-cyan-300 to-[#DD2131]"></div>
-        <div class="mx-auto max-w-[1440px] px-4 py-12 lg:px-10 lg:py-16">
-            <div class="grid gap-6 lg:grid-cols-[1.15fr_0.9fr_0.9fr_1.05fr]">
-                <div class="footer-panel rounded p-6">
-                    <div class="inline-flex rounded bg-white p-2 shadow-lg shadow-black/10">
-                        <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-14 w-auto">
-                    </div>
-                    <p class="mt-5 max-w-sm text-sm leading-7 text-slate-300">{{ __('ftherm.footer.summary') }}</p>
-                    <h2 class="mt-6 text-xs font-black uppercase text-cyan-200">{{ __('ftherm.footer.languages') }}</h2>
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        @foreach ($supportedLocales as $locale => $label)
-                            <a href="{{ change_locale_url($locale) }}" class="rounded border px-3 py-2 text-sm font-black transition {{ $currentLocale === $locale ? 'border-white bg-white text-slate-950' : 'border-white/15 text-slate-300 hover:border-white hover:text-white' }}">
-                                <span class="mr-1">{{ $localeFlags[$locale] }}</span>{{ $label }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
+    <footer class="site-footer">
+        <div class="footer-shell mx-auto flex flex-col items-center gap-4 px-4 py-2 sm:flex-row sm:justify-between sm:py-3">
+            <a href="{{ route('home') }}" class="footer-logo-mark" aria-label="FTHERM">
+                <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-14 w-auto sm:h-16">
+            </a>
 
-                <div class="footer-panel rounded p-6">
-                    <h2 class="text-xs font-black uppercase text-cyan-200">{{ __('ftherm.footer.services') }}</h2>
-                    <ul class="mt-5 space-y-3 text-sm text-slate-300">
-                        @foreach (array_slice(__('ftherm.services.items'), 0, 5) as $service)
-                            <li>
-                                <a href="{{ route('home') }}#services" class="footer-link inline-flex items-center gap-2 hover:text-white">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-[#DD2131]"></span>
-                                    {{ $service['title'] }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <div class="footer-panel rounded p-6">
-                    <h2 class="text-xs font-black uppercase text-cyan-200">{{ __('ftherm.footer.links') }}</h2>
-                    <nav class="mt-5 grid gap-3 text-sm text-slate-300" aria-label="Footer navigation">
-                        <a href="{{ route('home') }}" class="footer-link hover:text-white">{{ __('ftherm.nav.home') }}</a>
-                        <a href="{{ route('home') }}#services" class="footer-link hover:text-white">{{ __('ftherm.nav.services') }}</a>
-                        @if ($shopEnabled)
-                            <a href="{{ route('shop.index') }}" class="footer-link hover:text-white">{{ __('ftherm.nav.products') }}</a>
-                        @endif
-                        <a href="{{ route('about', ['locale' => current_locale()]) }}" class="footer-link hover:text-white">{{ __('ftherm.nav.about') }}</a>
-                        <a href="{{ route('home') }}#references" class="footer-link hover:text-white">{{ __('ftherm.nav.references') }}</a>
-                        <a href="{{ route('home') }}#faq" class="footer-link hover:text-white">{{ __('ftherm.nav.faq') }}</a>
-                        <a href="{{ route('home') }}#contact" class="footer-link hover:text-white">{{ __('ftherm.nav.contact') }}</a>
-                    </nav>
-                </div>
-
-                <div class="footer-panel rounded p-6">
-                    <h2 class="text-xs font-black uppercase text-cyan-200">{{ __('ftherm.footer.contact') }}</h2>
-                    <div class="mt-5 space-y-3">
-                        @if ($companyPhone)
-                            <a href="{{ $telHref }}" class="footer-action flex items-center gap-3 rounded p-3">
-                                <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded bg-[#DD2131] text-white">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
-                                    </svg>
-                                </span>
-                                <span>
-                                    <span class="block text-[11px] font-black uppercase text-slate-400">{{ __('ftherm.contact.phone') }}</span>
-                                    <span class="mt-0.5 block font-black text-white">{{ $companyPhone }}</span>
-                                </span>
-                            </a>
-                        @endif
-                        @if ($companyEmail)
-                            <a href="mailto:{{ $companyEmail }}" class="footer-action flex items-center gap-3 rounded p-3">
-                                <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded bg-[#09539A] text-white">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
-                                </span>
-                                <span class="min-w-0">
-                                    <span class="block text-[11px] font-black uppercase text-slate-400">{{ __('ftherm.contact.email') }}</span>
-                                    <span class="mt-0.5 block break-all font-black text-white">{{ $companyEmail }}</span>
-                                </span>
-                            </a>
-                        @endif
-                        @if ($companyAddress)
-                            <div class="flex items-start gap-3 pt-2 text-sm leading-6 text-slate-300">
-                                <svg class="mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.66 16.66L13.41 20.9a2 2 0 01-2.82 0l-4.25-4.24a8 8 0 1111.32 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
+                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                    @if ($companyPhone)
+                        <a href="{{ $telHref }}" class="footer-action footer-action--phone inline-flex items-center gap-2 px-2.5 py-2 text-sm font-black" aria-label="{{ __('ftherm.contact.phone') }}: {{ $companyPhone }}">
+                            <span class="footer-action__icon">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
                                 </svg>
-                                <span>{{ $companyAddress }}</span>
-                            </div>
-                        @endif
+                            </span>
+                            <span class="footer-action__text">{{ $companyPhone }}</span>
+                        </a>
+                    @endif
+                    @if ($companyEmail)
+                        <a href="mailto:{{ $companyEmail }}" class="footer-action footer-action--email inline-flex items-center gap-2 px-2.5 py-2 text-sm font-black" aria-label="{{ __('ftherm.contact.email') }}: {{ $companyEmail }}">
+                            <span class="footer-action__icon">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </span>
+                            <span class="footer-action__text">{{ $companyEmail }}</span>
+                        </a>
+                    @endif
+                    <div class="flex justify-center gap-2">
+                        <a href="{{ $facebookUrl }}" target="_blank" rel="noopener noreferrer" class="footer-action footer-social-link" aria-label="FTHERM Facebook">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill="currentColor" d="M14.2 8.2V6.7c0-.7.5-.9.9-.9h2.3V2.1L14.2 2c-3.6 0-4.4 2.7-4.4 4.4v1.8H7V12h2.8v10h4.1V12H17l.5-3.8h-3.3z" />
+                            </svg>
+                        </a>
+                        <a href="{{ $instagramUrl }}" target="_blank" rel="noopener noreferrer" class="footer-action footer-social-link" aria-label="FTHERM Instagram">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect width="18" height="18" x="3" y="3" rx="5" stroke-width="2" />
+                                <circle cx="12" cy="12" r="4" stroke-width="2" />
+                                <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
+                            </svg>
+                        </a>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="border-t border-white/10">
-            <div class="mx-auto flex max-w-[1440px] flex-col gap-2 px-4 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between lg:px-10">
-                <p>&copy; {{ date('Y') }} FTHERM. {{ __('ftherm.footer.rights') }}</p>
-                <p class="font-semibold text-slate-300">{{ setting_value('company_name', 'FTHERM') }}</p>
-            </div>
+            @endif
         </div>
     </footer>
 
@@ -427,6 +629,40 @@
             </svg>
             {{ __('ftherm.cta.call') }}
         </a>
+    @endif
+
+    @if (session('contact_success'))
+        <script>
+            (() => {
+                const showContactSuccess = () => {
+                    const message = @json(session('contact_success'));
+
+                    if (!window.Swal) {
+                        window.alert(message);
+                        return;
+                    }
+
+                    window.Swal.fire({
+                        icon: 'success',
+                        title: @json(__('ftherm.contact.success_title')),
+                        text: message,
+                        confirmButtonText: @json(__('ftherm.contact.success_button')),
+                        confirmButtonColor: '#09539A',
+                        backdrop: 'rgba(7, 21, 39, 0.44)',
+                        customClass: {
+                            popup: 'contact-success-popup',
+                            confirmButton: 'contact-success-confirm',
+                        },
+                    });
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', showContactSuccess, { once: true });
+                } else {
+                    showContactSuccess();
+                }
+            })();
+        </script>
     @endif
 
     @stack('scripts')
