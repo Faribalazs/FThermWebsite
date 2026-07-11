@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Slide extends Model
 {
@@ -27,4 +28,15 @@ class Slide extends Model
         'button_text' => 'array',
         'active'      => 'boolean',
     ];
+
+    public function getImageUrlAttribute(): string
+    {
+        if (! $this->image) {
+            return asset('images/ftherm/hero-ftherm-technician-ac-installation.webp');
+        }
+
+        return str_starts_with($this->image, 'images/')
+            ? asset($this->image)
+            : Storage::disk('public')->url($this->image);
+    }
 }

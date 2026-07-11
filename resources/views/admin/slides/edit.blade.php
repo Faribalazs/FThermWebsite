@@ -40,7 +40,7 @@
                 <div x-data="{ preview: null }" class="space-y-3">
                     <!-- Current image -->
                     <div x-show="!preview" class="relative rounded-xl overflow-hidden h-48 bg-gray-100">
-                        <img src="{{ Storage::url($slide->image) }}" alt="" class="w-full h-full object-cover">
+                        <img src="{{ $slide->image_url }}" alt="{{ translate($slide->title) }}" class="w-full h-full object-cover">
                         <div class="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg font-medium">Trenutna slika</div>
                     </div>
                     <!-- New preview -->
@@ -143,13 +143,10 @@
 
         <!-- Submit -->
         <div class="flex items-center justify-between gap-3">
-            <form action="{{ route('admin.slides.destroy', $slide) }}" method="POST" onsubmit="return confirm('Obrisati slajd?')">
-                @csrf @method('DELETE')
-                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    Obriši slajd
-                </button>
-            </form>
+            <button type="submit" form="delete-slide-form" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Obriši slajd
+            </button>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.slides.index') }}" class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 transition">Otkaži</a>
                 <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-sm font-bold hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
@@ -158,6 +155,11 @@
                 </button>
             </div>
         </div>
+    </form>
+
+    <form id="delete-slide-form" action="{{ route('admin.slides.destroy', $slide) }}" method="POST" onsubmit="return confirm('Obrisati slajd?')">
+        @csrf
+        @method('DELETE')
     </form>
 </div>
 @endsection

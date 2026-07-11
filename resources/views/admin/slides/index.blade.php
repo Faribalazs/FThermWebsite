@@ -53,7 +53,7 @@
     <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden mb-4 flex flex-col sm:flex-row">
         <!-- Thumbnail -->
         <div class="sm:w-48 lg:w-64 h-36 sm:h-auto flex-shrink-0 relative overflow-hidden bg-gray-100">
-            <img src="{{ Storage::url($slide->image) }}" alt="{{ translate($slide->title) }}" class="w-full h-full object-cover">
+            <img src="{{ $slide->image_url }}" alt="{{ translate($slide->title) }}" class="w-full h-full object-cover" loading="lazy">
             @if(!$slide->active)
             <div class="absolute inset-0 bg-gray-900/50 flex items-center justify-center">
                 <span class="text-white text-xs font-bold bg-gray-700 px-2 py-1 rounded-full">Neaktivan</span>

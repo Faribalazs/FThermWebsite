@@ -94,7 +94,9 @@ class SlideController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($slide->image);
+            if ($slide->image && ! str_starts_with($slide->image, 'images/')) {
+                Storage::disk('public')->delete($slide->image);
+            }
             $data['image'] = $request->file('image')->store('slides', 'public');
         }
 
@@ -105,7 +107,9 @@ class SlideController extends Controller
 
     public function destroy(Slide $slide)
     {
-        Storage::disk('public')->delete($slide->image);
+        if ($slide->image && ! str_starts_with($slide->image, 'images/')) {
+            Storage::disk('public')->delete($slide->image);
+        }
         $slide->delete();
 
         return redirect()->route('admin.slides.index')->with('success', 'Slajd obrisan.');

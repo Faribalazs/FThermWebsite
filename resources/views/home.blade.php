@@ -42,9 +42,7 @@
                 <div class="swiper-wrapper">
                     @forelse ($slides as $slide)
                         @php
-                            $slideImage = str_starts_with($slide->image, 'images/')
-                                ? asset($slide->image)
-                                : Storage::url($slide->image);
+                            $slideImage = $slide->image_url;
                             $slideTitle = translate($slide->title) ?: __('ftherm.hero.headline');
                             $slideDescription = translate($slide->description) ?: __('ftherm.hero.subheadline');
                             $slideButton = translate($slide->button_text) ?: __('ftherm.cta.quote');
