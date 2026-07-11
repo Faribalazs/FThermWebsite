@@ -28,7 +28,10 @@ Route::get('/maintenance', function () {
 
 // Redirect root to default locale
 Route::get('/', function () {
-    return redirect('/' . config('app.locale'));
+    $locale = config('app.locale');
+    $locale = $locale === 'rs' ? 'sr' : $locale;
+
+    return redirect('/' . (in_array($locale, ['sr', 'en', 'hu'], true) ? $locale : 'sr'), 301);
 });
 
 // Redirect common typo /rs -> /sr
@@ -107,6 +110,7 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
         ->names('gallery')
         ->except(['show']);
     Route::post('references/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'uploadImage'])->name('gallery.images.upload');
+    Route::delete('references/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImages'])->name('gallery.images.bulk-delete');
     Route::delete('references/images/{image}', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImage'])->name('gallery.images.delete');
     Route::post('references/{gallery}/images/reorder', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'reorderImages'])->name('gallery.images.reorder');
 

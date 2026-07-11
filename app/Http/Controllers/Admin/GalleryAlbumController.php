@@ -136,6 +136,25 @@ class GalleryAlbumController extends Controller
         return back()->with('success', 'Slika uspešno obrisana');
     }
 
+    public function deleteImages(Request $request, GalleryAlbum $gallery)
+    {
+        $validated = $request->validate([
+            'image_ids' => ['required', 'array', 'min:1'],
+            'image_ids.*' => ['integer'],
+        ]);
+
+        $images = $gallery->images()->whereIn('id', $validated['image_ids'])->get();
+
+        if ($images->isEmpty()) {
+            return back()->withErrors(['image_ids' => 'Izaberite najmanje jednu sliku iz ove reference.']);
+        }
+
+        Storage::disk('public')->delete($images->pluck('path')->all());
+        $gallery->images()->whereIn('id', $images->pluck('id'))->delete();
+
+        return back()->with('success', $images->count() . ' slika je uspešno obrisano.');
+    }
+
     public function reorderImages(Request $request, GalleryAlbum $gallery)
     {
         $request->validate([

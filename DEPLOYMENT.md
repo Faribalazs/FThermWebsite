@@ -51,6 +51,41 @@ php artisan deploy:public
 
 - Runs `php artisan optimize`.
 
+## Public storage and uploaded images
+
+By default, deployment tries to create this symbolic link:
+
+```text
+/home/fthermrs/public_html/storage
+→ /home/fthermrs/FThermWebsiteNew/storage/app/public
+```
+
+If cPanel blocks symbolic links, the command automatically copies and synchronizes the files instead. You can explicitly select either mode:
+
+```bash
+php artisan deploy:public --skip-build --storage-mode=link
+php artisan deploy:public --skip-build --storage-mode=copy
+```
+
+When copy mode is used, run the deployment command again to synchronize images uploaded after the previous deployment:
+
+```bash
+php artisan deploy:public --skip-build --no-optimize --storage-mode=copy
+```
+
+For uploads to be written directly into `public_html/storage` on servers that do not permit symbolic links, add this to the production `.env`:
+
+```dotenv
+PUBLIC_STORAGE_PATH=/home/fthermrs/public_html/storage
+```
+
+Then clear the cached configuration:
+
+```bash
+php artisan config:clear
+php artisan deploy:public --skip-build --storage-mode=copy
+```
+
 ## Subsequent deployments
 
 ```bash
@@ -90,9 +125,9 @@ php artisan deploy:public --skip-build --no-optimize
 
 ## Storage-link safety
 
-If `public_html/storage` is a real directory instead of a symbolic link, deployment stops without replacing it. Move its files into `storage/app/public`, remove the old directory manually, and run deployment again.
+If `public_html/storage` is a real directory, automatic mode synchronizes files into it. It no longer stops deployment.
 
-Do not use `php artisan storage:link` for this cPanel layout. Laravel's `public` directory is not the live document root; `deploy:public` creates the link in the correct `public_html` directory.
+Do not use `php artisan storage:link` for this cPanel layout. Laravel's `public` directory is not the live document root; `deploy:public` publishes storage in the correct `public_html` directory.
 
 ## Server requirements
 
@@ -137,3 +172,7 @@ php artisan deploy:public --skip-build
 php artisan optimize:clear
 php artisan deploy:public --skip-build
 ```
+Ezt kell futtatni:
+
+php artisan config:clear
+php artisan deploy:public --skip-build --storage-mode=copy

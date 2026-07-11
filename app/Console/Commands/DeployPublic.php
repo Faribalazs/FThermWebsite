@@ -11,7 +11,8 @@ class DeployPublic extends Command
     protected $signature = 'deploy:public
         {--path= : Absolute public_html path (default: sibling public_html)}
         {--skip-build : Use the existing public/build files}
-        {--no-optimize : Do not rebuild Laravel production caches}';
+        {--no-optimize : Do not rebuild Laravel production caches}
+        {--storage-mode=auto : Storage publishing mode: auto, link, or copy}';
 
     protected $description = 'Build frontend assets and deploy Laravel public files to public_html';
 
@@ -32,9 +33,9 @@ class DeployPublic extends Command
         }
 
         $storageLink = $target.DIRECTORY_SEPARATOR.'storage';
-        if (file_exists($storageLink) && ! is_link($storageLink)) {
-            $this->error("{$storageLink} exists and is not a symbolic link.");
-            $this->line('Move or remove that directory manually, then run the command again.');
+        $storageMode = strtolower((string) $this->option('storage-mode'));
+        if (! in_array($storageMode, ['auto', 'link', 'copy'], true)) {
+            $this->error('The --storage-mode option must be auto, link, or copy.');
             return self::FAILURE;
         }
 
@@ -65,12 +66,8 @@ class DeployPublic extends Command
 
         $storageTarget = storage_path('app/public');
         $files->ensureDirectoryExists($storageTarget, 0755, true);
-        if (is_link($storageLink)) {
-            unlink($storageLink);
-        }
-
-        if (! symlink($storageTarget, $storageLink)) {
-            $this->error('Unable to create the public_html/storage symbolic link.');
+        $publishedStorageMode = $this->publishStorage($files, $storageTarget, $storageLink, $storageMode);
+        if ($publishedStorageMode === null) {
             return self::FAILURE;
         }
 
@@ -80,9 +77,53 @@ class DeployPublic extends Command
 
         $this->newLine();
         $this->components->info('Public deployment completed successfully.');
-        $this->line("Storage: {$storageLink} -> {$storageTarget}");
+        if ($publishedStorageMode === 'link') {
+            $this->line("Storage link: {$storageLink} -> {$storageTarget}");
+        } else {
+            $this->line("Storage copy: {$storageTarget} -> {$storageLink}");
+            $this->components->warn('The server did not use a symbolic link. Run deploy:public again after new uploads to resync files, or set PUBLIC_STORAGE_PATH to the public_html/storage directory.');
+        }
 
         return self::SUCCESS;
+    }
+
+    private function publishStorage(
+        Filesystem $files,
+        string $source,
+        string $destination,
+        string $mode
+    ): ?string {
+        if ($mode !== 'copy') {
+            if (is_link($destination) && realpath($destination) === realpath($source)) {
+                return 'link';
+            }
+
+            if (is_link($destination)) {
+                unlink($destination);
+            }
+
+            if (! file_exists($destination) && @symlink($source, $destination) && is_link($destination)) {
+                return 'link';
+            }
+
+            if ($mode === 'link') {
+                $this->error("Unable to create symbolic link: {$destination} -> {$source}");
+                $this->line('Your hosting may have disabled the PHP symlink() function. Use --storage-mode=copy.');
+                return null;
+            }
+        }
+
+        if (is_link($destination)) {
+            unlink($destination);
+        }
+
+        $files->ensureDirectoryExists($destination, 0755, true);
+        if (! $files->copyDirectory($source, $destination)) {
+            $this->error("Unable to copy public storage to {$destination}.");
+            return null;
+        }
+
+        return 'copy';
     }
 
     private function copyPublicDirectory(Filesystem $files, string $source, string $target): void

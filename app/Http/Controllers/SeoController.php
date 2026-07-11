@@ -15,15 +15,22 @@ class SeoController extends Controller
         $urls = [];
 
         foreach ($locales as $locale) {
-            foreach (['', '/about', '/shop', '/references'] as $path) {
+            $staticPaths = ['', '/about', '/references'];
+            if (shop_enabled()) {
+                $staticPaths[] = '/shop';
+            }
+
+            foreach ($staticPaths as $path) {
                 $urls[] = ['loc' => url("/{$locale}{$path}"), 'priority' => $path === '' ? '1.0' : '0.8'];
             }
 
             foreach (Service::where('active', true)->orderBy('order')->get(['slug', 'updated_at']) as $service) {
                 $urls[] = ['loc' => url("/{$locale}/services/{$service->slug}"), 'lastmod' => $service->updated_at?->toAtomString(), 'priority' => '0.9'];
             }
-            foreach (Product::where('active', true)->orderBy('order')->get(['slug', 'updated_at']) as $product) {
-                $urls[] = ['loc' => url("/{$locale}/shop/{$product->slug}"), 'lastmod' => $product->updated_at?->toAtomString(), 'priority' => '0.7'];
+            if (shop_enabled()) {
+                foreach (Product::where('active', true)->orderBy('order')->get(['slug', 'updated_at']) as $product) {
+                    $urls[] = ['loc' => url("/{$locale}/shop/{$product->slug}"), 'lastmod' => $product->updated_at?->toAtomString(), 'priority' => '0.7'];
+                }
             }
             foreach (GalleryAlbum::where('active', true)->orderBy('order')->get(['slug', 'updated_at']) as $album) {
                 $urls[] = ['loc' => url("/{$locale}/references/{$album->slug}"), 'lastmod' => $album->updated_at?->toAtomString(), 'priority' => '0.6'];

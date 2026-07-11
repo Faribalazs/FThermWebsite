@@ -78,6 +78,114 @@
         </div>
     </div>
 
+    <!-- Website Analytics -->
+    <section class="mb-6 sm:mb-8">
+        <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-xs font-black uppercase tracking-wider text-primary-600">Analitika sajta</p>
+                <h2 class="mt-1 text-lg font-black text-gray-900 sm:text-xl">Posete i popularnost</h2>
+            </div>
+            <p class="text-xs text-gray-500">Podaci bez botova · poslednjih 30 dana</p>
+        </div>
+
+        @if($analytics['available'])
+            <div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                @foreach([
+                    ['label' => 'Danas', 'value' => $analytics['today'], 'color' => 'text-sky-600', 'bg' => 'from-sky-50 to-sky-100'],
+                    ['label' => 'Posete / 7 dana', 'value' => $analytics['seven_days'], 'color' => 'text-indigo-600', 'bg' => 'from-indigo-50 to-indigo-100'],
+                    ['label' => 'Posete / 30 dana', 'value' => $analytics['thirty_days'], 'color' => 'text-primary-600', 'bg' => 'from-primary-50 to-primary-100'],
+                    ['label' => 'Jedinstveni posetioci', 'value' => $analytics['unique_thirty_days'], 'color' => 'text-emerald-600', 'bg' => 'from-emerald-50 to-emerald-100'],
+                ] as $metric)
+                    <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                        <div class="mb-3 h-1.5 w-12 rounded-full bg-gradient-to-r {{ $metric['bg'] }}"></div>
+                        <p class="text-2xl font-black {{ $metric['color'] }} sm:text-3xl">{{ number_format($metric['value']) }}</p>
+                        <p class="mt-1 text-[11px] font-bold text-gray-500 sm:text-xs">{{ $metric['label'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mb-4 grid gap-4 xl:grid-cols-[1.35fr_0.65fr]">
+                <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
+                    <div class="mb-5 flex items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-black text-gray-900">Posete poslednjih 7 dana</h3>
+                            <p class="mt-0.5 text-xs text-gray-500">Dnevni broj pregleda javnih stranica</p>
+                        </div>
+                        <span class="rounded-full px-2.5 py-1 text-xs font-black {{ $analytics['growth'] >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' }}">
+                            {{ $analytics['growth'] >= 0 ? '+' : '' }}{{ $analytics['growth'] }}%
+                        </span>
+                    </div>
+                    @php $trendMax = max(1, $analytics['trend']->max('total')); @endphp
+                    <div class="flex h-44 items-end gap-2 sm:gap-4" aria-label="Grafikon poseta">
+                        @foreach($analytics['trend'] as $day)
+                            <div class="flex min-w-0 flex-1 flex-col items-center justify-end gap-2">
+                                <span class="text-[10px] font-black text-gray-600">{{ $day['total'] }}</span>
+                                <div class="w-full max-w-10 rounded-t-lg bg-gradient-to-t from-primary-600 to-sky-400 transition-all" style="height: {{ max(5, round(($day['total'] / $trendMax) * 112)) }}px"></div>
+                                <span class="text-[9px] font-bold text-gray-400 sm:text-[10px]">{{ $day['date'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 xl:grid-cols-1">
+                    <div class="rounded-2xl border border-gray-100 bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white shadow-sm sm:p-5">
+                        <p class="text-xs font-bold text-slate-300">Promena poseta</p>
+                        <p class="mt-2 text-2xl font-black {{ $analytics['growth'] >= 0 ? 'text-green-300' : 'text-red-300' }}">{{ $analytics['growth'] >= 0 ? '+' : '' }}{{ $analytics['growth'] }}%</p>
+                        <p class="mt-1 text-[10px] leading-4 text-slate-400">u odnosu na prethodnih 30 dana</p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
+                        <p class="text-xs font-bold text-gray-500">Konverzija u upite</p>
+                        <p class="mt-2 text-2xl font-black text-purple-600">{{ $analytics['conversion'] }}%</p>
+                        <p class="mt-1 text-[10px] leading-4 text-gray-400">upiti / jedinstveni posetioci</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-2">
+                <div class="rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <div class="border-b border-gray-100 px-4 py-3 sm:px-5"><h3 class="text-sm font-black text-gray-900">Najpopularnije stranice</h3></div>
+                    <div class="divide-y divide-gray-50">
+                        @forelse($analytics['popular_pages'] as $page)
+                            <div class="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                                <span class="min-w-0 truncate text-xs font-bold text-gray-700" title="{{ $page->path }}">{{ $page->path }}</span>
+                                <span class="flex-shrink-0 rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-black text-primary-700">{{ number_format($page->total) }}</span>
+                            </div>
+                        @empty
+                            <p class="p-5 text-sm text-gray-400">Još nema podataka.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                    @foreach([
+                        ['title' => 'Uređaji', 'items' => $analytics['devices'], 'key' => 'device'],
+                        ['title' => 'Jezici', 'items' => $analytics['languages'], 'key' => 'locale'],
+                        ['title' => 'Izvori', 'items' => $analytics['sources'], 'key' => 'source'],
+                    ] as $group)
+                        <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                            <h3 class="mb-3 text-xs font-black uppercase tracking-wide text-gray-500">{{ $group['title'] }}</h3>
+                            <div class="space-y-3">
+                                @forelse($group['items'] as $item)
+                                    @php $label = $item->{$group['key']}; @endphp
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="min-w-0 truncate text-xs font-bold capitalize text-gray-700">{{ $label }}</span>
+                                        <span class="text-xs font-black text-gray-900">{{ number_format($item->total) }}</span>
+                                    </div>
+                                @empty
+                                    <span class="text-xs text-gray-400">Nema podataka</span>
+                                @endforelse
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @else
+            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                Analitika će biti dostupna nakon pokretanja migracija: <code class="font-bold">php artisan migrate --force</code>
+            </div>
+        @endif
+    </section>
+
     <!-- Recent Inquiries -->
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-6 sm:mb-8">
         <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">

@@ -1,4 +1,5 @@
 @import './worker.scss';
+@import './admin-mobile.scss';
 @import './frontend/_layout.scss';
 @import './frontend/_home.scss';
 @import './frontend/_about.scss';

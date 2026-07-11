@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckMaintenanceMode::class,
             \App\Http\Middleware\ExtendRememberedSession::class,
+            \App\Http\Middleware\CachePublicPages::class,
+            \App\Http\Middleware\TrackPageView::class,
         ]);
         
         $middleware->alias([

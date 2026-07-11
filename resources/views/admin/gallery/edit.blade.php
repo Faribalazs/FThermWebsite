@@ -149,14 +149,19 @@
             <form action="{{ route('admin.gallery.images.upload', $gallery) }}" method="POST" enctype="multipart/form-data" id="upload-form">
                 @csrf
                 <div id="drop-zone"
-                    class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all duration-200 cursor-pointer mb-6"
-                    onclick="document.getElementById('image-input').click()">
+                    class="border-2 border-dashed border-gray-200 rounded-2xl p-5 sm:p-8 text-center hover:border-primary-400 hover:bg-primary-50/30 transition-all duration-200 cursor-pointer mb-6"
+                    role="button" tabindex="0" aria-label="Izaberite slike za otpremanje">
                     <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
                     <p class="text-sm font-bold text-gray-500">Kliknite ili prevucite slike ovde</p>
                     <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — max 8 MB po slici</p>
-                    <input type="file" id="image-input" name="images[]" multiple accept="image/*" class="hidden">
+                    <label for="image-input" class="mt-4 inline-flex min-h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-primary-700 cursor-pointer">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2 1.6-1.6a2 2 0 012.8 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Izaberi slike sa uređaja
+                    </label>
+                    <input type="file" id="image-input" name="images[]" multiple accept="image/jpeg,image/png,image/webp,image/gif" class="sr-only">
+                    <p class="mt-2 text-[11px] text-gray-400 sm:hidden">Možete izabrati više fotografija iz galerije telefona.</p>
                 </div>
 
                 <!-- Preview before upload -->
@@ -164,7 +169,7 @@
                     <p class="text-xs font-bold text-gray-500 mb-3">Pregled pre otpremanja:</p>
                     <div id="preview-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 mb-4"></div>
                     <button type="submit"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-sm font-bold hover:from-primary-700 hover:to-primary-800 shadow transition-all duration-200 hover:-translate-y-0.5">
+                        class="inline-flex min-h-12 w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-sm font-bold hover:from-primary-700 hover:to-primary-800 shadow transition-all duration-200 hover:-translate-y-0.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                         </svg>
@@ -175,12 +180,36 @@
 
             <!-- Existing Images (sortable) -->
             @if($gallery->images->isNotEmpty())
+            <form id="bulk-delete-form" action="{{ route('admin.gallery.images.bulk-delete', $gallery) }}" method="POST"
+                data-confirm="Obrišite sve izabrane slike? Ova radnja se ne može poništiti." data-type="delete" class="mb-4">
+                @csrf
+                @method('DELETE')
+                <div class="flex flex-col gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <label class="inline-flex min-h-11 cursor-pointer items-center gap-3 text-sm font-bold text-gray-700">
+                        <input id="select-all-images" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                        Izaberi sve
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <span id="selected-images-count" class="text-xs font-bold text-gray-500">0 izabrano</span>
+                        <button id="bulk-delete-button" type="submit" disabled
+                            class="inline-flex min-h-11 flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.9 12.1A2 2 0 0116.1 21H7.9a2 2 0 01-2-1.9L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" /></svg>
+                            Obriši izabrane
+                        </button>
+                    </div>
+                </div>
+            </form>
+            @error('image_ids') <p class="mb-3 text-xs font-semibold text-red-600">{{ $message }}</p> @enderror
             <div id="sortable-images" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 @foreach($gallery->images as $image)
                 <div class="relative group cursor-grab active:cursor-grabbing" data-id="{{ $image->id }}">
                     <div class="aspect-square rounded-xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-md transition-shadow duration-200">
                         <img src="{{ Storage::url($image->path) }}" alt="" class="w-full h-full object-cover">
                     </div>
+                    <label class="absolute left-2 top-2 z-20 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/95 shadow-md" aria-label="Izaberi sliku {{ $loop->iteration }}">
+                        <input type="checkbox" name="image_ids[]" value="{{ $image->id }}" form="bulk-delete-form"
+                            class="image-select-checkbox h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                    </label>
                     <!-- Drag handle overlay -->
                     <div class="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-start justify-end p-1.5">
                         <form action="{{ route('admin.gallery.images.delete', $image) }}" method="POST"
@@ -188,7 +217,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                class="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-lg">
+                                class="w-8 h-8 sm:w-6 sm:h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600 shadow-lg">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
@@ -236,6 +265,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     input.addEventListener('change', () => showPreviews(input.files));
+    dropZone.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            input.click();
+        }
+    });
 
     // Drag & drop onto drop zone
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-primary-400', 'bg-primary-50/30'); });
@@ -255,6 +290,8 @@ document.addEventListener('DOMContentLoaded', function () {
         Sortable.create(sortableEl, {
             animation: 150,
             ghostClass: 'opacity-30',
+            filter: 'input, button, label, form',
+            preventOnFilter: false,
             onEnd: function () {
                 const ids = Array.from(sortableEl.querySelectorAll('[data-id]')).map(el => el.dataset.id);
                 fetch('{{ route('admin.gallery.images.reorder', $gallery) }}', {
@@ -272,6 +309,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         });
+    }
+
+    // Bulk image selection
+    const selectAll = document.getElementById('select-all-images');
+    const imageCheckboxes = Array.from(document.querySelectorAll('.image-select-checkbox'));
+    const selectedCount = document.getElementById('selected-images-count');
+    const bulkDeleteButton = document.getElementById('bulk-delete-button');
+
+    function updateBulkSelection() {
+        const count = imageCheckboxes.filter(checkbox => checkbox.checked).length;
+        selectedCount.textContent = `${count} izabrano`;
+        bulkDeleteButton.disabled = count === 0;
+        selectAll.checked = count > 0 && count === imageCheckboxes.length;
+        selectAll.indeterminate = count > 0 && count < imageCheckboxes.length;
+    }
+
+    if (selectAll) {
+        selectAll.addEventListener('change', () => {
+            imageCheckboxes.forEach(checkbox => { checkbox.checked = selectAll.checked; });
+            updateBulkSelection();
+        });
+        imageCheckboxes.forEach(checkbox => checkbox.addEventListener('change', updateBulkSelection));
+        updateBulkSelection();
     }
 
     // Confirm dialogs (same pattern as rest of admin)

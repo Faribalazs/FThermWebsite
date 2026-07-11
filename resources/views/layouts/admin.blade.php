@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-x-hidden">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,7 +27,7 @@
         .animate-slide-in { animation: slideIn 0.3s ease-out; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans antialiased overflow-x-hidden">
+<body class="admin-app bg-gray-50 font-sans antialiased overflow-x-hidden">
     <!-- Mobile Menu Overlay -->
     <div id="mobile-menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
 
@@ -207,7 +207,7 @@
         <div class="flex-1 flex flex-col w-full lg:ml-64 overflow-x-hidden">
             <!-- Mobile Header -->
             <header class="bg-white border-b border-gray-100 sticky top-0 z-30 lg:hidden shadow-sm">
-                <div class="px-4 py-3">
+                <div class="admin-mobile-header px-4 py-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <img src="{{ asset('images/logo.svg') }}" alt="FTHERM" class="h-8 w-auto">
@@ -227,7 +227,7 @@
 
             <!-- Content Area -->
             <main class="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 pb-20 lg:pb-0">
-                <div class="p-4 sm:p-6 lg:p-8">
+                <div class="admin-content-padding p-4 sm:p-6 lg:p-8">
                     <div class="w-full">
                         @if (session('success'))
                             <div class="mb-4 sm:mb-6 bg-gradient-to-r from-green-50 to-green-100/50 border-l-4 border-green-500 p-3 sm:p-4 rounded-xl shadow-lg flex items-center justify-between animate-fade-in-up">

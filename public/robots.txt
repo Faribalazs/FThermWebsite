@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /worker/
 Disallow: /profile
 
-Sitemap: /sitemap.xml
+Sitemap: https://ftherm.rs/sitemap.xml
