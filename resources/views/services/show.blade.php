@@ -35,6 +35,17 @@
 @section('og_image', $image)
 
 @push('head')
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'Service',
+        '@id' => url()->current() . '#service',
+        'name' => $title,
+        'description' => Str::limit(strip_tags($description), 300),
+        'image' => $image,
+        'url' => url()->current(),
+        'areaServed' => ['@type' => 'Country', 'name' => 'Serbia'],
+        'provider' => ['@id' => url('/#organization')],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         .service-page {
             --ft-navy: #071527;

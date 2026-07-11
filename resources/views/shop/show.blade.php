@@ -1,6 +1,36 @@
 @extends('layouts.public')
 
-@section('title', translate($product->name))
+@php
+    $productName = translate($product->name);
+    $productDescription = Str::limit(strip_tags(translate($product->description)), 155);
+    $productImage = $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('images/ftherm/hero-ftherm-technician-ac-installation.webp');
+    $productSchema = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        '@id' => url()->current() . '#product',
+        'name' => $productName,
+        'description' => $productDescription,
+        'image' => $productImage,
+        'category' => $product->category ? translate($product->category->name) : null,
+        'brand' => ['@type' => 'Brand', 'name' => 'FTHERM'],
+        'url' => url()->current(),
+        'offers' => $product->price ? [
+            '@type' => 'Offer',
+            'price' => (string) $product->price,
+            'priceCurrency' => 'RSD',
+            'availability' => 'https://schema.org/InStock',
+            'url' => url()->current(),
+        ] : null,
+    ]);
+@endphp
+
+@section('title', $productName . ' | FTHERM')
+@section('meta_description', $productDescription)
+@section('og_image', $productImage)
+
+@push('head')
+    <script type="application/ld+json">{!! json_encode($productSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+@endpush
 
 @section('content')
 <!-- Breadcrumb -->

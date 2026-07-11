@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\Product;
-use App\Models\HomepageContent;
 use App\Models\Slide;
 use App\Models\GalleryAlbum;
 use App\Models\Faq;
@@ -19,7 +18,6 @@ class HomeController extends Controller
         $featured_products = $shopEnabled
             ? Product::where('active', true)->orderBy('order')->take(6)->get()
             : collect();
-        $hero = HomepageContent::whereIn('key', ['hero_title', 'hero_subtitle', 'hero_cta'])->get()->keyBy('key');
         $slides = Slide::where('active', true)->orderBy('order')->get();
         $galleryAlbums = GalleryAlbum::where('active', true)
             ->with(['images' => fn ($query) => $query->orderBy('order')->limit(1)])
@@ -28,6 +26,6 @@ class HomeController extends Controller
             ->get();
         $faqItems = Faq::where('active', true)->orderBy('order')->get();
 
-        return view('home', compact('services', 'featured_products', 'hero', 'slides', 'shopEnabled', 'galleryAlbums', 'faqItems'));
+        return view('home', compact('services', 'featured_products', 'slides', 'shopEnabled', 'galleryAlbums', 'faqItems'));
     }
 }

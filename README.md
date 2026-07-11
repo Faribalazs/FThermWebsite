@@ -284,41 +284,20 @@ php artisan route:clear
 
 ## 🚀 Production Deployment
 
-1. **Environment**
+Deploy the public website with:
+
 ```bash
-APP_ENV=production
-APP_DEBUG=false
+php artisan deploy:public
 ```
 
-2. **Optimize**
-```bash
-composer install --optimize-autoloader --no-dev
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-npm run build
-```
-
-3. **Security**
-- Change default admin password
-- Set strong `APP_KEY`
-- Configure proper `.env` values
-- Set correct file permissions (755 for directories, 644 for files)
-- Configure SSL certificate
-
-4. **Server Requirements**
-- PHP 8.2+
-- MySQL 5.7+ / MariaDB 10.3+
-- Apache/Nginx with proper rewrite rules
-- Composer
-- Node.js (for builds)
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete cPanel server structure, first deployment, command options, storage-link behavior, permissions, and troubleshooting.
 
 ## 🆘 Troubleshooting
 
 ### Storage not working
 ```bash
-php artisan storage:link
 chmod -R 775 storage bootstrap/cache
+php artisan deploy:public --skip-build
 ```
 
 ### Assets not loading

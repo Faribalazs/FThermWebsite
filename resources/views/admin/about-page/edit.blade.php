@@ -40,7 +40,7 @@
         @csrf
         @method('PUT')
 
-        <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div class="w-full space-y-6">
             <div class="space-y-6">
                 <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg" x-data="{ langTab: 'sr' }">
                     <div class="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-4 sm:px-6">
@@ -159,49 +159,68 @@
                 </div>
             </div>
 
-            <aside class="space-y-6">
+            <section class="space-y-6">
                 <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg">
                     <div class="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-4 sm:px-6">
                         <h2 class="font-bold text-gray-900">Slike</h2>
                         <p class="mt-0.5 text-xs text-gray-500">Hero i detaljna slika stranice</p>
                     </div>
-                    <div class="space-y-6 p-4 sm:p-6">
-                        <div>
-                            <label for="hero_image" class="mb-2 block text-sm font-bold text-gray-700">Hero slika</label>
-                            @if ($heroPreview)
-                                <img src="{{ $heroPreview }}" alt="" class="mb-3 h-40 w-full rounded-xl object-cover">
-                            @endif
-                            <input id="hero_image" name="hero_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
-                            @error('hero_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    <div class="space-y-8 p-4 sm:p-6">
+                        <div class="grid gap-6 md:grid-cols-2">
+                            <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+                                <label for="hero_image" class="mb-2 block text-sm font-bold text-gray-700">Hero slika</label>
+                                @if ($heroPreview)
+                                    <img src="{{ $heroPreview }}" alt="" class="mb-4 h-56 w-full rounded-xl object-cover shadow-sm">
+                                @else
+                                    <div class="mb-4 flex h-56 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white text-sm text-gray-400">Slika nije postavljena</div>
+                                @endif
+                                <input id="hero_image" name="hero_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
+                                <p class="mt-2 text-xs text-gray-500">Ostavite prazno ako ne želite da menjate postojeću sliku.</p>
+                                @error('hero_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+                                <label for="secondary_image" class="mb-2 block text-sm font-bold text-gray-700">Detaljna slika</label>
+                                @if ($secondaryPreview)
+                                    <img src="{{ $secondaryPreview }}" alt="" class="mb-4 h-56 w-full rounded-xl object-cover shadow-sm">
+                                @else
+                                    <div class="mb-4 flex h-56 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white text-sm text-gray-400">Slika nije postavljena</div>
+                                @endif
+                                <input id="secondary_image" name="secondary_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
+                                <p class="mt-2 text-xs text-gray-500">Ostavite prazno ako ne želite da menjate postojeću sliku.</p>
+                                @error('secondary_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            </div>
                         </div>
 
                         <div>
-                            <label for="secondary_image" class="mb-2 block text-sm font-bold text-gray-700">Detaljna slika</label>
-                            @if ($secondaryPreview)
-                                <img src="{{ $secondaryPreview }}" alt="" class="mb-3 h-40 w-full rounded-xl object-cover">
-                            @endif
-                            <input id="secondary_image" name="secondary_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
-                            @error('secondary_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                            <h3 class="mb-1 text-sm font-bold text-gray-800">Opisi slika</h3>
+                            <p class="mb-4 text-xs text-gray-500">Kratko opišite slike radi pristupačnosti i SEO optimizacije.</p>
+                            <div class="space-y-5">
+                                @foreach ($languages as $locale => $language)
+                                    <div class="rounded-xl border border-gray-200 p-4">
+                                        <p class="mb-3 text-sm font-bold text-primary-700"><span class="mr-1">{{ $language['flag'] }}</span> {{ $language['label'] }}</p>
+                                        <div class="grid gap-4 md:grid-cols-2">
+                                            <div>
+                                                <label for="hero_image_alt_{{ $locale }}" class="mb-1.5 block text-xs font-bold text-gray-600">Opis hero slike</label>
+                                                <input id="hero_image_alt_{{ $locale }}" name="hero_image_alt_{{ $locale }}" type="text" value="{{ $topValue('hero_image_alt', $locale) }}" class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
+                                            </div>
+                                            <div>
+                                                <label for="secondary_image_alt_{{ $locale }}" class="mb-1.5 block text-xs font-bold text-gray-600">Opis detaljne slike</label>
+                                                <input id="secondary_image_alt_{{ $locale }}" name="secondary_image_alt_{{ $locale }}" type="text" value="{{ $topValue('secondary_image_alt', $locale) }}" class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-
-                        @foreach ($languages as $locale => $language)
-                            <div>
-                                <label for="hero_image_alt_{{ $locale }}" class="mb-1.5 block text-xs font-bold text-gray-600">Hero alt {{ $language['label'] }}</label>
-                                <input id="hero_image_alt_{{ $locale }}" name="hero_image_alt_{{ $locale }}" type="text" value="{{ $topValue('hero_image_alt', $locale) }}" class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
-                            </div>
-                            <div>
-                                <label for="secondary_image_alt_{{ $locale }}" class="mb-1.5 block text-xs font-bold text-gray-600">Detaljna alt {{ $language['label'] }}</label>
-                                <input id="secondary_image_alt_{{ $locale }}" name="secondary_image_alt_{{ $locale }}" type="text" value="{{ $topValue('secondary_image_alt', $locale) }}" class="w-full rounded-xl border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500">
-                            </div>
-                        @endforeach
                     </div>
                 </div>
 
-                <div class="flex flex-col-reverse gap-3">
-                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition hover:bg-gray-50">Otkaži</a>
-                    <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:from-primary-700 hover:to-primary-800">Sačuvaj O nama</button>
+                <div class="sticky bottom-4 z-10 flex flex-col-reverse gap-3 rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-xl backdrop-blur sm:flex-row sm:items-center sm:justify-end">
+                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-bold text-gray-700 shadow-sm transition hover:bg-gray-50">Otkaži</a>
+                    <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 px-7 py-3 text-sm font-bold text-white shadow-lg transition hover:from-primary-700 hover:to-primary-800">Sačuvaj izmene</button>
                 </div>
-            </aside>
+            </section>
         </div>
     </form>
 </div>

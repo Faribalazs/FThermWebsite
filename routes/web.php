@@ -12,11 +12,14 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InquiryController;
-use App\Http\Controllers\Admin\HomepageContentController;
 use App\Http\Controllers\Admin\CatalogSettingController;
 use App\Http\Controllers\Admin\AboutPageController as AdminAboutPageController;
 use App\Http\Controllers\Admin\FaqController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SeoController;
+
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
 
 // Maintenance
 Route::get('/maintenance', function () {
@@ -85,9 +88,6 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     Route::post('inquiries/notification-email', [InquiryController::class, 'updateNotificationEmail'])->name('inquiries.notification-email.update');
     Route::patch('inquiries/{inquiry}/mark-read', [InquiryController::class, 'markAsRead'])->name('inquiries.mark-read');
     
-    // Homepage Content Management
-    Route::resource('homepage-contents', HomepageContentController::class);
-
     // About Page Management
     Route::get('about-page', [AdminAboutPageController::class, 'edit'])->name('about-page.edit');
     Route::put('about-page', [AdminAboutPageController::class, 'update'])->name('about-page.update');

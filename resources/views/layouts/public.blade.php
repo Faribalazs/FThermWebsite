@@ -9,6 +9,7 @@
     $shopEnabled = shop_enabled();
     $companyPhone = setting_value('company_phone');
     $companyEmail = setting_value('company_email');
+    $companyAddress = setting_value('company_address');
     $telHref = $companyPhone ? 'tel:' . preg_replace('/[^\d+]/', '', $companyPhone) : null;
     $facebookUrl = 'https://www.facebook.com/people/FTherm/100094193259896/';
     $instagramUrl = 'https://www.instagram.com/ftherm.rs/';
@@ -17,6 +18,41 @@
     $metaKeywords = trim($__env->yieldContent('meta_keywords')) ?: __('ftherm.seo.keywords');
     $canonicalUrl = trim($__env->yieldContent('canonical')) ?: url()->current();
     $ogImage = trim($__env->yieldContent('og_image')) ?: asset('images/ftherm/hero-ftherm-technician-ac-installation.webp');
+    $robots = trim($__env->yieldContent('robots')) ?: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    $schemaGraph = [
+        [
+            '@type' => ['Organization', 'LocalBusiness'],
+            '@id' => url('/#organization'),
+            'name' => 'FTHERM',
+            'url' => url('/'),
+            'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo.svg')],
+            'image' => $ogImage,
+            'telephone' => $companyPhone,
+            'email' => $companyEmail,
+            'address' => $companyAddress ? ['@type' => 'PostalAddress', 'streetAddress' => $companyAddress, 'addressCountry' => 'RS'] : null,
+            'sameAs' => [$facebookUrl, $instagramUrl],
+        ],
+        [
+            '@type' => 'WebSite',
+            '@id' => url('/#website'),
+            'url' => url('/'),
+            'name' => 'FTHERM',
+            'inLanguage' => array_keys($supportedLocales),
+            'publisher' => ['@id' => url('/#organization')],
+        ],
+        [
+            '@type' => 'WebPage',
+            '@id' => $canonicalUrl . '#webpage',
+            'url' => $canonicalUrl,
+            'name' => $pageTitle,
+            'description' => $metaDescription,
+            'inLanguage' => $currentLocale,
+            'isPartOf' => ['@id' => url('/#website')],
+            'about' => ['@id' => url('/#organization')],
+            'primaryImageOfPage' => ['@type' => 'ImageObject', 'url' => $ogImage],
+        ],
+    ];
+    $schemaGraph = array_map(fn ($item) => array_filter($item, fn ($value) => $value !== null && $value !== ''), $schemaGraph);
 @endphp
 
 <head>
@@ -25,18 +61,29 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="{{ $metaDescription }}">
     <meta name="keywords" content="{{ $metaKeywords }}">
+    <meta name="robots" content="{{ $robots }}">
+    <meta name="author" content="FTHERM">
+    <meta name="theme-color" content="#071527">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $metaDescription }}">
     <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:site_name" content="FTHERM">
+    <meta property="og:locale" content="{{ str_replace('-', '_', app()->getLocale()) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $metaDescription }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @foreach ($supportedLocales as $locale => $label)
         <link rel="alternate" hreflang="{{ $locale }}" href="{{ change_locale_url($locale) }}">
     @endforeach
     <link rel="alternate" hreflang="x-default" href="{{ change_locale_url('sr') }}">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
     <title>{{ $pageTitle }}</title>
+    <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         [x-cloak] { display: none !important; }

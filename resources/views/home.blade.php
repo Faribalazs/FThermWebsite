@@ -21,24 +21,10 @@
         'M4 7h16M7 7v10a2 2 0 002 2h6a2 2 0 002-2V7M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2',
         'M13 2L4 14h7l-1 8 10-13h-7l0-7z',
     ];
-    $structuredData = array_filter([
-        '@context' => 'https://schema.org',
-        '@type' => 'LocalBusiness',
-        'name' => 'FTHERM',
-        'url' => route('home'),
-        'image' => asset('images/ftherm/hero-ftherm-technician-ac-installation.webp'),
-        'telephone' => $companyPhone,
-        'email' => $companyEmail,
-        'address' => $companyAddress ? ['@type' => 'PostalAddress', 'streetAddress' => $companyAddress] : null,
-        'description' => __('ftherm.seo.meta_description'),
-        'areaServed' => 'Serbia',
-        'priceRange' => '$$',
-    ]);
 @endphp
 
 @push('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         .ftherm-home,
         .home-loader {
