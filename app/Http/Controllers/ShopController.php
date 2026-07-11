@@ -11,7 +11,9 @@ class ShopController extends Controller
     public function index(Request $request)
     {
         if (!shop_enabled()) {
-            abort(404);
+            return redirect()->route('home', [
+                'locale' => $request->route('locale') ?: 'sr',
+            ], 301);
         }
 
         $query = Product::where('active', true)->with('category', 'primaryImage');
@@ -29,7 +31,7 @@ class ShopController extends Controller
     public function show(string $locale, Product $product)
     {
         if (!shop_enabled()) {
-            abort(404);
+            return redirect()->route('home', ['locale' => $locale], 301);
         }
 
         $product->load('category', 'images');
