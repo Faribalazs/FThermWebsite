@@ -85,391 +85,14 @@
     <title>{{ $pageTitle }}</title>
     <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>
-        [x-cloak] { display: none !important; }
-
-        .contact-success-popup {
-            width: min(92vw, 31rem) !important;
-            border: 1px solid rgba(9, 83, 154, 0.16) !important;
-            border-radius: 8px !important;
-            box-shadow: 0 28px 80px rgba(7, 21, 39, 0.24) !important;
-        }
-
-        .contact-success-popup .swal2-title {
-            color: #071527 !important;
-            font-weight: 900 !important;
-            letter-spacing: 0 !important;
-        }
-
-        .contact-success-popup .swal2-html-container {
-            color: #475569 !important;
-            font-weight: 600 !important;
-            line-height: 1.65 !important;
-        }
-
-        .contact-success-popup .swal2-success-ring {
-            border-color: rgba(9, 83, 154, 0.2) !important;
-        }
-
-        .contact-success-popup .swal2-success-line-tip,
-        .contact-success-popup .swal2-success-line-long {
-            background-color: #09539a !important;
-        }
-
-        .contact-success-confirm {
-            border-radius: 999px !important;
-            background: linear-gradient(135deg, #09539a, #0c93ea) !important;
-            padding: 0.85rem 1.65rem !important;
-            font-weight: 900 !important;
-            box-shadow: 0 14px 30px rgba(9, 83, 154, 0.25) !important;
-        }
-
-        .site-topbar {
-            --site-topbar-bg: linear-gradient(135deg, rgba(7, 21, 39, 0.98), rgba(9, 83, 154, 0.96)), #071527;
-            position: relative;
-            z-index: 45;
-            isolation: isolate;
-            overflow: hidden;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-            background: var(--site-topbar-bg);
-            box-shadow: 0 10px 30px rgba(7, 21, 39, 0.18);
-        }
-
-        .site-topbar::before {
-            display: none;
-        }
-
-        .site-topbar > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .site-topbar-contact {
-            display: inline-flex;
-            flex: 0 1 auto;
-            min-width: 0;
-            align-items: center;
-            justify-content: center;
-            gap: 0.55rem;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.13);
-            background: rgba(255, 255, 255, 0.075);
-            padding: 0.42rem 0.82rem 0.42rem 0.5rem;
-            color: #dbeafe;
-            font-weight: 800;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.12),
-                0 8px 20px rgba(2, 6, 23, 0.12);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
-        }
-
-        .site-topbar-contact:hover {
-            transform: translateY(-1px);
-            border-color: rgba(103, 232, 249, 0.34);
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-        }
-
-        .site-topbar-contact__icon {
-            display: inline-grid;
-            width: 1.55rem;
-            height: 1.55rem;
-            flex: 0 0 auto;
-            place-items: center;
-            border-radius: 999px;
-            color: #ffffff;
-            box-shadow: 0 9px 18px rgba(2, 6, 23, 0.18);
-        }
-
-        .site-topbar-contact--phone .site-topbar-contact__icon {
-            background: linear-gradient(135deg, #dd2131, #a91624);
-        }
-
-        .site-topbar-contact--email .site-topbar-contact__icon {
-            background: linear-gradient(135deg, #0c93ea, #09539a);
-        }
-
-        .site-topbar-contact__text {
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .site-social-link {
-            display: inline-grid;
-            width: 2.35rem;
-            height: 2.35rem;
-            flex: 0 0 auto;
-            place-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.13);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.075);
-            color: #ffffff;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.12),
-                0 8px 20px rgba(2, 6, 23, 0.12);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-        }
-
-        .site-social-link:hover {
-            transform: translateY(-1px);
-            border-color: rgba(103, 232, 249, 0.34);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .site-social-link svg {
-            width: 1rem;
-            height: 1rem;
-        }
-
-        .site-header {
-            padding: 0.85rem clamp(0.75rem, 2.5vw, 2rem);
-            margin-bottom: calc(-5rem - 1.7rem);
-            background: transparent;
-            pointer-events: none;
-        }
-
-        .site-header::after {
-            display: none;
-        }
-
-        .site-nav-shell {
-            position: relative;
-            isolation: isolate;
-            overflow: visible;
-            pointer-events: auto;
-            border-radius: 2rem;
-            border: 0;
-            background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(245, 250, 255, 0.74) 46%, rgba(224, 241, 255, 0.62)),
-                rgba(255, 255, 255, 0.78);
-            box-shadow:
-                0 18px 42px rgba(7, 21, 39, 0.22),
-                0 5px 14px rgba(7, 21, 39, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9),
-                inset 0 -1px 0 rgba(9, 83, 154, 0.08);
-            backdrop-filter: blur(24px) saturate(1.32);
-            -webkit-backdrop-filter: blur(24px) saturate(1.32);
-        }
-
-        .site-nav-shell::after {
-            content: "";
-            position: absolute;
-            z-index: -1;
-            left: 8%;
-            right: 8%;
-            bottom: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(9, 83, 154, 0.28), rgba(221, 33, 49, 0.22), transparent);
-            pointer-events: none;
-        }
-
-        .site-nav-link {
-            border-radius: 999px;
-            text-transform: uppercase;
-            letter-spacing: 0;
-            transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .site-nav-link:hover {
-            transform: translateY(-1px);
-            box-shadow: inset 0 0 0 1px rgba(9, 83, 154, 0.08);
-        }
-
-        .site-action,
-        .site-icon-button,
-        .site-lang-button {
-            border-radius: 999px;
-        }
-
-        .site-lang-menu {
-            z-index: 90;
-            border-radius: 1rem;
-        }
-
-        .site-flag {
-            display: inline-block;
-            font-size: 0.88rem;
-            line-height: 1;
-        }
-
-        .site-lang-option {
-            transition: background 0.18s ease, color 0.18s ease;
-        }
-
-        .site-mobile-nav-link {
-            text-transform: uppercase;
-            letter-spacing: 0;
-        }
-
-        .site-footer {
-            --site-footer-bg: linear-gradient(135deg, rgba(7, 21, 39, 0.98), rgba(9, 83, 154, 0.96)), #071527;
-            position: relative;
-            isolation: isolate;
-            overflow: hidden;
-            margin-top: 0;
-            border-top: 0;
-            background: var(--site-footer-bg);
-            color: #ffffff;
-            padding: clamp(2.4rem, 4.8vw, 3.4rem) 0 clamp(0.9rem, 2vw, 1.5rem);
-            box-shadow: 0 -28px 70px rgba(7, 21, 39, 0.12);
-            clip-path: polygon(
-                0 26%,
-                10% 21%,
-                22% 16%,
-                34% 11%,
-                46% 8%,
-                50% 7%,
-                54% 8%,
-                66% 11%,
-                78% 16%,
-                90% 21%,
-                100% 26%,
-                100% 100%,
-                0 100%
-            );
-        }
-
-        .site-footer::before {
-            display: none;
-        }
-
-        .site-footer::after {
-            display: none;
-        }
-
-        .footer-shell {
-            width: min(1440px, calc(100% - 2rem));
-        }
-
-        .site-footer > * {
-            position: relative;
-            z-index: 2;
-        }
-
-        .footer-action {
-            min-width: 0;
-            max-width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 999px;
-            background: transparent;
-            color: #ffffff;
-            box-shadow: none;
-            transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
-        }
-
-        .footer-action:hover {
-            transform: translateY(-1px);
-            border-color: rgba(103, 232, 249, 0.36);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .footer-action__icon {
-            display: inline-grid;
-            width: 1.9rem;
-            height: 1.9rem;
-            flex: 0 0 auto;
-            place-items: center;
-            border-radius: 999px;
-            color: #ffffff;
-        }
-
-        .footer-action__icon svg {
-            display: block;
-        }
-
-        .footer-action--phone .footer-action__icon {
-            background: linear-gradient(135deg, #dd2131, #a91624);
-        }
-
-        .footer-action--email .footer-action__icon {
-            background: linear-gradient(135deg, #0c93ea, #09539a);
-        }
-
-        .footer-action__text {
-            min-width: 0;
-            max-width: min(18rem, 68vw);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .footer-social-link {
-            display: inline-grid;
-            width: 2.45rem;
-            height: 2.45rem;
-            flex: 0 0 auto;
-            place-items: center;
-            padding: 0;
-        }
-
-        .footer-social-link svg {
-            display: block;
-            width: 1rem;
-            height: 1rem;
-        }
-
-        .footer-logo-mark {
-            display: inline-flex;
-            align-items: center;
-            width: fit-content;
-        }
-
-        .footer-logo-mark img {
-            filter: drop-shadow(0 10px 18px rgba(2, 6, 23, 0.18));
-        }
-
-        @media (max-width: 767px) {
-            .site-header {
-                margin-bottom: calc(-5rem - 1.7rem);
-            }
-
-            .site-nav-shell {
-                border-radius: 1.45rem;
-            }
-
-            .site-topbar-contact {
-                flex: 1 1 0;
-                padding-right: 0.66rem;
-                font-size: 0.72rem;
-            }
-
-            .site-footer {
-                clip-path: none;
-                padding-top: 1.35rem;
-            }
-
-            .footer-action:not(.footer-social-link) {
-                width: 100%;
-            }
-
-            .footer-logo-mark {
-                margin-inline: auto;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
     @stack('head')
 </head>
 
 <body class="bg-white font-sans antialiased text-slate-900" x-data="{ mobileMenu: false, languageOpen: false }">
     @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
         <div class="site-topbar text-white">
-            <div class="mx-auto flex max-w-[1440px] items-center justify-center px-4 py-2 text-xs lg:px-10">
-                <div class="flex w-full flex-wrap items-center justify-center gap-2 sm:w-auto sm:gap-3">
+            <div class="site-topbar-inner mx-auto flex max-w-[1440px] items-center justify-center text-xs">
+                <div class="site-topbar-items flex w-full items-center justify-center sm:w-auto">
                     @if ($companyPhone)
                         <a href="{{ $telHref }}" class="site-topbar-contact site-topbar-contact--phone" aria-label="{{ __('ftherm.contact.phone') }}: {{ $companyPhone }}">
                             <span class="site-topbar-contact__icon">
@@ -508,9 +131,9 @@
     @endif
 
     <header class="site-header sticky top-0 z-40">
-        <nav class="site-nav-shell mx-auto flex min-h-20 max-w-[1440px] items-center justify-between px-4 lg:px-10" aria-label="Main navigation">
+        <nav class="site-nav-shell mx-auto flex max-w-[1440px] items-center justify-between px-4 lg:px-10" aria-label="Main navigation">
             <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="FTHERM">
-                <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-14 w-auto">
+                <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="site-logo w-auto">
             </a>
 
             <div class="hidden items-center gap-1 lg:flex">
@@ -553,7 +176,7 @@
                         {{ __('ftherm.cta.call') }}
                     </a>
                 @endif
-                <button type="button" @click="mobileMenu = true" class="site-icon-button inline-flex h-11 w-11 items-center justify-center border border-slate-200 text-slate-700 lg:hidden" aria-label="Open menu">
+                <button type="button" @click="mobileMenu = true" class="site-icon-button inline-flex items-center justify-center border border-slate-200 text-slate-700 lg:hidden" aria-label="Open menu">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
                     </svg>
@@ -670,11 +293,10 @@
     </footer>
 
     @if ($companyPhone)
-        <a href="{{ $telHref }}" class="fixed bottom-4 right-4 z-30 inline-flex items-center gap-2 rounded bg-[#DD2131] px-4 py-3 text-sm font-black text-white shadow-lg shadow-red-900/20 md:hidden" aria-label="{{ __('ftherm.cta.call') }}">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="{{ $telHref }}" class="mobile-call-button fixed bottom-4 right-4 z-30 inline-flex items-center justify-center text-white md:hidden" aria-label="{{ __('ftherm.cta.call') }}">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
             </svg>
-            {{ __('ftherm.cta.call') }}
         </a>
     @endif
 

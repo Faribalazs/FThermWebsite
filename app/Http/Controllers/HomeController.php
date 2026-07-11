@@ -22,7 +22,7 @@ class HomeController extends Controller
         $galleryAlbums = GalleryAlbum::where('active', true)
             ->with(['images' => fn ($query) => $query->orderBy('order')->limit(1)])
             ->orderBy('order')
-            ->take(3)
+            ->take(10)
             ->get();
         $faqItems = Faq::where('active', true)->orderBy('order')->get();
 

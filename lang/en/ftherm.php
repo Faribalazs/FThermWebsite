@@ -77,6 +77,7 @@ return [
     ],
 
     'seasonal' => [
+        'eyebrow' => 'Seasonal preparation',
         'title' => 'Do not wait for the heatwave - prepare in time',
         'text' => 'An air conditioner circulates the air in the room, so regular cleaning matters both for the equipment and for everyday comfort. Pre-season maintenance can help prevent unpleasant odours, weaker performance and unexpected issues.',
         'bullets' => [
@@ -113,7 +114,7 @@ return [
     'gallery' => [
         'title' => 'References and our work',
         'text' => 'View previous work: air conditioning installation, heat pump systems, underfloor heating, plumbing and refrigeration projects.',
-        'cta' => 'View references',
+        'cta' => 'View all',
         'placeholder' => 'Real project photos will be added here when available.',
     ],
 
@@ -124,6 +125,9 @@ return [
 
     'faq' => [
         'title' => 'FAQ',
+        'eyebrow' => 'Quick answers',
+        'intro' => 'Find answers to common questions about air conditioning, heating, cooling and our services.',
+        'contact' => 'Have another question?',
         'items' => [
             ['question' => 'When should I request AC cleaning?', 'answer' => 'Ideally before the cooling season, and also before the heating season if the unit is used for heating. With regular use, inspection and cleaning are recommended at least once a year.'],
             ['question' => 'What size air conditioner do I need?', 'answer' => 'It depends on room size, insulation, orientation, windows and how the space is used. An accurate recommendation can be made after a survey or consultation.'],

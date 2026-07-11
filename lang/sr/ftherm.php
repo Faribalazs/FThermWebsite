@@ -77,6 +77,7 @@ return [
     ],
 
     'seasonal' => [
+        'eyebrow' => 'Sezonska priprema',
         'title' => 'Ne čekajte velike vrućine - pripremite se na vreme',
         'text' => 'Klima uređaj kruži vazduh iz prostorije, zato je redovno čišćenje važno i za uređaj i za osećaj komfora. Održavanje pre sezone može pomoći da se izbegnu neprijatni mirisi, slabiji učinak i neočekivani kvarovi.',
         'bullets' => [
@@ -113,7 +114,7 @@ return [
     'gallery' => [
         'title' => 'Reference i naši radovi',
         'text' => 'Pogledajte prethodne radove: ugradnja klima uređaja, sistemi sa toplotnim pumpama, podno grejanje, vodoinstalacije i rashladna tehnika.',
-        'cta' => 'Pogledaj reference',
+        'cta' => 'Pogledaj sve',
         'placeholder' => 'Stvarne fotografije projekata biće dodate kada budu dostupne.',
     ],
 
@@ -124,6 +125,9 @@ return [
 
     'faq' => [
         'title' => 'Česta pitanja',
+        'eyebrow' => 'Brzi odgovori',
+        'intro' => 'Pronađite odgovore na najčešća pitanja o klima uređajima, grejanju, hlađenju i našim uslugama.',
+        'contact' => 'Imate drugo pitanje?',
         'items' => [
             ['question' => 'Kada je najbolje uraditi čišćenje klime?', 'answer' => 'Najbolje pre sezone hlađenja, a kod klima koje se koriste za grejanje i pre grejne sezone. Kod redovne upotrebe preporučuje se provera i čišćenje najmanje jednom godišnje.'],
             ['question' => 'Kolika klima je potrebna za prostoriju?', 'answer' => 'To zavisi od kvadrature, izolacije, orijentacije, prozora i načina korišćenja prostora. Tačan predlog se daje nakon procene ili dogovora.'],

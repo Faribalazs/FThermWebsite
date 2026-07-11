@@ -77,6 +77,7 @@ return [
     ],
 
     'seasonal' => [
+        'eyebrow' => 'Szezonális felkészülés',
         'title' => 'Ne várja meg a kánikulát - készüljön fel időben',
         'text' => 'A klímaberendezés a helyiség levegőjét keringeti, ezért a rendszeres tisztítás nemcsak a készüléknek, hanem a komfortérzetnek is fontos. A szezon előtti karbantartás segíthet megelőzni a kellemetlen szagokat, a gyengébb teljesítményt és a váratlan meghibásodásokat.',
         'bullets' => [
@@ -113,7 +114,7 @@ return [
     'gallery' => [
         'title' => 'Referenciák és munkáink',
         'text' => 'Nézze meg korábbi kivitelezéseinket: klímaszerelés, hőszivattyús rendszerek, padlófűtés, vízszerelés és hűtéstechnikai munkák.',
-        'cta' => 'Referenciák megtekintése',
+        'cta' => 'Összes megtekintése',
         'placeholder' => 'Valós projektfotók kerülnek ide, amint elérhetők.',
     ],
 
@@ -124,6 +125,9 @@ return [
 
     'faq' => [
         'title' => 'Gyakori kérdések',
+        'eyebrow' => 'Gyors válaszok',
+        'intro' => 'Válaszok a klímával, fűtéssel, hűtéssel és szolgáltatásainkkal kapcsolatos leggyakoribb kérdésekre.',
+        'contact' => 'Más kérdése van?',
         'items' => [
             ['question' => 'Mikor érdemes klímatisztítást kérni?', 'answer' => 'Legjobb a hűtési szezon előtt, illetve fűtésre használt klímáknál a fűtési szezon előtt is. Rendszeres használat mellett évente legalább egyszer ajánlott ellenőriztetni és tisztíttatni.'],
             ['question' => 'Mekkora klíma kell egy helyiségbe?', 'answer' => 'Ez függ az alapterülettől, szigeteléstől, tájolástól, nyílászáróktól és a használattól. Pontos javaslatot felmérés vagy egyeztetés alapján lehet adni.'],

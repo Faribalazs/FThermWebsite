@@ -1,4 +1,10 @@
 @import './worker.scss';
+@import './frontend/_layout.scss';
+@import './frontend/_home.scss';
+@import './frontend/_about.scss';
+@import './frontend/_services.scss';
+@import './frontend/_references-index.scss';
+@import './frontend/_references-show.scss';
 @import 'flatpickr/dist/flatpickr.min.css';
 @import 'sweetalert2/dist/sweetalert2.min.css';
 

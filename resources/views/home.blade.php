@@ -25,714 +25,6 @@
 
 @push('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-    <style>
-        .ftherm-home,
-        .home-loader {
-            --ft-navy: #071527;
-            --ft-ink: #0f172a;
-            --ft-blue: #09539a;
-            --ft-blue-soft: #0c93ea;
-            --ft-red: #dd2131;
-            --ft-red-dark: #a91624;
-            --ft-cyan: #67e8f9;
-            --ft-ice: #f0f9ff;
-            --ft-border: #d8e5f0;
-            color: var(--ft-ink);
-            background: #ffffff;
-        }
-
-        .home-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 80;
-            display: grid;
-            place-items: center;
-            background:
-                linear-gradient(135deg, rgba(7, 21, 39, 0.98), rgba(9, 83, 154, 0.96)),
-                #071527;
-            color: #ffffff;
-            pointer-events: none;
-            animation: loaderFallback 0.5s ease 2.8s forwards;
-        }
-
-        .home-loader.is-hidden {
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.45s ease, visibility 0.45s ease;
-        }
-
-        .loader-unit {
-            width: min(30rem, calc(100vw - 2rem));
-            text-align: center;
-        }
-
-        .loader-logo {
-            display: inline-grid;
-            place-items: center;
-            width: min(17rem, 72vw);
-            height: min(11rem, 46vw);
-        }
-
-        .loader-logo svg {
-            width: min(13.5rem, 58vw);
-            height: auto;
-            overflow: visible;
-        }
-
-        .loader-logo svg path {
-            fill: transparent !important;
-            stroke: rgba(255, 255, 255, 0.92);
-            stroke-width: 12;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            stroke-dasharray: 4200;
-            stroke-dashoffset: 4200;
-            animation: logoTrace 1.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, logoFillWhite 0.45s ease 1.45s forwards;
-        }
-
-        .loader-logo svg path:not(:first-of-type):not(:last-of-type) {
-            stroke: var(--ft-blue-soft);
-            animation-name: logoTrace, logoFillBlue;
-        }
-
-        .loader-logo svg path:last-of-type {
-            stroke: var(--ft-red);
-            animation-name: logoTrace, logoFillRed;
-        }
-
-        .hero-premium {
-            min-height: clamp(660px, 88vh, 900px);
-            background: var(--ft-navy);
-            border-radius: 0;
-            box-shadow: none;
-            border-bottom: 0;
-        }
-
-        .hero-swiper,
-        .hero-swiper .swiper-wrapper,
-        .hero-swiper .swiper-slide {
-            min-height: inherit;
-        }
-
-        .hero-premium::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-            background-size: 72px 72px;
-            mask-image:
-                linear-gradient(90deg, #000 0%, transparent 74%),
-                linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
-            opacity: 0.14;
-            pointer-events: none;
-        }
-
-        .hero-premium::after {
-            display: none;
-        }
-
-        .hero-premium__image {
-            filter: saturate(1.14) contrast(1.05) brightness(1.04);
-            object-position: 60% center;
-        }
-
-        .hero-premium__overlay {
-            background:
-                radial-gradient(circle at 78% 34%, rgba(9, 83, 154, 0.1), transparent 34%),
-                radial-gradient(circle at 18% 78%, rgba(221, 33, 49, 0.08), transparent 32%),
-                linear-gradient(90deg, rgba(7, 21, 39, 0.72) 0%, rgba(7, 21, 39, 0.44) 38%, rgba(7, 21, 39, 0.08) 100%),
-                linear-gradient(180deg, rgba(7, 21, 39, 0.02), rgba(7, 21, 39, 0.24));
-        }
-
-        .section-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--ft-blue);
-            font-size: 0.82rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .section-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ft-red);
-        }
-
-        .section-kicker--light {
-            color: #bdefff;
-        }
-
-        .section-kicker--light::before {
-            background: var(--ft-red);
-        }
-
-        .hero-title {
-            text-wrap: balance;
-            text-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
-        }
-
-        .hero-copy,
-        .balanced-copy {
-            text-wrap: pretty;
-        }
-
-        .ft-btn {
-            position: relative;
-            overflow: hidden;
-            border-radius: 6px;
-            transform: translateZ(0);
-            transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
-        }
-
-        .ft-btn::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            transform: translateX(-120%) skewX(-18deg);
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
-            transition: transform 0.7s ease;
-        }
-
-        .ft-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .ft-btn:hover::after {
-            transform: translateX(120%) skewX(-18deg);
-        }
-
-        .ft-btn-red {
-            background: linear-gradient(135deg, var(--ft-red), var(--ft-red-dark));
-            box-shadow: 0 20px 50px rgba(221, 33, 49, 0.28);
-        }
-
-        .ft-btn-blue {
-            background: linear-gradient(135deg, var(--ft-blue), var(--ft-blue-soft));
-            box-shadow: 0 20px 50px rgba(9, 83, 154, 0.22);
-        }
-
-        .ft-btn-ghost {
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(14px);
-        }
-
-        .hero-arrow {
-            width: 3rem;
-            height: 3rem;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            backdrop-filter: blur(14px);
-            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .hero-arrow:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.16);
-        }
-
-        .hero-pagination .swiper-pagination-bullet {
-            width: 2.25rem;
-            height: 3px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.36);
-            opacity: 1;
-        }
-
-        .hero-pagination .swiper-pagination-bullet-active {
-            background: linear-gradient(90deg, var(--ft-blue-soft), var(--ft-red));
-        }
-
-        .trust-showcase {
-            isolation: isolate;
-            padding-bottom: 12rem;
-            background: var(--ft-blue);
-            background-image: linear-gradient(var(--ft-blue) 1%, #fff 100%);
-        }
-
-        .trust-showcase::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(120deg, transparent 0 42%, rgba(103, 232, 249, 0.1) 42% 42.3%, transparent 42.3% 100%);
-            background-size: 76px 76px, 76px 76px, 100% 100%;
-            -webkit-mask-image: linear-gradient(180deg, transparent 0%, transparent 30%, #000 46%, #000 84%, transparent 100%);
-            mask-image: linear-gradient(180deg, transparent 0%, transparent 30%, #000 46%, #000 84%, transparent 100%);
-            opacity: 0.26;
-            pointer-events: none;
-        }
-
-        .trust-showcase::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background:
-                linear-gradient(180deg, transparent 0%, transparent 62%, rgba(255, 255, 255, 0.2) 78%, #ffffff 92%, #ffffff 100%);
-            pointer-events: none;
-        }
-
-        .trust-showcase__intro {
-            border-left: 3px solid var(--ft-cyan);
-            color: #d9efff;
-        }
-
-        .trust-showcase .section-kicker--light::before {
-            background: var(--ft-cyan);
-        }
-
-        .trust-stat {
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(7, 21, 39, 0.18);
-            box-shadow: 0 18px 46px rgba(7, 21, 39, 0.12);
-            backdrop-filter: blur(18px);
-        }
-
-        .trust-card {
-            position: relative;
-            min-height: 17rem;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.32);
-            background:
-                linear-gradient(180deg, rgba(7, 21, 39, 0.36), rgba(9, 83, 154, 0.22)),
-                rgba(6, 32, 58, 0.34);
-            box-shadow:
-                0 30px 86px rgba(7, 21, 39, 0.26),
-                inset 0 1px 0 rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(22px) saturate(1.16);
-        }
-
-        .trust-card::before {
-            content: "";
-            position: absolute;
-            inset-inline: 0;
-            top: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--ft-red), var(--ft-cyan), #ffffff);
-            box-shadow: 0 0 28px rgba(103, 232, 249, 0.42);
-        }
-
-        .trust-card::after {
-            content: "";
-            position: absolute;
-            inset: auto -20% -45% 28%;
-            height: 9rem;
-            transform: rotate(-8deg);
-            background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.2), rgba(255, 255, 255, 0.12), transparent);
-            pointer-events: none;
-        }
-
-        .trust-card__number {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: clamp(2.5rem, 5vw, 4.75rem);
-            line-height: 0.8;
-        }
-
-        .trust-card__icon {
-            border-radius: 8px;
-            background: linear-gradient(135deg, rgba(103, 232, 249, 0.28), rgba(255, 255, 255, 0.1));
-            color: #e8fbff;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .premium-card,
-        .service-card,
-        .reference-card,
-        .quote-panel {
-            border-radius: 8px;
-            border: 1px solid rgba(9, 83, 154, 0.13);
-            background: linear-gradient(180deg, #ffffff, #f8fbff);
-            box-shadow: 0 16px 40px rgba(7, 21, 39, 0.07);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-        }
-
-        .premium-card:hover,
-        .service-card:hover,
-        .reference-card:hover,
-        .quote-panel:hover {
-            transform: translateY(-4px);
-            border-color: rgba(9, 83, 154, 0.28);
-            box-shadow: 0 28px 70px rgba(7, 21, 39, 0.12);
-        }
-
-        .service-card {
-            position: relative;
-            isolation: isolate;
-        }
-
-        .service-card::before {
-            content: "";
-            position: absolute;
-            inset-inline: 0;
-            top: 0;
-            height: 3px;
-            z-index: 2;
-            transform: scaleX(0);
-            transform-origin: left;
-            background: linear-gradient(90deg, var(--ft-blue), var(--ft-cyan), var(--ft-red));
-            transition: transform 0.28s ease;
-        }
-
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .services-grid {
-            align-items: stretch;
-        }
-
-        .services-grid .service-card {
-            display: flex;
-            height: 100%;
-            flex-direction: column;
-        }
-
-        .services-grid .service-card__body {
-            display: flex;
-            flex: 1 1 auto;
-            flex-direction: column;
-        }
-
-        .services-grid .service-card__cta {
-            margin-top: auto;
-            padding-top: 1.25rem;
-        }
-
-        .premium-section {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .premium-section::before {
-            content: none;
-            display: none;
-        }
-
-        .trust-showcase+.premium-section {
-            margin-top: 0;
-        }
-
-        .split-section-light {
-            background: var(--ft-blue);
-        }
-
-        .split-section-dark {
-            background:
-                linear-gradient(135deg, #071527 0%, #0a2d53 58%, #08111f 100%);
-        }
-
-        .faq-section {
-            isolation: isolate;
-            background: var(--ft-blue);
-        }
-
-        .faq-section::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -1;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(120deg, transparent 0 42%, rgba(103, 232, 249, 0.1) 42% 42.3%, transparent 42.3% 100%);
-            background-size: 76px 76px, 76px 76px, 100% 100%;
-            -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 78%, transparent 100%);
-            mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 78%, transparent 100%);
-            opacity: 0.2;
-            pointer-events: none;
-        }
-
-        .faq-shell {
-            overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.32);
-            background:
-                linear-gradient(180deg, rgba(7, 21, 39, 0.28), rgba(9, 83, 154, 0.2)),
-                rgba(6, 32, 58, 0.28);
-            box-shadow:
-                0 30px 86px rgba(7, 21, 39, 0.18),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(22px) saturate(1.12);
-        }
-
-        .faq-row+.faq-row {
-            border-top: 1px solid rgba(255, 255, 255, 0.16);
-        }
-
-        .faq-trigger {
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-
-        .faq-trigger:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .faq-answer {
-            display: grid;
-            grid-template-rows: 0fr;
-            opacity: 0;
-            transition:
-                grid-template-rows 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
-                opacity 0.24s ease;
-        }
-
-        .faq-answer.is-open {
-            grid-template-rows: 1fr;
-            opacity: 1;
-        }
-
-        .faq-answer__inner {
-            overflow: hidden;
-        }
-
-        .media-frame {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 34px 80px rgba(7, 21, 39, 0.18);
-        }
-
-        .media-frame::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border: 1px solid rgba(255, 255, 255, 0.36);
-            pointer-events: none;
-        }
-
-        .quote-form input,
-        .quote-form select,
-        .quote-form textarea {
-            border-radius: 6px;
-            border-color: #cbd5e1;
-            background: #f8fbff;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
-        }
-
-        .quote-form input:focus,
-        .quote-form select:focus,
-        .quote-form textarea:focus {
-            border-color: var(--ft-blue);
-            box-shadow: 0 0 0 4px rgba(9, 83, 154, 0.12);
-            transform: translateY(-1px);
-        }
-
-        .contact-section {
-            background: #ffffff;
-        }
-
-        .contact-method-card {
-            border-radius: 8px;
-            border: 1px solid rgba(9, 83, 154, 0.13);
-            background: rgba(255, 255, 255, 0.86);
-            box-shadow: 0 20px 55px rgba(7, 21, 39, 0.08);
-            backdrop-filter: blur(18px);
-            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-        }
-
-        .contact-method-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(9, 83, 154, 0.24);
-            box-shadow: 0 30px 80px rgba(7, 21, 39, 0.12);
-        }
-
-        .contact-social-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 1rem;
-        }
-
-        .contact-social-card {
-            display: flex;
-            min-width: 0;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-        }
-
-        .contact-social-card__icon {
-            display: grid;
-            width: 3.25rem;
-            height: 3.25rem;
-            flex: 0 0 auto;
-            place-items: center;
-            border-radius: 8px;
-            color: #ffffff;
-            box-shadow: 0 16px 34px rgba(7, 21, 39, 0.15);
-        }
-
-        .contact-social-card__icon svg {
-            width: 1.35rem;
-            height: 1.35rem;
-        }
-
-        .contact-social-card--facebook .contact-social-card__icon {
-            background: linear-gradient(135deg, #1877f2, #09539a);
-        }
-
-        .contact-social-card--instagram .contact-social-card__icon {
-            background: linear-gradient(135deg, #833ab4, #e1306c 52%, #f77737);
-        }
-
-        .contact-social-card__label {
-            display: block;
-            color: #64748b;
-            font-size: 0.72rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .contact-social-card__title {
-            display: block;
-            margin-top: 0.2rem;
-            color: #020617;
-            font-size: 1.02rem;
-            font-weight: 900;
-            line-height: 1.15;
-        }
-
-        .contact-form-shell {
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            border: 1px solid rgba(9, 83, 154, 0.13);
-            background:
-                linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.95)),
-                #ffffff;
-            box-shadow: 0 30px 90px rgba(7, 21, 39, 0.11);
-        }
-
-        .contact-form-shell::before {
-            content: "";
-            position: absolute;
-            inset-inline: 0;
-            top: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--ft-blue), var(--ft-blue-soft), var(--ft-red));
-        }
-
-        .custom-service-menu {
-            border-radius: 8px;
-            border: 1px solid rgba(9, 83, 154, 0.14);
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 24px 60px rgba(7, 21, 39, 0.14);
-            backdrop-filter: blur(18px);
-        }
-
-        .custom-service-option {
-            transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
-        }
-
-        .custom-service-option:hover {
-            transform: translateX(2px);
-        }
-
-        .motion-reveal {
-            opacity: 0;
-            transform: translateY(26px);
-            transition:
-                opacity 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay, 0ms),
-                transform 0.72s cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay, 0ms);
-        }
-
-        .motion-reveal.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 640px) {
-            .contact-social-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @keyframes logoTrace {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-
-        @keyframes logoFillWhite {
-            to {
-                fill: rgba(255, 255, 255, 0.96);
-            }
-        }
-
-        @keyframes logoFillBlue {
-            to {
-                fill: var(--ft-blue);
-            }
-        }
-
-        @keyframes logoFillRed {
-            to {
-                fill: var(--ft-red);
-            }
-        }
-
-        @keyframes loaderFallback {
-            to {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-
-        @keyframes heroImageDrift {
-            from {
-                transform: scale(1.02) translate3d(0, 0, 0);
-            }
-
-            to {
-                transform: scale(1.08) translate3d(1.5%, -1%, 0);
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .home-loader {
-                display: none;
-            }
-
-            .motion-reveal,
-            .hero-premium__image,
-            .ft-btn,
-            .premium-card,
-            .service-card,
-            .reference-card,
-            .quote-panel {
-                opacity: 1 !important;
-                transform: none !important;
-                animation: none !important;
-                transition: none !important;
-            }
-        }
-    </style>
-    <noscript>
-        <style>
-            .home-loader {
-                display: none;
-            }
-
-            .motion-reveal {
-                opacity: 1 !important;
-                transform: none !important;
-            }
-        </style>
-    </noscript>
 @endpush
 
 @section('content')
@@ -842,7 +134,7 @@
                             {{ __('ftherm.trust.intro') }}</p>
                     </div>
 
-                    <div class="motion-reveal grid gap-3 sm:grid-cols-3" data-reveal style="--delay: 120ms">
+                    <div class="motion-reveal hidden gap-3 sm:grid sm:grid-cols-3" data-reveal style="--delay: 120ms">
                         @foreach (__('ftherm.trust.metrics') as $metric)
                             <div class="trust-stat px-4 py-4">
                                 <p class="text-2xl font-black text-white">{{ $metric['value'] }}</p>
@@ -883,7 +175,8 @@
                     <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.services.intro') }}</p>
                 </div>
 
-                <div class="services-grid mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="services-swiper swiper mt-10">
+                    <div class="services-grid swiper-wrapper">
                     @forelse ($services as $index => $service)
                         @php
                             $serviceTitle = translate($service->title);
@@ -898,7 +191,7 @@
                                 ? route('services.show', ['service' => $service->slug])
                                 : '#contact';
                         @endphp
-                        <article class="service-card motion-reveal group overflow-hidden" data-reveal
+                        <article class="service-card swiper-slide motion-reveal group overflow-hidden" data-reveal
                             style="--delay: {{ ($index % 4) * 75 }}ms">
                             <img src="{{ $serviceImage }}" alt="{{ $serviceAlt }}"
                                 class="h-40 w-full object-cover transition group-hover:scale-105" width="640"
@@ -918,7 +211,7 @@
                         </article>
                     @empty
                         @foreach (__('ftherm.services.items') as $index => $service)
-                            <article class="service-card motion-reveal overflow-hidden" data-reveal
+                            <article class="service-card swiper-slide motion-reveal overflow-hidden" data-reveal
                                 style="--delay: {{ ($index % 4) * 75 }}ms">
                                 <div class="service-card__body p-5">
                                     <h3 class="text-lg font-black text-slate-950">{{ $service['title'] }}</h3>
@@ -935,37 +228,49 @@
                             </article>
                         @endforeach
                     @endforelse
+                    </div>
+                    <div class="services-slider-controls">
+                        <div class="services-pagination" aria-label="Service slider pagination"></div>
+                        <div class="services-navigation">
+                            <button type="button" class="services-prev" aria-label="Previous service">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            </button>
+                            <button type="button" class="services-next" aria-label="Next service">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="split-section-light py-24 md:py-32">
-            <div class="mx-auto grid max-w-[1440px] gap-10 px-4 lg:grid-cols-2 lg:items-center lg:px-10">
-                <div class="media-frame motion-reveal" data-reveal>
+        <section class="seasonal-section premium-section py-16 md:py-24">
+            <div class="seasonal-shell mx-auto grid max-w-[1200px] gap-0 overflow-hidden lg:grid-cols-2 lg:items-stretch">
+                <div class="seasonal-media motion-reveal" data-reveal>
                     <img src="{{ asset('images/ftherm/service-ac-cleaning.webp') }}"
                         alt="{{ __('ftherm.services.items.2.alt') }}"
-                        class="h-full min-h-[320px] w-full rounded object-cover" width="900" height="506"
+                        class="h-full min-h-[300px] w-full object-cover" width="900" height="506"
                         loading="lazy">
                 </div>
-                <div class="motion-reveal flex flex-col justify-center" data-reveal style="--delay: 120ms">
-                    <h2 class="text-3xl font-black text-white sm:text-5xl">{{ __('ftherm.seasonal.title') }}</h2>
-                    <p class="balanced-copy mt-5 text-lg leading-8 text-sky-100">{{ __('ftherm.seasonal.text') }}</p>
-                    <ul class="mt-7 grid gap-3">
+                <div class="seasonal-content motion-reveal flex flex-col justify-center" data-reveal style="--delay: 120ms">
+                    <p class="section-kicker">{{ __('ftherm.seasonal.eyebrow') }}</p>
+                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.seasonal.title') }}</h2>
+                    <p class="balanced-copy mt-5 text-base leading-8 text-slate-600 sm:text-lg">{{ __('ftherm.seasonal.text') }}</p>
+                    <ul class="seasonal-benefits mt-7 grid gap-3 sm:grid-cols-2">
                         @foreach (__('ftherm.seasonal.bullets') as $bullet)
-                            <li class="flex items-start gap-3 text-white">
-                                <span
-                                    class="mt-1 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded bg-[#DD2131] text-white shadow-lg shadow-red-950/20">
+                            <li class="seasonal-benefit flex items-start gap-3">
+                                <span class="seasonal-benefit__icon">
                                     <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
                                 </span>
-                                <span class="font-semibold">{{ $bullet }}</span>
+                                <span class="font-bold text-slate-700">{{ $bullet }}</span>
                             </li>
                         @endforeach
                     </ul>
                     <a href="#contact"
-                        class="ft-btn ft-btn-red mt-8 inline-flex w-fit px-6 py-4 font-black text-white">{{ __('ftherm.seasonal.cta') }}</a>
+                        class="ft-btn ft-btn-red mt-8 inline-flex w-full justify-center px-6 py-4 font-black text-white sm:w-fit">{{ __('ftherm.seasonal.cta') }}</a>
                 </div>
             </div>
         </section>
@@ -978,14 +283,15 @@
                         <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.gallery.text') }}</p>
                     </div>
                     <a href="{{ route('references.index', ['locale' => current_locale()]) }}"
-                        class="ft-btn inline-flex w-fit border border-slate-300 px-5 py-3 font-black text-slate-800 transition hover:bg-slate-950 hover:text-white">{{ __('ftherm.gallery.cta') }}</a>
+                        class="ft-btn hidden w-fit border border-slate-300 px-5 py-3 font-black text-slate-800 transition hover:bg-slate-950 hover:text-white md:inline-flex">{{ __('ftherm.gallery.cta') }}</a>
                 </div>
 
                 @if ($galleryAlbums->count())
-                    <div class="mt-10 grid gap-5 md:grid-cols-3">
+                    <div class="references-swiper swiper mt-10">
+                        <div class="references-home-grid swiper-wrapper">
                         @foreach ($galleryAlbums as $album)
                             <a href="{{ route('references.show', ['locale' => current_locale(), 'slug' => $album->slug]) }}"
-                                class="reference-card motion-reveal group overflow-hidden" data-reveal
+                                class="reference-card swiper-slide motion-reveal group overflow-hidden" data-reveal
                                 style="--delay: {{ $loop->index * 80 }}ms">
                                 @if ($album->images->first())
                                     <img src="{{ Storage::url($album->images->first()->path) }}"
@@ -1008,6 +314,18 @@
                                 </div>
                             </a>
                         @endforeach
+                        </div>
+                        <div class="references-slider-controls">
+                            <div class="references-pagination" aria-label="Reference slider pagination"></div>
+                            <div class="references-navigation">
+                                <button type="button" class="references-prev" aria-label="Previous reference">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                </button>
+                                <button type="button" class="references-next" aria-label="Next reference">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 @else
                     <div class="mt-10 grid gap-5 md:grid-cols-3">
@@ -1021,6 +339,8 @@
                     </div>
                     <p class="mt-4 text-sm font-semibold text-slate-500">{{ __('ftherm.gallery.placeholder') }}</p>
                 @endif
+                <a href="{{ route('references.index', ['locale' => current_locale()]) }}"
+                    class="ft-btn mt-7 inline-flex w-full justify-center border border-slate-300 px-5 py-3 font-black text-slate-800 transition hover:bg-slate-950 hover:text-white md:hidden">{{ __('ftherm.gallery.cta') }}</a>
             </div>
         </section>
 
@@ -1077,35 +397,41 @@
         @endphp
 
         <section id="faq" class="faq-section premium-section py-16 md:py-24">
-            <div class="mx-auto max-w-[960px] px-4 lg:px-10">
-                <h2 class="motion-reveal text-3xl font-black text-white sm:text-5xl" data-reveal>
-                    {{ __('ftherm.faq.title') }}</h2>
-                <div class="faq-shell motion-reveal mt-8"
-                    x-data="{ open: null }" data-reveal style="--delay: 100ms">
+            <div class="faq-layout mx-auto max-w-[1440px] px-4 lg:px-10">
+                <div class="faq-intro motion-reveal" data-reveal>
+                    <p class="section-kicker">{{ __('ftherm.faq.eyebrow') }}</p>
+                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.faq.title') }}</h2>
+                    <p class="mt-5 max-w-lg text-base leading-8 text-slate-600 sm:text-lg">{{ __('ftherm.faq.intro') }}</p>
+                    <a href="#contact" class="faq-contact-link mt-7 inline-flex items-center gap-3 font-black">
+                        <span>{{ __('ftherm.faq.contact') }}</span>
+                        <span class="faq-contact-link__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14m-5-5 5 5-5 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </span>
+                    </a>
+                </div>
+                <div class="faq-shell motion-reveal" x-data="{ open: 0 }" data-reveal style="--delay: 100ms">
                     @foreach ($displayFaqItems as $index => $item)
                         @php
                             $question = is_array($item) ? ($item['question'] ?? '') : translate($item->question ?? '');
                             $answer = is_array($item) ? ($item['answer'] ?? '') : translate($item->answer ?? '');
                         @endphp
-                        <article class="faq-row">
+                        <article class="faq-row" :class="open === {{ $index }} ? 'is-open' : ''">
                             <button type="button"
-                                class="faq-trigger flex w-full items-center justify-between gap-5 px-5 py-5 text-left font-black text-white"
+                                class="faq-trigger flex w-full items-center gap-4 text-left"
                                 @click="open = open === {{ $index }} ? null : {{ $index }}"
                                 :aria-expanded="(open === {{ $index }}).toString()"
                                 aria-controls="faq-panel-{{ $index }}">
-                                <span>{{ $question }}</span>
-                                <svg class="h-5 w-5 flex-shrink-0 text-cyan-100 transition duration-300"
-                                    :class="open === {{ $index }} ? 'rotate-180' : ''" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
+                                <span class="faq-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                <span class="faq-question flex-1">{{ $question }}</span>
+                                <span class="faq-toggle" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" :class="open === {{ $index }} ? 'rotate-45' : ''"><path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round" /></svg>
+                                </span>
                             </button>
                             <div x-cloak id="faq-panel-{{ $index }}" class="faq-answer"
                                 :class="open === {{ $index }} ? 'is-open' : ''"
                                 :aria-hidden="(open !== {{ $index }}).toString()">
                                 <div class="faq-answer__inner">
-                                    <p class="p-5 leading-7 text-sky-100">{{ $answer }}</p>
+                                    <p class="faq-answer-copy">{{ $answer }}</p>
                                 </div>
                             </div>
                         </article>
@@ -1356,6 +682,54 @@
                     },
                     keyboard: {
                         enabled: true
+                    }
+                });
+            }
+
+            if (window.Swiper && document.querySelector('.services-swiper')) {
+                new Swiper('.services-swiper', {
+                    slidesPerView: 1.48,
+                    spaceBetween: 14,
+                    speed: reduceMotion ? 0 : 550,
+                    watchOverflow: true,
+                    pagination: {
+                        el: '.services-pagination',
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: '.services-next',
+                        prevEl: '.services-prev'
+                    },
+                    breakpoints: {
+                        640: {
+                            enabled: false,
+                            slidesPerView: 2,
+                            spaceBetween: 20
+                        }
+                    }
+                });
+            }
+
+            if (window.Swiper && document.querySelector('.references-swiper')) {
+                new Swiper('.references-swiper', {
+                    slidesPerView: 1.48,
+                    spaceBetween: 14,
+                    speed: reduceMotion ? 0 : 550,
+                    watchOverflow: true,
+                    pagination: {
+                        el: '.references-pagination',
+                        clickable: true
+                    },
+                    navigation: {
+                        nextEl: '.references-next',
+                        prevEl: '.references-prev'
+                    },
+                    breakpoints: {
+                        768: {
+                            enabled: false,
+                            slidesPerView: 3,
+                            spaceBetween: 20
+                        }
                     }
                 });
             }
