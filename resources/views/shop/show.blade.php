@@ -5,7 +5,7 @@
     $productDescription = Str::limit(strip_tags(translate($product->description)), 155);
     $productImage = $product->images->first() ? asset('storage/' . $product->images->first()->image_path) : asset('images/ftherm/hero-ftherm-technician-ac-installation.webp');
     $productSchema = array_filter([
-        '@context' => 'https://schema.org',
+        chr(64).'context' => 'https://schema.org',
         '@type' => 'Product',
         '@id' => url()->current() . '#product',
         'name' => $productName,

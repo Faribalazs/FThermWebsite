@@ -27,7 +27,7 @@
 @push('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
+        chr(64).'context' => 'https://schema.org',
         '@type' => 'FAQPage',
         '@id' => url()->current() . '#faq',
         'mainEntity' => $structuredFaqItems->map(function ($item) {
@@ -74,8 +74,11 @@
                                 class="relative z-10 mx-auto flex min-h-[inherit] max-w-[1440px] items-center px-4 py-20 md:py-28 lg:px-10">
                                 <div class="motion-reveal max-w-3xl" data-reveal>
                                     <p class="section-kicker section-kicker--light mb-5">{{ __('ftherm.hero.eyebrow') }}</p>
-                                    <h1 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
-                                        {{ $slideTitle }}</h1>
+                                    @if ($loop->first)
+                                        <h1 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">{{ $slideTitle }}</h1>
+                                    @else
+                                        <h2 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">{{ $slideTitle }}</h2>
+                                    @endif
                                     <p class="hero-copy mt-6 max-w-2xl text-base leading-8 text-slate-200 sm:text-lg">
                                         {{ $slideDescription }}</p>
                                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">

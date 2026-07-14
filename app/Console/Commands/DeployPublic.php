@@ -42,6 +42,10 @@ class DeployPublic extends Command
         $this->components->info("Application: {$appRoot}");
         $this->components->info("Public root: {$target}");
 
+        if (! $this->verifySeoTemplates($files)) {
+            return self::FAILURE;
+        }
+
         if (! $this->option('skip-build')) {
             if (! $this->runProcess(['npm', 'run', 'build'], $appRoot, 'Building Vite assets')) {
                 return self::FAILURE;
@@ -176,6 +180,26 @@ class DeployPublic extends Command
         }
 
         $this->components->info('Verified public assets and SEO discovery entry points.');
+
+        return true;
+    }
+
+    private function verifySeoTemplates(Filesystem $files): bool
+    {
+        $unsafeTemplates = collect($files->allFiles(resource_path('views')))
+            ->filter(fn ($file) => $file->getExtension() === 'php')
+            ->filter(fn ($file) => str_contains($files->get($file->getPathname()), "'@context'"))
+            ->map(fn ($file) => $file->getRelativePathname())
+            ->values();
+
+        if ($unsafeTemplates->isNotEmpty()) {
+            $this->error('Unsafe JSON-LD @context keys found. Blade may compile them as directives:');
+            $unsafeTemplates->each(fn (string $path) => $this->line(" - resources/views/{$path}"));
+
+            return false;
+        }
+
+        $this->components->info('Verified Blade-safe JSON-LD templates.');
 
         return true;
     }

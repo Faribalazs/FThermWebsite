@@ -37,7 +37,7 @@
 @push('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
+        chr(64).'context' => 'https://schema.org',
         '@type' => 'Service',
         '@id' => url()->current() . '#service',
         'name' => $title,

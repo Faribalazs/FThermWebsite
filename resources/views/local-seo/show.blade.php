@@ -6,7 +6,7 @@
 
 @push('head')
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
+        chr(64).'context' => 'https://schema.org',
         '@type' => 'Service',
         '@id' => url()->current() . '#service',
         'name' => $page['serviceName'],
@@ -20,7 +20,7 @@
         'provider' => ['@id' => url('/#organization')],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
+        chr(64).'context' => 'https://schema.org',
         '@type' => 'FAQPage',
         'mainEntity' => collect($page['faqs'])->map(fn ($faq) => [
             '@type' => 'Question',

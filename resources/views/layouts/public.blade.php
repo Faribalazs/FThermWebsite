@@ -120,7 +120,7 @@
     <link rel="sitemap" type="application/xml" title="Sitemap" href="{{ route('sitemap') }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.ico') }}">
     <title>{{ $pageTitle }}</title>
-    <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode([chr(64).'context' => 'https://schema.org', '@graph' => $schemaGraph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
