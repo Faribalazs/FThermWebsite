@@ -4,4 +4,43 @@ Disallow: /admin/
 Disallow: /worker/
 Disallow: /profile
 
+# Allow ChatGPT Search to discover, summarize and cite public FTHERM pages.
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
+# Allow OpenAI's training crawler separately from the search crawler.
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
+# AI answer engines that cite public web sources.
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /worker/
+Disallow: /profile
+
 Sitemap: https://ftherm.rs/sitemap.xml

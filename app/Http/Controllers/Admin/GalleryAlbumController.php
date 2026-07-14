@@ -5,15 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GalleryAlbum;
 use App\Models\GalleryImage;
+use App\Services\WebpImageStorage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class GalleryAlbumController extends Controller
 {
+    public function __construct(private readonly WebpImageStorage $imageStorage) {}
+
     public function index()
     {
         $albums = GalleryAlbum::withCount('images')->orderBy('order')->paginate(20);
+
         return view('admin.gallery.index', compact('albums'));
     }
 
@@ -58,6 +61,7 @@ class GalleryAlbumController extends Controller
     public function edit(GalleryAlbum $gallery)
     {
         $gallery->load('images');
+
         return view('admin.gallery.edit', compact('gallery'));
     }
 
@@ -70,7 +74,7 @@ class GalleryAlbumController extends Controller
             'description_sr' => 'nullable|string',
             'description_en' => 'nullable|string',
             'description_hu' => 'nullable|string',
-            'slug' => 'required|string|max:255|unique:gallery_albums,slug,' . $gallery->id,
+            'slug' => 'required|string|max:255|unique:gallery_albums,slug,'.$gallery->id,
             'order' => 'required|integer',
             'active' => 'boolean',
         ]);
@@ -115,7 +119,7 @@ class GalleryAlbumController extends Controller
         $lastOrder = $gallery->images()->max('order') ?? 0;
 
         foreach ($request->file('images') as $file) {
-            $path = $file->store('gallery/' . $gallery->id, 'public');
+            $path = $this->imageStorage->store($file, 'gallery/'.$gallery->id);
             $lastOrder++;
 
             GalleryImage::create([
@@ -152,7 +156,7 @@ class GalleryAlbumController extends Controller
         Storage::disk('public')->delete($images->pluck('path')->all());
         $gallery->images()->whereIn('id', $images->pluck('id'))->delete();
 
-        return back()->with('success', $images->count() . ' slika je uspešno obrisano.');
+        return back()->with('success', $images->count().' slika je uspešno obrisano.');
     }
 
     public function reorderImages(Request $request, GalleryAlbum $gallery)

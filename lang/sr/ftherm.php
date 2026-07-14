@@ -2,9 +2,9 @@
 
 return [
     'seo' => [
-        'meta_title' => 'FTHERM - Ugradnja klime, servis, toplotne pumpe, grejanje-hlađenje i vodoinstalacije',
-        'meta_description' => 'FTHERM pruža profesionalne usluge ugradnje klima uređaja, servisa, čišćenja, toplotnih pumpi, podnog i zidnog grejanja, radijatora, vodoinstalacija i rashladnih komora za domove i poslovne prostore.',
-        'keywords' => 'ugradnja klime, servis klima uređaja, čišćenje klime, toplotne pumpe, podno grejanje, zidno grejanje, radijatori, vodoinstalacije, rashladne komore, grejanje i hlađenje',
+        'meta_title' => 'FTHERM Subotica - Montaža klime, servis i toplotne pumpe',
+        'meta_description' => 'Montaža, ugradnja, servis i čišćenje klima uređaja, kao i ugradnja toplotnih pumpi u Subotici, Paliću i okolini. Pozovite FTHERM za procenu i ponudu.',
+        'keywords' => 'klime Subotica, montaža klime Subotica, ugradnja klime Subotica, servis klima Subotica, toplotne pumpe Subotica, FTHERM',
     ],
 
     'nav' => [

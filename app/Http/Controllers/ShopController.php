@@ -5,15 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ShopController extends Controller
 {
     public function index(Request $request)
     {
         if (!shop_enabled()) {
-            return redirect()->route('home', [
-                'locale' => $request->route('locale') ?: 'sr',
-            ], 301);
+            return $this->gone();
         }
 
         $query = Product::where('active', true)->with('category', 'primaryImage');
@@ -31,7 +30,7 @@ class ShopController extends Controller
     public function show(string $locale, Product $product)
     {
         if (!shop_enabled()) {
-            return redirect()->route('home', ['locale' => $locale], 301);
+            return $this->gone();
         }
 
         $product->load('category', 'images');
@@ -42,5 +41,15 @@ class ShopController extends Controller
             ->get();
 
         return view('shop.show', compact('product', 'related_products'));
+    }
+
+    /**
+     * Tell search engines that the disabled catalog and its products were removed.
+     */
+    private function gone(): Response
+    {
+        return response('', Response::HTTP_GONE)
+            ->header('X-Robots-Tag', 'noindex, nofollow, noarchive')
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }
 }

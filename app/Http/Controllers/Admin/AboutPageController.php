@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AboutPage;
+use App\Services\WebpImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AboutPageController extends Controller
 {
     private array $locales = ['sr', 'en', 'hu'];
+
+    public function __construct(private readonly WebpImageStorage $imageStorage) {}
 
     public function edit()
     {
@@ -32,13 +35,13 @@ class AboutPageController extends Controller
         $data = $this->pageData($request);
 
         if ($request->hasFile('hero_image')) {
+            $data['hero_image'] = $this->imageStorage->store($request->file('hero_image'), 'about-page');
             $this->deleteStoredImage($aboutPage->hero_image);
-            $data['hero_image'] = $request->file('hero_image')->store('about-page', 'public');
         }
 
         if ($request->hasFile('secondary_image')) {
+            $data['secondary_image'] = $this->imageStorage->store($request->file('secondary_image'), 'about-page');
             $this->deleteStoredImage($aboutPage->secondary_image);
-            $data['secondary_image'] = $request->file('secondary_image')->store('about-page', 'public');
         }
 
         $aboutPage->update($data);
@@ -147,7 +150,7 @@ class AboutPageController extends Controller
 
     private function deleteStoredImage(?string $image): void
     {
-        if ($image && !str_starts_with($image, 'images/')) {
+        if ($image && ! str_starts_with($image, 'images/')) {
             Storage::disk('public')->delete($image);
         }
     }

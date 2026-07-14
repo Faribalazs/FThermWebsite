@@ -24,13 +24,45 @@
             '@type' => ['Organization', 'LocalBusiness'],
             '@id' => url('/#organization'),
             'name' => 'FTHERM',
+            'alternateName' => 'FTHERM Subotica',
             'url' => url('/'),
             'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo.svg')],
             'image' => $ogImage,
             'telephone' => $companyPhone,
             'email' => $companyEmail,
-            'address' => $companyAddress ? ['@type' => 'PostalAddress', 'streetAddress' => $companyAddress, 'addressCountry' => 'RS'] : null,
+            'contactPoint' => ($companyPhone || $companyEmail) ? [
+                '@type' => 'ContactPoint',
+                'telephone' => $companyPhone,
+                'email' => $companyEmail,
+                'contactType' => 'customer service',
+                'areaServed' => 'RS',
+                'availableLanguage' => ['sr', 'hu', 'en'],
+            ] : null,
+            'address' => $companyAddress ? ['@type' => 'PostalAddress', 'streetAddress' => $companyAddress, 'addressLocality' => 'Subotica', 'postalCode' => '24000', 'addressCountry' => 'RS'] : null,
+            'areaServed' => [
+                ['@type' => 'City', 'name' => 'Subotica'],
+                ['@type' => 'Place', 'name' => 'Palić'],
+                ['@type' => 'AdministrativeArea', 'name' => 'Severnobački okrug'],
+            ],
             'sameAs' => [$facebookUrl, $instagramUrl],
+            'knowsAbout' => [
+                'Montaža i ugradnja klima uređaja',
+                'Servis i popravka klima uređaja',
+                'Čišćenje i dezinfekcija klima uređaja',
+                'Toplotne pumpe',
+                'Podno i zidno grejanje',
+                'Vodoinstalacije',
+                'Rashladne komore i rashladna tehnika',
+            ],
+            'hasOfferCatalog' => [
+                '@type' => 'OfferCatalog',
+                'name' => 'FTHERM usluge u Subotici i okolini',
+                'itemListElement' => [
+                    ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Montaža klime Subotica', 'url' => url('/sr/klime-subotica')]],
+                    ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Servis i čišćenje klima uređaja Subotica', 'url' => url('/sr/services/ac-cleaning-disinfection')]],
+                    ['@type' => 'Offer', 'itemOffered' => ['@type' => 'Service', 'name' => 'Toplotne pumpe Subotica', 'url' => url('/sr/toplotne-pumpe-subotica')]],
+                ],
+            ],
         ],
         [
             '@type' => 'WebSite',
@@ -50,6 +82,11 @@
             'isPartOf' => ['@id' => url('/#website')],
             'about' => ['@id' => url('/#organization')],
             'primaryImageOfPage' => ['@type' => 'ImageObject', 'url' => $ogImage],
+            'potentialAction' => [
+                '@type' => 'CommunicateAction',
+                'target' => route('home', ['locale' => $currentLocale]) . '#contact',
+                'name' => __('ftherm.cta.quote'),
+            ],
         ],
     ];
     $schemaGraph = array_map(fn ($item) => array_filter($item, fn ($value) => $value !== null && $value !== ''), $schemaGraph);
@@ -250,6 +287,11 @@
             <a href="{{ route('home') }}" class="footer-logo-mark" aria-label="FTHERM">
                 <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-14 w-auto sm:h-16">
             </a>
+
+            <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-bold text-slate-200">
+                <a href="{{ route('local-seo.air-conditioning', ['locale' => current_locale()]) }}" class="hover:text-white">{{ current_locale() === 'hu' ? 'Klímaszerelés Szabadka' : (current_locale() === 'en' ? 'Air conditioning Subotica' : 'Klime Subotica') }}</a>
+                <a href="{{ route('local-seo.heat-pumps', ['locale' => current_locale()]) }}" class="hover:text-white">{{ current_locale() === 'hu' ? 'Hőszivattyú Szabadka' : (current_locale() === 'en' ? 'Heat pumps Subotica' : 'Toplotne pumpe Subotica') }}</a>
+            </div>
 
             @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
                 <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">

@@ -42,6 +42,8 @@ php artisan deploy:public
 - Copies files from `public/` to `/home/fthermrs/public_html`.
 - Copies `.htaccess`, images, CSS, JavaScript, `robots.txt`, and other public assets.
 - Generates `public_html/index.php` configured to load the Laravel application from `FThermWebsiteNew`.
+- Verifies that `.htaccess`, `index.php`, `robots.txt`, the Vite manifest, and the FTHERM logo exist in `public_html`.
+- Keeps `sitemap.xml` and `llms.txt` dynamic: Apache sends those requests through `public_html/index.php` to Laravel, so they always reflect current services and references.
 - Creates this storage link:
 
 ```text
@@ -65,6 +67,14 @@ If cPanel blocks symbolic links, the command automatically copies and synchroniz
 ```bash
 php artisan deploy:public --skip-build --storage-mode=link
 php artisan deploy:public --skip-build --storage-mode=copy
+```
+
+This command copies all static SEO assets from `public/` to `public_html`, including `robots.txt`, images, favicons and compiled CSS/JavaScript. It also verifies the rewrite/front-controller files needed for these live URLs:
+
+```text
+https://ftherm.rs/robots.txt
+https://ftherm.rs/sitemap.xml
+https://ftherm.rs/llms.txt
 ```
 
 When copy mode is used, run the deployment command again to synchronize images uploaded after the previous deployment:

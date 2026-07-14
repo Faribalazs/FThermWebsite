@@ -64,6 +64,10 @@ class DeployPublic extends Command
         $files->put($target.DIRECTORY_SEPARATOR.'index.php', $index);
         chmod($target.DIRECTORY_SEPARATOR.'index.php', 0644);
 
+        if (! $this->verifyPublicDeployment($files, $target)) {
+            return self::FAILURE;
+        }
+
         $storageTarget = storage_path('app/public');
         $files->ensureDirectoryExists($storageTarget, 0755, true);
         $publishedStorageMode = $this->publishStorage($files, $storageTarget, $storageLink, $storageMode);
@@ -77,6 +81,7 @@ class DeployPublic extends Command
 
         $this->newLine();
         $this->components->info('Public deployment completed successfully.');
+        $this->line('SEO discovery: robots.txt copied; sitemap.xml and llms.txt are served by Laravel through index.php.');
         if ($publishedStorageMode === 'link') {
             $this->line("Storage link: {$storageLink} -> {$storageTarget}");
         } else {
@@ -140,6 +145,39 @@ class DeployPublic extends Command
             $files->ensureDirectoryExists(dirname($destination), 0755, true);
             $files->copy($file->getPathname(), $destination);
         }
+    }
+
+    private function verifyPublicDeployment(Filesystem $files, string $target): bool
+    {
+        $requiredFiles = [
+            '.htaccess',
+            'index.php',
+            'robots.txt',
+            'build/manifest.json',
+            'images/logo.svg',
+        ];
+
+        $missingFiles = collect($requiredFiles)
+            ->reject(fn (string $path) => $files->isFile($target.DIRECTORY_SEPARATOR.$path))
+            ->values();
+
+        if ($missingFiles->isNotEmpty()) {
+            $this->error('Deployment is incomplete. Required public/SEO files are missing from public_html:');
+            $missingFiles->each(fn (string $path) => $this->line(" - {$path}"));
+
+            return false;
+        }
+
+        $htaccess = $files->get($target.DIRECTORY_SEPARATOR.'.htaccess');
+        if (! str_contains($htaccess, 'RewriteRule ^ index.php')) {
+            $this->error('The deployed .htaccess does not route sitemap.xml and llms.txt through Laravel.');
+
+            return false;
+        }
+
+        $this->components->info('Verified public assets and SEO discovery entry points.');
+
+        return true;
     }
 
     private function runProcess(array $command, string $directory, string $label): bool

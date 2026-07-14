@@ -12,6 +12,7 @@ class TrackPageView
 {
     private const PUBLIC_ROUTES = [
         'home', 'about', 'shop.index', 'shop.show', 'services.show',
+        'local-seo.air-conditioning', 'local-seo.heat-pumps',
         'references.index', 'references.show',
     ];
 

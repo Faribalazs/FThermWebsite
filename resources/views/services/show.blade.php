@@ -44,7 +44,11 @@
         'description' => Str::limit(strip_tags($description), 300),
         'image' => $image,
         'url' => url()->current(),
-        'areaServed' => ['@type' => 'Country', 'name' => 'Serbia'],
+        'areaServed' => [
+            ['@type' => 'City', 'name' => 'Subotica'],
+            ['@type' => 'Place', 'name' => 'Palić'],
+            ['@type' => 'AdministrativeArea', 'name' => 'Severnobački okrug'],
+        ],
         'provider' => ['@id' => url('/#organization')],
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush

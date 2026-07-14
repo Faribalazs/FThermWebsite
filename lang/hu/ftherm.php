@@ -2,9 +2,9 @@
 
 return [
     'seo' => [
-        'meta_title' => 'FTHERM - Klímaszerelés, hőszivattyúk, fűtés-hűtés és vízszerelés',
-        'meta_description' => 'FTHERM - professzionális klímaszerelés, klímaszerviz, klímatisztítás, hőszivattyúk, padló- és falfűtés, radiátorok, vízszerelés és hűtőkamrák lakossági és üzleti ügyfeleknek.',
-        'keywords' => 'klímaszerelés, klímaszerviz, klímatisztítás, hőszivattyú telepítés, padlófűtés, falfűtés, radiátor, vízszerelés, hűtőkamra, fűtés-hűtés',
+        'meta_title' => 'FTHERM Szabadka - Klímaszerelés, klímatisztítás és hőszivattyúk',
+        'meta_description' => 'Klímaszerelés, klímaszerviz, klímatisztítás és hőszivattyú-telepítés Szabadkán, Palicson és környékén. Kérjen helyszíni felmérést és ajánlatot az FTHERM-től.',
+        'keywords' => 'klímaszerelés Szabadka, klímatisztítás Szabadka, klímaszerviz Szabadka, hőszivattyú Szabadka, hőszivattyú telepítés Szabadka, FTHERM',
     ],
 
     'nav' => [

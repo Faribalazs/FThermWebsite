@@ -58,7 +58,7 @@
 
                 @php
                     $catalogOpen = request()->routeIs('admin.product-categories.*') || request()->routeIs('admin.products.*') || request()->routeIs('admin.catalog-settings.*');
-                    $contentOpen = request()->routeIs('admin.about-page.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.gallery.*');
+                    $contentOpen = request()->routeIs('admin.about-page.*') || request()->routeIs('admin.homepage-trust-section.*') || request()->routeIs('admin.services.*') || request()->routeIs('admin.faqs.*') || request()->routeIs('admin.slides.*') || request()->routeIs('admin.gallery.*');
                 @endphp
 
                 <div class="mt-6">
@@ -117,6 +117,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"></path>
                                 </svg>
                                 <span class="text-sm lg:text-base">O nama</span>
+                            </a>
+
+                            <a href="{{ route('admin.homepage-trust-section.edit') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.homepage-trust-section.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">
+                                <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                <span class="text-sm lg:text-base">Zašto FTHERM?</span>
                             </a>
 
                             <a href="{{ route('admin.services.index') }}" class="flex items-center pl-10 lg:pl-12 pr-4 lg:pr-6 py-2.5 text-gray-300 hover:bg-industrial-800 hover:text-white transition-all {{ request()->routeIs('admin.services.*') ? 'bg-industrial-800 text-white border-l-4 border-primary-500' : '' }}">

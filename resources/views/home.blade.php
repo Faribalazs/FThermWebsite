@@ -12,8 +12,9 @@
     $telHref = $companyPhone ? 'tel:' . preg_replace('/[^\d+]/', '', $companyPhone) : null;
     $facebookUrl = 'https://www.facebook.com/people/FTherm/100094193259896/';
     $instagramUrl = 'https://www.instagram.com/ftherm.rs/';
-    $trustItems = __('ftherm.trust.items');
+    $trustItems = $trustSection->items;
     $fallbackFaqItems = __('ftherm.faq.items');
+    $structuredFaqItems = ($faqItems ?? collect())->count() ? $faqItems : collect($fallbackFaqItems);
     $serviceTypes = __('ftherm.contact.service_types');
     $trustIcons = [
         'M9 12l2 2 4-5m5 3a8 8 0 11-16 0 8 8 0 0116 0z',
@@ -25,6 +26,20 @@
 
 @push('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        '@id' => url()->current() . '#faq',
+        'mainEntity' => $structuredFaqItems->map(function ($item) {
+            $question = is_array($item) ? ($item['question'] ?? '') : translate($item->question);
+            $answer = is_array($item) ? ($item['answer'] ?? '') : translate($item->answer);
+            return [
+                '@type' => 'Question',
+                'name' => strip_tags($question),
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($answer)],
+            ];
+        })->values()->all(),
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
 
 @section('content')
@@ -125,18 +140,18 @@
             <div class="mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
                     <div class="motion-reveal max-w-3xl" data-reveal>
-                        <p class="section-kicker section-kicker--light">{{ __('ftherm.trust.eyebrow') }}</p>
+                        <p class="section-kicker section-kicker--light">{{ translate($trustSection->eyebrow) }}</p>
                         <h2 class="mt-4 text-3xl font-black leading-tight text-white sm:text-5xl">
-                            {{ __('ftherm.trust.title') }}</h2>
+                            {{ translate($trustSection->title) }}</h2>
                         <p class="trust-showcase__intro mt-6 max-w-2xl pl-5 text-base leading-8 sm:text-lg">
-                            {{ __('ftherm.trust.intro') }}</p>
+                            {{ translate($trustSection->intro) }}</p>
                     </div>
 
                     <div class="motion-reveal hidden gap-3 sm:grid sm:grid-cols-3" data-reveal style="--delay: 120ms">
-                        @foreach (__('ftherm.trust.metrics') as $metric)
+                        @foreach ($trustSection->metrics as $metric)
                             <div class="trust-stat px-4 py-4">
                                 <p class="text-2xl font-black text-white">{{ $metric['value'] }}</p>
-                                <p class="mt-1 text-xs font-black uppercase text-sky-100">{{ $metric['label'] }}</p>
+                                <p class="mt-1 text-xs font-black uppercase text-sky-100">{{ translate($metric['label']) }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -156,8 +171,8 @@
                                 <span class="trust-card__number font-black">0{{ $loop->iteration }}</span>
                             </div>
                             <div class="relative z-10 mt-7">
-                                <h3 class="text-xl font-black text-white">{{ $item['title'] }}</h3>
-                                <p class="mt-4 text-sm leading-7 text-slate-200">{{ $item['text'] }}</p>
+                                <h3 class="text-xl font-black text-white">{{ translate($item['title']) }}</h3>
+                                <p class="mt-4 text-sm leading-7 text-slate-200">{{ translate($item['text']) }}</p>
                             </div>
                         </article>
                     @endforeach

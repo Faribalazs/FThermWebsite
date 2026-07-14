@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Slide;
 use App\Models\GalleryAlbum;
 use App\Models\Faq;
+use App\Models\HomepageTrustSection;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -25,7 +26,9 @@ class HomeController extends Controller
             ->take(10)
             ->get();
         $faqItems = Faq::where('active', true)->orderBy('order')->get();
+        $trustSection = HomepageTrustSection::first();
+        $trustSection = $trustSection ?: new HomepageTrustSection(HomepageTrustSection::defaultContent());
 
-        return view('home', compact('services', 'featured_products', 'slides', 'shopEnabled', 'galleryAlbums', 'faqItems'));
+        return view('home', compact('services', 'featured_products', 'slides', 'shopEnabled', 'galleryAlbums', 'faqItems', 'trustSection'));
     }
 }

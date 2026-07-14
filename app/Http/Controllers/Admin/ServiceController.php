@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Services\WebpImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -11,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class ServiceController extends Controller
 {
+    public function __construct(private readonly WebpImageStorage $imageStorage) {}
+
     public function index()
     {
         $services = Service::orderBy('order')->paginate(15);
@@ -29,7 +32,7 @@ class ServiceController extends Controller
         $data = $this->serviceData($validated);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('services', 'public');
+            $data['image'] = $this->imageStorage->store($request->file('image'), 'services');
         }
 
         Service::create($data);
@@ -48,8 +51,8 @@ class ServiceController extends Controller
         $data = $this->serviceData($validated, $service);
 
         if ($request->hasFile('image')) {
+            $data['image'] = $this->imageStorage->store($request->file('image'), 'services');
             $this->deleteStoredImage($service);
-            $data['image'] = $request->file('image')->store('services', 'public');
         }
 
         $service->update($data);
@@ -132,7 +135,7 @@ class ServiceController extends Controller
         while (Service::where('slug', $slug)
             ->when($service, fn ($query) => $query->whereKeyNot($service->getKey()))
             ->exists()) {
-            $slug = $baseSlug . '-' . $count;
+            $slug = $baseSlug.'-'.$count;
             $count++;
         }
 
@@ -141,7 +144,7 @@ class ServiceController extends Controller
 
     private function deleteStoredImage(Service $service): void
     {
-        if ($service->image && !str_starts_with($service->image, 'images/')) {
+        if ($service->image && ! str_starts_with($service->image, 'images/')) {
             Storage::disk('public')->delete($service->image);
         }
     }

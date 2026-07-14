@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\CatalogSettingController;
 use App\Http\Controllers\Admin\AboutPageController as AdminAboutPageController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\HomepageTrustSectionController;
+use App\Http\Controllers\LocalSeoController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SeoController;
 
@@ -52,6 +54,8 @@ Route::prefix('{locale}')
         Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
         Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
         Route::get('/services/{service:slug}', [ServicePageController::class, 'show'])->name('services.show');
+        Route::get('/klime-subotica', [LocalSeoController::class, 'airConditioning'])->name('local-seo.air-conditioning');
+        Route::get('/toplotne-pumpe-subotica', [LocalSeoController::class, 'heatPumps'])->name('local-seo.heat-pumps');
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
         Route::get('/references', [GalleryController::class, 'index'])->name('references.index');
         Route::get('/references/{slug}', [GalleryController::class, 'show'])->name('references.show');
@@ -70,13 +74,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('logout', [App\Http\Controllers\Admin\Auth\LoginController::class, 'destroy'])->name('logout');
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Services Management
     Route::resource('services', ServiceController::class)->except(['show']);
-    
+
     // Product Categories Management
     Route::resource('product-categories', ProductCategoryController::class);
-    
+
     // Products Management
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/images', [ProductController::class, 'uploadImage'])->name('products.images.upload');
@@ -85,15 +89,17 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     // Catalog Settings
     Route::get('catalog-settings', [CatalogSettingController::class, 'index'])->name('catalog-settings.index');
     Route::post('catalog-settings', [CatalogSettingController::class, 'update'])->name('catalog-settings.update');
-    
+
     // Inquiries Management
     Route::resource('inquiries', InquiryController::class)->only(['index', 'show', 'destroy']);
     Route::post('inquiries/notification-email', [InquiryController::class, 'updateNotificationEmail'])->name('inquiries.notification-email.update');
     Route::patch('inquiries/{inquiry}/mark-read', [InquiryController::class, 'markAsRead'])->name('inquiries.mark-read');
-    
+
     // About Page Management
     Route::get('about-page', [AdminAboutPageController::class, 'edit'])->name('about-page.edit');
     Route::put('about-page', [AdminAboutPageController::class, 'update'])->name('about-page.update');
+    Route::get('homepage-trust-section', [HomepageTrustSectionController::class, 'edit'])->name('homepage-trust-section.edit');
+    Route::put('homepage-trust-section', [HomepageTrustSectionController::class, 'update'])->name('homepage-trust-section.update');
 
     // FAQ Management
     Route::resource('faqs', FaqController::class)->except(['show']);
@@ -127,12 +133,12 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
 // Worker Routes
 Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')->group(function () {
     Route::post('logout', [App\Http\Controllers\Worker\Auth\LoginController::class, 'destroy'])->name('logout');
-    
+
     // No permissions page (accessible to all workers)
     Route::get('/no-permissions', function () {
         return view('worker.no-permissions');
     })->name('no-permissions');
-    
+
     // Dashboard - requires dashboard permission
     Route::middleware('worker.permission:dashboard')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Worker\DashboardController::class, 'index'])->name('dashboard');
@@ -171,7 +177,7 @@ Route::middleware(['auth:worker', 'worker'])->prefix('worker')->name('worker.')-
         Route::get('inventory/quantity/{product}/{warehouse}', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'getQuantity'])->name('inventory.get-quantity');
         Route::post('inventory/{product}/add', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'update'])->name('inventory.add');
         Route::post('inventory/{product}/set', [App\Http\Controllers\Worker\InventoryReplenishmentController::class, 'set'])->name('inventory.set');
-        
+
         // Warehouses Management
         Route::get('warehouses/{warehouse}/export', [App\Http\Controllers\Worker\WarehouseController::class, 'export'])->name('warehouses.export');
         Route::post('warehouses/{warehouse}/import', [App\Http\Controllers\Worker\WarehouseController::class, 'import'])->name('warehouses.import');
