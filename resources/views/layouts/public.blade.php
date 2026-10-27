@@ -6,6 +6,16 @@
     $localeNames = ['hu' => 'Magyar', 'sr' => 'Srpski', 'en' => 'English'];
     $localeFlags = ['hu' => '🇭🇺', 'sr' => '🇷🇸', 'en' => '🇬🇧'];
     $currentLocale = current_locale();
+    $localSeoLinks = [
+        [
+            'route' => 'local-seo.air-conditioning',
+            'label' => $currentLocale === 'hu' ? 'Klímaszerelés Szabadka' : ($currentLocale === 'en' ? 'Air conditioning Subotica' : 'Klime Subotica'),
+        ],
+        [
+            'route' => 'local-seo.heat-pumps',
+            'label' => $currentLocale === 'hu' ? 'Hőszivattyú Szabadka' : ($currentLocale === 'en' ? 'Heat pumps Subotica' : 'Toplotne pumpe Subotica'),
+        ],
+    ];
     $shopEnabled = shop_enabled();
     $companyPhone = setting_value('company_phone');
     $companyEmail = setting_value('company_email');
@@ -175,7 +185,24 @@
 
             <div class="hidden items-center gap-1 lg:flex">
                 <a href="{{ route('home') }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.home') }}</a>
-                <a href="{{ route('home') }}#services" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.services') }}</a>
+                <div class="site-nav-services">
+                    <a href="{{ route('home') }}#services" class="site-nav-link site-nav-services__trigger px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">
+                        <span>{{ __('ftherm.nav.services') }}</span>
+                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </a>
+                    <div class="site-nav-services__menu" aria-label="{{ __('ftherm.nav.services') }}">
+                        @foreach ($localSeoLinks as $localLink)
+                            <a href="{{ route($localLink['route'], ['locale' => $currentLocale]) }}" class="site-nav-services__option">
+                                <span>{{ $localLink['label'] }}</span>
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
                 @if ($shopEnabled)
                     <a href="{{ route('shop.index') }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.products') }}</a>
                 @endif
@@ -251,6 +278,16 @@
                 <div class="space-y-1">
                     <a href="{{ route('home') }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.home') }}</a>
                     <a href="{{ route('home') }}#services" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.services') }}</a>
+                    <div class="site-mobile-local-links">
+                        @foreach ($localSeoLinks as $localLink)
+                            <a href="{{ route($localLink['route'], ['locale' => $currentLocale]) }}" @click="mobileMenu = false" class="site-mobile-local-link">
+                                <span>{{ $localLink['label'] }}</span>
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        @endforeach
+                    </div>
                     @if ($shopEnabled)
                         <a href="{{ route('shop.index') }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.products') }}</a>
                     @endif
@@ -289,8 +326,9 @@
             </a>
 
             <div class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm font-bold text-slate-200">
-                <a href="{{ route('local-seo.air-conditioning', ['locale' => current_locale()]) }}" class="hover:text-white">{{ current_locale() === 'hu' ? 'Klímaszerelés Szabadka' : (current_locale() === 'en' ? 'Air conditioning Subotica' : 'Klime Subotica') }}</a>
-                <a href="{{ route('local-seo.heat-pumps', ['locale' => current_locale()]) }}" class="hover:text-white">{{ current_locale() === 'hu' ? 'Hőszivattyú Szabadka' : (current_locale() === 'en' ? 'Heat pumps Subotica' : 'Toplotne pumpe Subotica') }}</a>
+                @foreach ($localSeoLinks as $localLink)
+                    <a href="{{ route($localLink['route'], ['locale' => $currentLocale]) }}" class="hover:text-white">{{ $localLink['label'] }}</a>
+                @endforeach
             </div>
 
             @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)

@@ -1,5 +1,29 @@
 // Worker Panel Custom Styles
 
+.work-order-assistant-messages {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(2, 132, 199, 0.35) transparent;
+}
+
+.work-order-assistant-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.work-order-assistant-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.work-order-assistant-messages::-webkit-scrollbar-thumb {
+    background: rgba(2, 132, 199, 0.35);
+    border-radius: 9999px;
+}
+
+.assistant-filled-field {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.16) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
 // Mobile App Navigation Styles
 .mobile-bottom-nav {
     -webkit-tap-highlight-color: transparent;

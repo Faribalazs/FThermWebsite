@@ -2,6 +2,83 @@
 
 This document explains how to deploy the Laravel application to `public_html` with the custom Artisan command.
 
+## Automatic deployment on this server
+
+Enabled and verified on 2026-10-27. A full deployment of `9c6bef00f713` completed successfully,
+including the database backup, migration check, cache rebuild and HTTPS checks for `/up` and `/sr`.
+The first independent cron run was also verified.
+
+The production server polls `origin/main` every minute. Pushes to other branches do not deploy.
+The runner is installed outside the checkout at `/home/fthermrs/deploy-ftherm`, so updating
+application code cannot interrupt the script that is currently running.
+
+```cron
+* * * * * /bin/bash /home/fthermrs/deploy-ftherm/auto-update.sh >> /home/fthermrs/deploy-ftherm/cron.log 2>&1
+```
+
+Each new commit is fetched using the server's existing GitHub access. The runner:
+
+1. Requires a clean `main` checkout and a fast-forward update, and takes an exclusive lock.
+2. Installs production Composer dependencies and runs `npm ci` / `npm run build` in a temporary directory with Node 22.
+3. Saves the previous source, vendor directory and public files in a private backup directory.
+4. Enables maintenance mode and creates a MySQL dump before running any migration.
+5. Updates the code and dependencies, runs `migrate --force`, clears/rebuilds Laravel caches,
+   publishes the frontend and signals queue workers to restart.
+6. Disables maintenance mode, checks `/up` and `/sr` over HTTPS, and records the successful commit.
+
+The production `.env`, application key and uploaded files are preserved. This host uses
+`PUBLIC_STORAGE_PATH=/home/fthermrs/public_html/storage`; the runner verifies that storage
+configuration and never copies the old `storage/app/public` files over current uploads.
+It never runs `migrate:fresh`, `migrate:refresh`, seeders or automatic database rollbacks.
+There are currently no scheduled application tasks or queued application jobs to configure.
+`queue:restart` signals existing workers; it does not create a worker service.
+
+### Status and recovery
+
+```bash
+cat /home/fthermrs/deploy-ftherm/state/status
+tail -n 100 /home/fthermrs/deploy-ftherm/logs/*.log
+/bin/bash /home/fthermrs/deploy-ftherm/auto-update.sh --check
+```
+
+If preparation fails, the live site remains unchanged. The same failed commit is not retried
+every minute; push a fix or use `--retry` after correcting the cause. If a failure occurs after
+live changes begin, maintenance mode stays enabled and automatic deployment stops, including
+for newer commits. Review the log and backup, fix the cause, then explicitly retry:
+
+```bash
+/bin/bash /home/fthermrs/deploy-ftherm/auto-update.sh --retry
+```
+
+Do not simply run `artisan up` after a failed migration: the schema and code must first be
+checked for compatibility. MySQL migrations can partly apply before failing. Recovery backups
+are in `/home/fthermrs/deploy-ftherm/backups/<timestamp>-<commit>/`; they include `database.sql`,
+`source.tar.gz`, `vendor.tar.gz`, `public.tar.gz` and the previous commit hash. Uploaded files and
+`.env` are not duplicated by this deployment backup. Backups are retained until manually pruned.
+
+Pause/resume automatic polling without editing the cron entry:
+
+```bash
+touch /home/fthermrs/deploy-ftherm/state/paused
+rm /home/fthermrs/deploy-ftherm/state/paused
+```
+
+To redeploy the current commit, use `--force` (a failed live deployment still requires `--retry`).
+
+### Installing or updating the runner
+
+Copy `deploy/auto-update.sh`, `deploy/backup-database.php` and a configured copy of
+`deploy/config.env.example` into `/home/fthermrs/deploy-ftherm` as `config.env`.
+Keep this directory private (`chmod 700`) and the config private (`chmod 600`). Runner changes
+in Git are **not** automatically copied into that directory; install them separately after review.
+Run `--check`, then `--force` to verify a full deployment before enabling the cron entry.
+
+Local deployment tests use temporary Git repositories and stubbed services:
+
+```bash
+python3 -m unittest discover -s tests/Deployment -v
+```
+
 ## Server structure
 
 ```text
@@ -186,3 +263,12 @@ Ezt kell futtatni:
 
 php artisan config:clear
 php artisan deploy:public --skip-build --storage-mode=copy
+
+
+## Reference videos and optimized uploads
+
+- Run `php artisan migrate --force` when deploying the reference video feature. The automatic deployment runner already does this. The additive migration creates `gallery_videos`; existing photos are unchanged.
+- Admin → Reference → Edit now accepts one MP4 or WebM video per upload, up to 50 MiB. MP4 with H.264 is recommended; uploads are stored as supplied, without server-side video transcoding. Public players use controls, inline playback and `preload="none"`.
+- `public/.user.ini` requests a 64 MiB per-file and 128 MiB total POST limit. Publish this hidden file into the document root as well. If the PHP handler ignores `.user.ini`, apply the same limits in cPanel's PHP settings; any web-server/proxy body limit must also permit these uploads.
+- All existing admin image upload forms use `WebpImageStorage`: WebP quality 82, maximum long edge 2048 px, proportional resizing without upscaling, alpha preservation, and JPEG EXIF orientation when PHP EXIF is enabled. PHP GD must include WebP support. This applies to new uploads; existing files are not rewritten.
+- Targeted checks: `php artisan test tests/Feature/WebpImageStorageTest.php tests/Feature/GalleryMediaTest.php` and `npm run build`. Database tests require PDO SQLite.

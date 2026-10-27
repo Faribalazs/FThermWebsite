@@ -94,6 +94,9 @@ return [
     'gallery_empty' => 'Trenutno nema referenci za prikaz.',
     'gallery_view_album' => 'Pogledaj referencu',
     'gallery_photos' => 'fotografija',
+    'gallery_videos_title' => 'Video snimci reference',
+    'gallery_videos' => 'video',
+    'gallery_download_video' => 'Preuzmi video',
     'gallery_no_images' => 'Ova referenca nema fotografija.',
     'gallery_back' => 'Nazad na reference',
 ];

@@ -155,7 +155,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                     </svg>
                     <p class="text-sm font-bold text-gray-500">Kliknite ili prevucite slike ovde</p>
-                    <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP — max 8 MB po slici</p>
+                    <p class="text-xs text-gray-400 mt-1">JPG, PNG, GIF, WEBP — max 8 MB po slici, do 10 slika odjednom</p>
+                    <p class="text-xs text-gray-500 mt-2">Slike se automatski optimizuju u WebP, do 2048 px, za brže učitavanje uz visok kvalitet.</p>
                     <label for="image-input" class="mt-4 inline-flex min-h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-primary-700 cursor-pointer">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2 1.6-1.6a2 2 0 012.8 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         Izaberi slike sa uređaja
@@ -177,6 +178,15 @@
                     </button>
                 </div>
             </form>
+
+            @foreach ($errors->get('images') as $message)
+                <p class="mb-3 text-sm text-red-600" role="alert">{{ $message }}</p>
+            @endforeach
+            @foreach ($errors->get('images.*') as $messages)
+                @foreach ($messages as $message)
+                    <p class="mb-3 text-sm text-red-600" role="alert">{{ $message }}</p>
+                @endforeach
+            @endforeach
 
             <!-- Existing Images (sortable) -->
             @if($gallery->images->isNotEmpty())
@@ -204,7 +214,7 @@
                 @foreach($gallery->images as $image)
                 <div class="relative group cursor-grab active:cursor-grabbing" data-id="{{ $image->id }}">
                     <div class="aspect-square rounded-xl overflow-hidden bg-gray-100 shadow-sm group-hover:shadow-md transition-shadow duration-200">
-                        <img src="{{ Storage::url($image->path) }}" alt="" class="w-full h-full object-cover">
+                        <img src="{{ Storage::url($image->path) }}" alt="" loading="lazy" decoding="async" class="w-full h-full object-cover">
                     </div>
                     <label class="absolute left-2 top-2 z-20 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/95 shadow-md" aria-label="Izaberi sliku {{ $loop->iteration }}">
                         <input type="checkbox" name="image_ids[]" value="{{ $image->id }}" form="bulk-delete-form"
@@ -236,6 +246,7 @@
             @endif
         </div>
     </div>
+    @include('admin.gallery._videos')
 </div>
 
 <!-- SortableJS CDN -->
@@ -248,23 +259,32 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewGrid = document.getElementById('preview-grid');
     const dropZone = document.getElementById('drop-zone');
 
+    let previewUrls = [];
     function showPreviews(files) {
+        previewUrls.forEach(url => URL.revokeObjectURL(url));
+        previewUrls = [];
         previewGrid.innerHTML = '';
         if (!files.length) { previewContainer.classList.add('hidden'); return; }
         previewContainer.classList.remove('hidden');
         Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const div = document.createElement('div');
-                div.className = 'aspect-square rounded-xl overflow-hidden bg-gray-100';
-                div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
-                previewGrid.appendChild(div);
-            };
-            reader.readAsDataURL(file);
+            if (!file.type.startsWith('image/')) return;
+            const url = URL.createObjectURL(file);
+            previewUrls.push(url);
+            const div = document.createElement('div');
+            div.className = 'aspect-square rounded-xl overflow-hidden bg-gray-100';
+            const image = document.createElement('img');
+            image.src = url;
+            image.alt = file.name;
+            image.className = 'w-full h-full object-cover';
+            div.appendChild(image);
+            previewGrid.appendChild(div);
         });
     }
 
     input.addEventListener('change', () => showPreviews(input.files));
+    dropZone.addEventListener('click', e => {
+        if (!e.target.closest('label, input')) input.click();
+    });
     dropZone.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -284,9 +304,27 @@ document.addEventListener('DOMContentLoaded', function () {
         showPreviews(input.files);
     });
 
+    const videoForm = document.getElementById('video-upload-form');
+    const videoInput = document.getElementById('video-input');
+    const videoError = document.getElementById('video-error');
+    videoInput.addEventListener('change', () => {
+        const tooLarge = videoInput.files[0]?.size > 50 * 1024 * 1024;
+        const message = tooLarge ? 'Video može imati najviše 50 MB.' : '';
+        videoInput.setCustomValidity(message);
+        videoError.textContent = message;
+    });
+    videoForm.addEventListener('submit', () => {
+        videoForm.querySelector('button[type="submit"]').disabled = true;
+        document.getElementById('video-upload-status').textContent = 'Otpremanje videa… Sačekajte i ostavite ovu stranicu otvorenu.';
+    });
+    window.addEventListener('pageshow', () => {
+        videoForm.querySelector('button[type="submit"]').disabled = false;
+        document.getElementById('video-upload-status').textContent = '';
+    });
+
     // Sortable
     const sortableEl = document.getElementById('sortable-images');
-    if (sortableEl) {
+    if (sortableEl && window.Sortable) {
         Sortable.create(sortableEl, {
             animation: 150,
             ghostClass: 'opacity-30',

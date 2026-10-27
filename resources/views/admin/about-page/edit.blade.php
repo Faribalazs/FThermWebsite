@@ -177,6 +177,7 @@
                                 <input id="hero_image" name="hero_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
                                 <p class="mt-2 text-xs text-gray-500">Ostavite prazno ako ne želite da menjate postojeću sliku.</p>
                                 @error('hero_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                                <p class="mt-2 text-xs text-gray-500">Automatska WebP optimizacija do 2048 px, uz visok kvalitet slike.</p>
                             </div>
 
                             <div class="rounded-xl border border-gray-200 bg-gray-50/50 p-4">
@@ -189,6 +190,7 @@
                                 <input id="secondary_image" name="secondary_image" type="file" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-primary-50 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-primary-700 hover:file:bg-primary-100">
                                 <p class="mt-2 text-xs text-gray-500">Ostavite prazno ako ne želite da menjate postojeću sliku.</p>
                                 @error('secondary_image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                                <p class="mt-2 text-xs text-gray-500">Automatska WebP optimizacija do 2048 px, uz visok kvalitet slike.</p>
                             </div>
                         </div>
 

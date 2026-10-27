@@ -56,6 +56,7 @@
                     </label>
                 </div>
                 @error('image')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                <p class="mt-2 text-xs text-gray-500">Automatska WebP optimizacija do 2048 px, uz visok kvalitet slike.</p>
             </div>
         </div>
 

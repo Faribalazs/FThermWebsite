@@ -63,15 +63,20 @@ if (!function_exists('shop_enabled')) {
      */
     function shop_enabled(): bool
     {
-        static $enabled = null;
+        $request = app()->bound('request') ? request() : null;
 
-        if ($enabled !== null) {
-            return $enabled;
+        if ($request?->attributes->has('_ftherm_shop_enabled')) {
+            return (bool) $request->attributes->get('_ftherm_shop_enabled');
         }
 
         $value = \App\Models\Setting::where('key', 'shop_enabled')->value('value');
+        $enabled = in_array($value, ['true', '1', 1, true], true);
 
-        return $enabled = !in_array($value, ['false', '0', 0, false], true);
+        // Cache only on the current request. A process-wide static value can leak
+        // across multiple requests in long-running workers and in feature tests.
+        $request?->attributes->set('_ftherm_shop_enabled', $enabled);
+
+        return $enabled;
     }
 }
 

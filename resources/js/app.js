@@ -1,4 +1,5 @@
 import './bootstrap';
+import './worker-work-order-assistant';
 
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2';

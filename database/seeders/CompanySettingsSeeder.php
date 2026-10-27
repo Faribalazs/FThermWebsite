@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class CompanySettingsSeeder extends Seeder
 {
@@ -22,7 +22,6 @@ class CompanySettingsSeeder extends Seeder
             'company_email' => 'farkas.tibor@ftherm.rs',
             'company_sifra_delatnosti' => '4322',
             'km_price' => '50',
-            'shop_enabled' => 'true',
         ];
 
         foreach ($settings as $key => $value) {
@@ -31,6 +30,9 @@ class CompanySettingsSeeder extends Seeder
                 ['value' => $value]
             );
         }
+
+        // Default to hidden without overwriting an administrator's later choice.
+        Setting::firstOrCreate(['key' => 'shop_enabled'], ['value' => 'false']);
 
         $this->command->info('Company settings seeded successfully!');
     }

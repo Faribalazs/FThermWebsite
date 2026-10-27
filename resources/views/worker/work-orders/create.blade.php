@@ -77,6 +77,8 @@
                 @csrf
                 <input type="hidden" name="draft_id" id="draft_id" value="">
 
+                @include('worker.work-orders.partials.voice-assistant')
+
                 <!-- Contact Selector -->
                 @include('worker.partials.contact-selector')
 
@@ -517,7 +519,9 @@
 
     <script>
         let sectionIndex = 0;
-        const products = @json($products);
+        window.workOrderProducts = @json($products);
+        window.workOrderContacts = @json($contacts ?? []);
+        const products = window.workOrderProducts;
         // Build a fast lookup map: id → product
         const productMap = Object.fromEntries(products.map(p => [p.id, p]));
         let currentWarehouseId = parseInt(document.getElementById('warehouse_value').value) || null;

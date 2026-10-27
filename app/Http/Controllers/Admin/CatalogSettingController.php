@@ -10,10 +10,8 @@ class CatalogSettingController extends Controller
 {
     public function index()
     {
-        $shopEnabled = Setting::where('key', 'shop_enabled')->value('value');
-
         return view('admin.catalog-settings.index', [
-            'shopEnabled' => !in_array($shopEnabled, ['false', '0', 0, false], true),
+            'shopEnabled' => shop_enabled(),
         ]);
     }
 

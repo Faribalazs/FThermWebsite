@@ -94,6 +94,9 @@ return [
     'gallery_empty' => 'Még nincs megjeleníthető referencia.',
     'gallery_view_album' => 'Referencia megtekintése',
     'gallery_photos' => 'fotó',
+    'gallery_videos_title' => 'Referenciavideók',
+    'gallery_videos' => 'videó',
+    'gallery_download_video' => 'Videó letöltése',
     'gallery_no_images' => 'Ehhez a referenciához nincs fotó.',
     'gallery_back' => 'Vissza a referenciákhoz',
 ];

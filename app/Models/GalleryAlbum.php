@@ -25,4 +25,9 @@ class GalleryAlbum extends Model
     {
         return $this->hasMany(GalleryImage::class, 'album_id')->orderBy('order');
     }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(GalleryVideo::class, 'album_id')->orderBy('order')->orderBy('id');
+    }
 }

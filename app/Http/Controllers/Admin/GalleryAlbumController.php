@@ -15,7 +15,9 @@ class GalleryAlbumController extends Controller
 
     public function index()
     {
-        $albums = GalleryAlbum::withCount('images')->orderBy('order')->paginate(20);
+        $albums = GalleryAlbum::withCount(['images', 'videos'])
+            ->with(['images' => fn ($query) => $query->limit(1)])
+            ->orderBy('order')->paginate(20);
 
         return view('admin.gallery.index', compact('albums'));
     }
@@ -39,7 +41,7 @@ class GalleryAlbumController extends Controller
             'active' => 'boolean',
         ]);
 
-        GalleryAlbum::create([
+        $gallery = GalleryAlbum::create([
             'title' => [
                 'sr' => $validated['title_sr'],
                 'en' => $validated['title_en'],
@@ -55,12 +57,12 @@ class GalleryAlbumController extends Controller
             'active' => $request->has('active'),
         ]);
 
-        return redirect()->route('admin.gallery.index')->with('success', 'Referenca uspešno kreirana');
+        return redirect()->route('admin.gallery.edit', $gallery)->with('success', 'Referenca uspešno kreirana. Sada možete dodati slike i video snimke.');
     }
 
     public function edit(GalleryAlbum $gallery)
     {
-        $gallery->load('images');
+        $gallery->load(['images', 'videos']);
 
         return view('admin.gallery.edit', compact('gallery'));
     }
@@ -104,6 +106,9 @@ class GalleryAlbumController extends Controller
         foreach ($gallery->images as $image) {
             Storage::disk('public')->delete($image->path);
         }
+        foreach ($gallery->videos as $video) {
+            Storage::disk('public')->delete($video->path);
+        }
         $gallery->delete();
 
         return redirect()->route('admin.gallery.index')->with('success', 'Referenca uspešno obrisana');
@@ -112,8 +117,8 @@ class GalleryAlbumController extends Controller
     public function uploadImage(Request $request, GalleryAlbum $gallery)
     {
         $request->validate([
-            'images' => 'required',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:8192',
+            'images' => 'required|array|min:1|max:10',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:8192',
         ]);
 
         $lastOrder = $gallery->images()->max('order') ?? 0;

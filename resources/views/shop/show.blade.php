@@ -134,7 +134,7 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-8">{{ __('frontend.product_related') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach($related_products as $related)
-            <a href="{{ route('shop.show', $related) }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+            <a href="{{ route('shop.show', ['productSlug' => $related->slug]) }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
                 @if($related->primaryImage)
                 <div class="relative overflow-hidden bg-gray-100">
                     <img src="{{ asset('storage/' . $related->primaryImage->image_path) }}" alt="{{ translate($related->name) }}" class="w-full h-44 object-cover group-hover:scale-105 transition duration-500">

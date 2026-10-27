@@ -375,7 +375,7 @@
                     </div>
                     <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($featured_products as $product)
-                            <a href="{{ route('shop.show', $product) }}"
+                            <a href="{{ route('shop.show', ['productSlug' => $product->slug]) }}"
                                 class="service-card motion-reveal group overflow-hidden" data-reveal
                                 style="--delay: {{ ($loop->index % 3) * 80 }}ms">
                                 @if ($product->primaryImage)

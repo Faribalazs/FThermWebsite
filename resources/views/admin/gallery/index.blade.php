@@ -14,7 +14,7 @@
             </div>
             <div>
                 <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Reference</h1>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte referencama i slikama</p>
+                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte referencama, slikama i video snimcima</p>
             </div>
         </div>
         <a href="{{ route('admin.gallery.create') }}" class="inline-flex items-center px-4 sm:px-6 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-xs sm:text-sm font-bold hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto justify-center">
@@ -81,7 +81,7 @@
                         </span>
                     @endif
                 </div>
-                <p class="text-xs text-gray-400">{{ $album->images_count }} {{ $album->images_count === 1 ? 'slika' : ($album->images_count < 5 ? 'slike' : 'slika') }} &middot; Redosled: {{ $album->order }} &middot; /{{ $album->slug }}</p>
+                <p class="text-xs text-gray-400">{{ $album->images_count }} {{ $album->images_count === 1 ? 'slika' : ($album->images_count < 5 ? 'slike' : 'slika') }} &middot; {{ $album->videos_count }} video &middot; Redosled: {{ $album->order }} &middot; /{{ $album->slug }}</p>
             </div>
 
             <!-- Actions -->
@@ -92,7 +92,7 @@
                     </svg>
                 </a>
                 <form action="{{ route('admin.gallery.destroy', $album) }}" method="POST" class="inline"
-                      data-confirm="Da li ste sigurni da želite da obrišete referencu '{{ $album->title['sr'] ?? '' }}' i sve slike u njoj?"
+                      data-confirm="Da li ste sigurni da želite da obrišete referencu '{{ $album->title['sr'] ?? '' }}' i sve slike i video snimke u njoj?"
                       data-type="delete">
                     @csrf
                     @method('DELETE')

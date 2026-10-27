@@ -52,7 +52,10 @@ Route::prefix('{locale}')
         Route::get('/about', [AboutPageController::class, 'show'])->name('about');
         Route::get('/o-nama', fn (string $locale) => redirect()->route('about', ['locale' => $locale], 301));
         Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-        Route::get('/shop/{product:slug}', [ShopController::class, 'show'])->name('shop.show');
+        // Keep the slug unresolved until the controller has checked the catalog switch.
+        // Otherwise Laravel's implicit binding turns stale product URLs into a 404 before
+        // the disabled catalog can consistently return its search-engine removal response.
+        Route::get('/shop/{productSlug}', [ShopController::class, 'show'])->name('shop.show');
         Route::get('/services/{service:slug}', [ServicePageController::class, 'show'])->name('services.show');
         Route::get('/klime-subotica', [LocalSeoController::class, 'airConditioning'])->name('local-seo.air-conditioning');
         Route::get('/toplotne-pumpe-subotica', [LocalSeoController::class, 'heatPumps'])->name('local-seo.heat-pumps');
@@ -119,6 +122,8 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     Route::delete('references/{gallery}/images', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImages'])->name('gallery.images.bulk-delete');
     Route::delete('references/images/{image}', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'deleteImage'])->name('gallery.images.delete');
     Route::post('references/{gallery}/images/reorder', [App\Http\Controllers\Admin\GalleryAlbumController::class, 'reorderImages'])->name('gallery.images.reorder');
+    Route::post('references/{gallery}/videos', [App\Http\Controllers\Admin\GalleryVideoController::class, 'store'])->name('gallery.videos.upload');
+    Route::delete('references/{gallery}/videos/{video}', [App\Http\Controllers\Admin\GalleryVideoController::class, 'destroy'])->name('gallery.videos.delete');
 
     // Worker Management
     Route::resource('workers', App\Http\Controllers\Admin\WorkerController::class);

@@ -94,6 +94,9 @@ return [
     'gallery_empty' => 'No references to display yet.',
     'gallery_view_album' => 'View reference',
     'gallery_photos' => 'photos',
+    'gallery_videos_title' => 'Reference videos',
+    'gallery_videos' => 'videos',
+    'gallery_download_video' => 'Download video',
     'gallery_no_images' => 'This reference has no photos.',
     'gallery_back' => 'Back to references',
 ];

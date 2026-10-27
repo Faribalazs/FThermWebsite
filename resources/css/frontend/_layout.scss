@@ -251,6 +251,88 @@
     box-shadow: inset 0 0 0 1px rgba(9, 83, 154, 0.08);
 }
 
+.site-nav-services {
+    position: relative;
+}
+
+.site-nav-services__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.site-nav-services__trigger svg {
+    transition: transform 0.2s ease;
+}
+
+.site-nav-services__menu {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    left: 0;
+    width: 17rem;
+    padding: 0.5rem;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-0.35rem);
+    border: 1px solid rgba(9, 83, 154, 0.13);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 24px 60px rgba(7, 21, 39, 0.16);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    pointer-events: none;
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+}
+
+.site-nav-services__menu::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: 0.75rem;
+}
+
+.site-nav-services:hover .site-nav-services__menu,
+.site-nav-services:focus-within .site-nav-services__menu {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.site-nav-services:hover .site-nav-services__trigger svg,
+.site-nav-services:focus-within .site-nav-services__trigger svg {
+    transform: rotate(180deg);
+}
+
+.site-nav-services__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 0.7rem;
+    padding: 0.75rem 0.8rem;
+    color: #334155;
+    font-size: 0.84rem;
+    font-weight: 850;
+    transition:
+        color 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+.site-nav-services__option:hover,
+.site-nav-services__option:focus-visible {
+    transform: translateX(2px);
+    background: #f0f9ff;
+    color: #09539a;
+    outline: none;
+}
+
 .site-action,
 .site-icon-button,
 .site-lang-button {
@@ -277,6 +359,30 @@
 .site-mobile-nav-link {
     text-transform: uppercase;
     letter-spacing: 0;
+}
+
+.site-mobile-local-links {
+    margin: 0.15rem 0 0.5rem 0.75rem;
+    padding-left: 0.65rem;
+    border-left: 2px solid rgba(9, 83, 154, 0.16);
+}
+
+.site-mobile-local-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 0.75rem;
+    padding: 0.7rem 0.75rem;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.site-mobile-local-link:hover {
+    background: #f0f9ff;
+    color: #09539a;
 }
 
 .site-footer {

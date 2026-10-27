@@ -35,6 +35,9 @@
                             </svg>
                             {{ $album->images->count() }} {{ __('frontend.gallery_photos') }}
                         </span>
+                        @if ($album->videos->isNotEmpty())
+                            <span class="reference-detail-pill">{{ $album->videos->count() }} {{ __('frontend.gallery_videos') }}</span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -43,7 +46,7 @@
         <section class="reference-gallery-section">
             <div class="reference-detail-container">
                 <div class="reference-gallery-head">
-                    <h2>{{ __('frontend.gallery_photos_title') }}</h2>
+                    <h2>{{ __($album->images->isEmpty() && $album->videos->isNotEmpty() ? 'frontend.gallery_videos_title' : 'frontend.gallery_photos_title') }}</h2>
                     <a href="{{ route('references.index', ['locale' => current_locale()]) }}" class="reference-back-link">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,15 +57,17 @@
                 </div>
 
                 @if ($album->images->isEmpty())
-                    <div class="reference-empty">
-                        <p>{{ __('frontend.gallery_no_images') }}</p>
-                    </div>
+                    @if ($album->videos->isEmpty())
+                        <div class="reference-empty">
+                            <p>{{ __('frontend.gallery_no_images') }}</p>
+                        </div>
+                    @endif
                 @else
                     <div class="reference-photo-grid">
                         @foreach ($album->images as $image)
                             <button type="button" class="reference-photo" @click="open({{ $loop->index }})">
                                 <img src="{{ Storage::url($image->path) }}"
-                                    alt="{{ $albumTitle }} - {{ $loop->iteration }}" loading="lazy">
+                                    alt="{{ $albumTitle }} - {{ $loop->iteration }}" loading="lazy" decoding="async">
                                 <span class="reference-photo__overlay" aria-hidden="true">
                                     <span class="reference-photo__icon">
                                         <svg width="20" height="20" fill="none" stroke="currentColor"
@@ -73,6 +78,29 @@
                                     </span>
                                 </span>
                             </button>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if ($album->videos->isNotEmpty())
+                    @if ($album->images->isNotEmpty())
+                        <div class="reference-gallery-head reference-video-heading">
+                            <h2>{{ __('frontend.gallery_videos_title') }}</h2>
+                        </div>
+                    @endif
+                    <div class="reference-video-grid">
+                        @foreach ($album->videos as $video)
+                            <figure class="reference-video-card">
+                                <video controls playsinline preload="none"
+                                    @if ($heroImage) poster="{{ Storage::url($heroImage->path) }}" @endif
+                                    aria-label="{{ $video->caption ?: $albumTitle.' — '.($loop->iteration) }}">
+                                    <source src="{{ Storage::url($video->path) }}" type="{{ $video->mime_type }}">
+                                </video>
+                                <figcaption>
+                                    <span>{{ $video->caption ?: $albumTitle.' — '.($loop->iteration) }}</span>
+                                    <a href="{{ Storage::url($video->path) }}" download>{{ __('frontend.gallery_download_video') }}</a>
+                                </figcaption>
+                            </figure>
                         @endforeach
                     </div>
                 @endif
@@ -106,7 +134,7 @@
             </button>
 
             <div class="reference-lightbox__stage">
-                <img :src="images[current]" :alt="'Photo ' + (current + 1)" @click.stop>
+                <img :src="isOpen ? images[current] : null" :alt="'Photo ' + (current + 1)" @click.stop>
             </div>
 
             <button type="button" @click.stop="next()" x-show="total > 1"
@@ -122,7 +150,7 @@
                         <button type="button" @click.stop="open({{ $loop->index }})"
                             :class="current === {{ $loop->index }} ? 'is-active' : ''"
                             class="reference-thumb">
-                            <img src="{{ Storage::url($image->path) }}" alt="">
+                            <img :src="isOpen ? @js(Storage::url($image->path)) : null" alt="">
                         </button>
                     @endforeach
                 </div>

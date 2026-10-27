@@ -11,7 +11,7 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        if (!shop_enabled()) {
+        if (! shop_enabled()) {
             return $this->gone();
         }
 
@@ -27,11 +27,16 @@ class ShopController extends Controller
         return view('shop.index', compact('products', 'categories'));
     }
 
-    public function show(string $locale, Product $product)
+    public function show(string $locale, string $productSlug)
     {
-        if (!shop_enabled()) {
+        if (! shop_enabled()) {
             return $this->gone();
         }
+
+        $product = Product::query()
+            ->where('slug', $productSlug)
+            ->where('active', true)
+            ->firstOrFail();
 
         $product->load('category', 'images');
         $related_products = Product::where('active', true)
@@ -48,7 +53,7 @@ class ShopController extends Controller
      */
     private function gone(): Response
     {
-        return response('', Response::HTTP_GONE)
+        return response()->view('errors.catalog-gone', [], Response::HTTP_GONE)
             ->header('X-Robots-Tag', 'noindex, nofollow, noarchive')
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     }

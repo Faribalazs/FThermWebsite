@@ -41,7 +41,7 @@
         <div class="flex-1">
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 @forelse($products as $product)
-                <a href="{{ route('shop.show', $product) }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+                <a href="{{ route('shop.show', ['productSlug' => $product->slug]) }}" class="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
                     @if($product->primaryImage)
                     <div class="relative overflow-hidden bg-gray-100">
                         <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ translate($product->name) }}" class="w-full h-52 object-cover group-hover:scale-105 transition duration-500">

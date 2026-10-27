@@ -7,6 +7,7 @@
 @section('content')
     @php
         $totalPhotos = $albums->sum('images_count');
+        $totalVideos = $albums->sum('videos_count');
     @endphp
 
     <main class="references-page">
@@ -28,6 +29,12 @@
                             <strong>{{ $totalPhotos }}</strong>
                             <span>{{ __('frontend.gallery_photos') }}</span>
                         </span>
+                        @if ($totalVideos)
+                            <span class="references-stat">
+                                <strong>{{ $totalVideos }}</strong>
+                                <span>{{ __('frontend.gallery_videos') }}</span>
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -61,7 +68,7 @@
                                 class="reference-album">
                                 <div class="reference-album__media">
                                     @if ($cover)
-                                        <img src="{{ Storage::url($cover->path) }}" alt="{{ $title }}" loading="lazy">
+                                        <img src="{{ Storage::url($cover->path) }}" alt="{{ $title }}" loading="lazy" decoding="async">
                                     @else
                                         <div class="reference-album__empty">
                                             <svg width="48" height="48" fill="none" stroke="currentColor"
@@ -76,7 +83,10 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4 16l4.6-4.6a2 2 0 012.8 0L16 16m-2-2l1.6-1.6a2 2 0 012.8 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        {{ $album->images_count }}
+                                        {{ $album->images_count }} {{ __('frontend.gallery_photos') }}
+                                        @if ($album->videos_count)
+                                            · {{ $album->videos_count }} {{ __('frontend.gallery_videos') }}
+                                        @endif
                                     </span>
                                 </div>
                                 <div class="reference-album__body">
