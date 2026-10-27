@@ -15,12 +15,14 @@
             </div>
             <div>
                 <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Sistemska Podešavanja</h1>
-                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte podešavanjima vašeg sajta</p>
+                <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Upravljajte svojim nalogom i podešavanjima sajta</p>
             </div>
         </div>
     </div>
 
     <div class="space-y-6">
+        @include('admin.settings.partials.account')
+
         <!-- Maintenance Mode Card -->
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div class="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">

@@ -216,9 +216,52 @@ If `public_html/storage` is a real directory, automatic mode synchronizes files 
 
 Do not use `php artisan storage:link` for this cPanel layout. Laravel's `public` directory is not the live document root; `deploy:public` publishes storage in the correct `public_html` directory.
 
+## PHP security updates
+
+The minimum supported patch versions are **8.2.35, 8.3.36, 8.4.27, and 8.5.12**.
+These contain the fixes for CVE-2026-109618 and CVE-2026-109619, announced in the
+[PHP security advisory on 21 October 2026](https://www.php.net/archive/2026.php).
+Composer rejects older patch versions in each branch; changing `composer.json` does
+not install or upgrade the PHP runtime itself.
+
+Verified on 2026-10-27: the live LiteSpeed response and CLI both reported PHP 8.2.35,
+production Composer platform checks passed, and `/up`, `/sr`, `/sr/contact`, and
+`/admin/login` returned HTTP 200. The provider had already applied the patch; no
+production runtime change was needed. The CLI also reported
+`session.upload_progress.enabled=0` and `session.serialize_handler=php`.
+
+Check both the website's PHP handler and the CLI used by cron/Composer. A PHP
+Selector label such as `8.2` only identifies the branch, not its patch version.
+On this host, check the selected runtime's full version in the cPanel Terminal:
+
+```bash
+php -v
+composer check-platform-reqs --no-dev
+```
+
+The hosting provider installs patch releases. If a patch update leaves old PHP
+workers running, restart the affected workers through the hosting controls or ask
+the provider to do so. After an update, verify `/up`, `/sr`, `/sr/contact`, and the
+admin login. Keep the website and deployment CLI on patched runtimes.
+
+PHP 8.2 reaches end of upstream security support on 31 December 2026. Plan a tested
+upgrade to a newer supported branch before that date.
+
+For the local Ubuntu development environment, the configured PHP package repository
+provides 8.2.35. Updating the system installation requires administrator access:
+
+```bash
+sudo apt-get update
+sudo apt-get install --only-upgrade php8.2-cli php8.2-common php8.2-bz2 php8.2-curl php8.2-gd php8.2-mbstring php8.2-mysql php8.2-opcache php8.2-phpdbg php8.2-readline php8.2-xml php8.2-zip
+php -v
+```
+
+Restart any development server after updating, so it uses the patched binary.
+Do not bypass Composer's PHP version check with `--ignore-platform-reqs`.
+
 ## Server requirements
 
-- PHP 8.2+
+- PHP 8.2.35+, 8.3.36+, 8.4.27+, or 8.5.12+ (latest security patch in the selected branch)
 - MySQL 5.7+ or MariaDB 10.3+
 - Apache with `mod_rewrite`
 - Composer

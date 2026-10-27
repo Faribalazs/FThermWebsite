@@ -85,7 +85,7 @@ A modern, production-ready Laravel 12 application for FTHERM - a professional HV
 ## 🛠 Installation
 
 ### Prerequisites
-- PHP 8.2+
+- PHP 8.2.35+, 8.3.36+, 8.4.27+, or 8.5.12+ (latest security patch in the selected branch)
 - Composer
 - Node.js & NPM
 - MySQL

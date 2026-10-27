@@ -135,6 +135,8 @@ Route::middleware(['auth:admin', 'admin'])->prefix('admin')->name('admin.')->gro
     // Settings
     Route::get('settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    Route::patch('settings/email', [App\Http\Controllers\Admin\AccountController::class, 'updateEmail'])->middleware('throttle:6,1')->name('settings.email.update');
+    Route::put('settings/password', [App\Http\Controllers\Admin\AccountController::class, 'updatePassword'])->middleware('throttle:6,1')->name('settings.password.update');
 });
 
 // Worker Routes
