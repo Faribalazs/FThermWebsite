@@ -86,10 +86,12 @@ if (!function_exists('setting_value')) {
      */
     function setting_value(string $key, mixed $default = null): mixed
     {
-        static $settings = [];
+        $request = app()->bound('request') ? request() : null;
+        $settings = $request?->attributes->get('_ftherm_settings', []) ?? [];
 
         if (!array_key_exists($key, $settings)) {
             $settings[$key] = \App\Models\Setting::where('key', $key)->value('value');
+            $request?->attributes->set('_ftherm_settings', $settings);
         }
 
         return $settings[$key] ?? $default;

@@ -49,7 +49,7 @@
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                         <a href="{{ route('home', ['locale' => current_locale()]) }}#services"
                             class="service-btn service-btn--red">{{ $copy['services'] }}</a>
-                        <a href="{{ route('home', ['locale' => current_locale()]) }}#contact"
+                        <a href="{{ route('contact', ['locale' => current_locale()]) }}"
                             class="service-btn service-btn--ghost">{{ $copy['quote'] }}</a>
                     </div>
                 </div>

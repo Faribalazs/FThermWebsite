@@ -11,6 +11,11 @@ use Throwable;
 
 class ContactController extends Controller
 {
+    public function show()
+    {
+        return response()->view('contact.show')->header('Cache-Control', 'no-store, private');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

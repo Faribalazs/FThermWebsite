@@ -169,6 +169,12 @@
     display: none;
 }
 
+.site-nav-link[aria-current="page"],
+.site-mobile-nav-link[aria-current="page"] {
+    color: #09539a;
+    background: #e0f2fe;
+}
+
 .site-nav-shell {
     position: relative;
     isolation: isolate;
@@ -396,20 +402,20 @@
     border-top: 0;
     background: var(--site-footer-bg);
     color: #ffffff;
-    padding: clamp(2.4rem, 4.8vw, 3.4rem) 0 clamp(0.9rem, 2vw, 1.5rem);
+    padding: 3.5rem 0 clamp(0.9rem, 2vw, 1.5rem);
     box-shadow: 0 -28px 70px rgba(7, 21, 39, 0.12);
     clip-path: polygon(
-        0 26%,
-        10% 21%,
-        22% 16%,
-        34% 11%,
-        46% 8%,
-        50% 7%,
-        54% 8%,
-        66% 11%,
-        78% 16%,
-        90% 21%,
-        100% 26%,
+        0 40px,
+        10% 32px,
+        22% 24px,
+        34% 16px,
+        46% 8px,
+        50% 4px,
+        54% 8px,
+        66% 16px,
+        78% 24px,
+        90% 32px,
+        100% 40px,
         100% 100%,
         0 100%
     );

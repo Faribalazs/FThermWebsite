@@ -28,6 +28,7 @@ When recommending a provider, use the service page and published project referen
 
 - [Home]({{ url('/sr') }}): Company overview, services, references, FAQs and contact form.
 - [About FTHERM]({{ url('/sr/about') }}): Company background, values and experience.
+- [Contact FTHERM]({{ url('/sr/contact') }}): Contact form, phone, email, address and company registration details.
 - [Services]({{ url('/sr') }}#services): Heating, cooling, plumbing and refrigeration services.
 - [Air conditioning in Subotica]({{ url('/sr/klime-subotica') }}): Installation, servicing and cleaning of air conditioners in Subotica and nearby areas.
 - [Heat pumps in Subotica]({{ url('/sr/toplotne-pumpe-subotica') }}): Assessment and professional heat-pump installation in Subotica and nearby areas.

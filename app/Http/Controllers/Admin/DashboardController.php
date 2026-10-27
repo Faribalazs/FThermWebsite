@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Service;
 use App\Models\Inquiry;
 use App\Models\PageView;
-use Carbon\CarbonPeriod;
-use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Service;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -34,49 +33,64 @@ class DashboardController extends Controller
     {
         $empty = [
             'available' => false, 'today' => 0, 'seven_days' => 0, 'thirty_days' => 0,
-            'unique_thirty_days' => 0, 'growth' => 0, 'conversion' => 0,
+            'unique_thirty_days' => 0, 'growth' => null, 'weekly_growth' => null, 'conversion' => null,
             'trend' => collect(), 'popular_pages' => collect(), 'devices' => collect(),
-            'languages' => collect(), 'sources' => collect(),
+            'languages' => collect(), 'sources' => collect(), 'timezone' => config('analytics.timezone'),
         ];
 
         if (! Schema::hasTable('page_views')) {
             return $empty;
         }
 
-        $now = now();
-        $thirtyDaysAgo = $now->copy()->subDays(29)->startOfDay();
-        $previousStart = $thirtyDaysAgo->copy()->subDays(30);
-        $previousEnd = $thirtyDaysAgo->copy()->subSecond();
+        $now = CarbonImmutable::now(config('analytics.timezone'));
+        // Stored timestamps use the application timezone; reporting uses local calendar days.
+        $storedTime = fn (CarbonImmutable $date) => $date->setTimezone(config('app.timezone'))->toDateTimeString();
+        $thirtyDaysAgo = $now->subDays(29)->startOfDay();
+        $sevenDaysAgo = $now->subDays(6)->startOfDay();
+        $currentViews = PageView::whereBetween('viewed_at', [$storedTime($thirtyDaysAgo), $storedTime($now)]);
 
-        $thirtyDays = PageView::where('viewed_at', '>=', $thirtyDaysAgo)->count();
-        $previousThirtyDays = PageView::whereBetween('viewed_at', [$previousStart, $previousEnd])->count();
-        $uniqueVisitors = PageView::where('viewed_at', '>=', $thirtyDaysAgo)->distinct()->count('visitor_hash');
-        $inquiriesThirtyDays = Inquiry::where('created_at', '>=', $thirtyDaysAgo)->count();
+        $thirtyDays = (clone $currentViews)->count();
+        // Compare through the same local time, since today is still in progress.
+        $previousThirtyDays = PageView::whereBetween('viewed_at', [
+            $storedTime($thirtyDaysAgo->subDays(30)), $storedTime($now->subDays(30)),
+        ])->count();
+        $previousSevenDays = PageView::whereBetween('viewed_at', [
+            $storedTime($sevenDaysAgo->subDays(7)), $storedTime($now->subDays(7)),
+        ])->count();
+        $uniqueVisitors = (clone $currentViews)->distinct()->count('visitor_hash');
+        $inquiriesThirtyDays = Inquiry::withTrashed()
+            ->whereBetween('created_at', [$storedTime($thirtyDaysAgo), $storedTime($now)])->count();
 
-        $dailyRows = PageView::query()
-            ->where('viewed_at', '>=', $now->copy()->subDays(6)->startOfDay())
-            ->selectRaw('DATE(viewed_at) as day, COUNT(*) as total')
-            ->groupBy('day')
-            ->pluck('total', 'day');
+        $trend = collect(range(6, 0))->map(function ($daysAgo) use ($now, $storedTime, $currentViews) {
+            $day = $now->subDays($daysAgo)->startOfDay();
 
-        $trend = collect(CarbonPeriod::create($now->copy()->subDays(6), $now))->map(function ($date) use ($dailyRows) {
-            $day = $date->format('Y-m-d');
-            return ['date' => $date->format('d.m.'), 'total' => (int) ($dailyRows[$day] ?? 0)];
+            return [
+                'date' => $day->format('d.m.'),
+                'total' => (clone $currentViews)
+                    ->where('viewed_at', '>=', $storedTime($day))
+                    ->where('viewed_at', '<', $storedTime($day->addDay()))->count(),
+            ];
         });
+        $sevenDays = $trend->sum('total');
+        $growth = fn (int $current, int $previous) => $previous > 0
+            ? round((($current - $previous) / $previous) * 100, 1)
+            : null;
 
         return [
             'available' => true,
-            'today' => PageView::whereDate('viewed_at', $now->toDateString())->count(),
-            'seven_days' => PageView::where('viewed_at', '>=', $now->copy()->subDays(6)->startOfDay())->count(),
+            'today' => $trend->last()['total'],
+            'seven_days' => $sevenDays,
             'thirty_days' => $thirtyDays,
             'unique_thirty_days' => $uniqueVisitors,
-            'growth' => $previousThirtyDays > 0 ? round((($thirtyDays - $previousThirtyDays) / $previousThirtyDays) * 100, 1) : ($thirtyDays > 0 ? 100 : 0),
-            'conversion' => $uniqueVisitors > 0 ? round(($inquiriesThirtyDays / $uniqueVisitors) * 100, 1) : 0,
+            'growth' => $growth($thirtyDays, $previousThirtyDays),
+            'weekly_growth' => $growth($sevenDays, $previousSevenDays),
+            'conversion' => $uniqueVisitors > 0 ? round(($inquiriesThirtyDays / $uniqueVisitors) * 100, 1) : null,
+            'timezone' => $now->timezoneName,
             'trend' => $trend,
-            'popular_pages' => PageView::where('viewed_at', '>=', $thirtyDaysAgo)->select('path', DB::raw('COUNT(*) as total'))->groupBy('path')->orderByDesc('total')->limit(8)->get(),
-            'devices' => PageView::where('viewed_at', '>=', $thirtyDaysAgo)->select('device', DB::raw('COUNT(*) as total'))->groupBy('device')->orderByDesc('total')->get(),
-            'languages' => PageView::where('viewed_at', '>=', $thirtyDaysAgo)->whereNotNull('locale')->select('locale', DB::raw('COUNT(*) as total'))->groupBy('locale')->orderByDesc('total')->get(),
-            'sources' => PageView::where('viewed_at', '>=', $thirtyDaysAgo)->selectRaw("COALESCE(referrer_host, 'Direktno') as source, COUNT(*) as total")->groupBy('source')->orderByDesc('total')->limit(6)->get(),
+            'popular_pages' => (clone $currentViews)->select('path', DB::raw('COUNT(*) as total'))->groupBy('path')->orderByDesc('total')->limit(8)->get(),
+            'devices' => (clone $currentViews)->select('device', DB::raw('COUNT(*) as total'))->groupBy('device')->orderByDesc('total')->get(),
+            'languages' => (clone $currentViews)->whereNotNull('locale')->select('locale', DB::raw('COUNT(*) as total'))->groupBy('locale')->orderByDesc('total')->get(),
+            'sources' => (clone $currentViews)->selectRaw("COALESCE(referrer_host, 'Direktno') as source, COUNT(*) as total")->groupBy('source')->orderByDesc('total')->limit(6)->get(),
         ];
     }
 }

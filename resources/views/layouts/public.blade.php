@@ -83,7 +83,7 @@
             'publisher' => ['@id' => url('/#organization')],
         ],
         [
-            '@type' => 'WebPage',
+            '@type' => request()->routeIs('contact') ? 'ContactPage' : 'WebPage',
             '@id' => $canonicalUrl . '#webpage',
             'url' => $canonicalUrl,
             'name' => $pageTitle,
@@ -94,7 +94,7 @@
             'primaryImageOfPage' => ['@type' => 'ImageObject', 'url' => $ogImage],
             'potentialAction' => [
                 '@type' => 'CommunicateAction',
-                'target' => route('home', ['locale' => $currentLocale]) . '#contact',
+                'target' => route('contact', ['locale' => $currentLocale]),
                 'name' => __('ftherm.cta.quote'),
             ],
         ],
@@ -104,7 +104,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="{{ $metaDescription }}">
     <meta name="keywords" content="{{ $metaKeywords }}">
@@ -135,7 +135,7 @@
     @stack('head')
 </head>
 
-<body class="bg-white font-sans antialiased text-slate-900" x-data="{ mobileMenu: false, languageOpen: false }">
+<body class="public-site bg-white font-sans antialiased text-slate-900" x-data="publicNavigation" @keydown.escape.window="languageOpen = false">
     @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
         <div class="site-topbar text-white">
             <div class="site-topbar-inner mx-auto flex max-w-[1440px] items-center justify-center text-xs">
@@ -209,11 +209,11 @@
                 <a href="{{ route('about', ['locale' => current_locale()]) }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.about') }}</a>
                 <a href="{{ route('references.index', ['locale' => current_locale()]) }}" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.references') }}</a>
                 <a href="{{ route('home') }}#faq" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.faq') }}</a>
-                <a href="{{ route('home') }}#contact" class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.contact') }}</a>
+                <a href="{{ route('contact') }}" @if(request()->routeIs('contact')) aria-current="page" @endif class="site-nav-link px-3 py-2 text-sm font-bold text-slate-700 hover:bg-sky-50 hover:text-sky-700">{{ __('ftherm.nav.contact') }}</a>
             </div>
 
             <div class="flex items-center gap-2">
-                <div class="relative hidden sm:block" @click.outside="languageOpen = false">
+                <div class="site-language-switcher relative" @click.outside="languageOpen = false">
                     <button type="button" @click="languageOpen = !languageOpen" class="site-lang-button inline-flex items-center gap-2 border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:border-sky-200 hover:bg-sky-50" aria-haspopup="true" :aria-expanded="languageOpen.toString()">
                         <span class="site-flag">{{ $localeFlags[$currentLocale] ?? '🌐' }}</span>
                         <span>{{ $supportedLocales[$currentLocale] ?? strtoupper($currentLocale) }}</span>
@@ -240,7 +240,7 @@
                         {{ __('ftherm.cta.call') }}
                     </a>
                 @endif
-                <button type="button" @click="mobileMenu = true" class="site-icon-button inline-flex items-center justify-center border border-slate-200 text-slate-700 lg:hidden" aria-label="Open menu">
+                <button type="button" @click="mobileMenu = true" class="site-icon-button inline-flex items-center justify-center border border-slate-200 text-slate-700 lg:hidden" aria-label="{{ __('ftherm.mobile.menu') }}" aria-controls="mobile-menu" :aria-expanded="mobileMenu.toString()">
                     <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
                     </svg>
@@ -249,26 +249,12 @@
         </nav>
     </header>
 
-    <div x-cloak x-show="mobileMenu"
-        x-transition:enter="transition-opacity ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity ease-in duration-300"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 overflow-hidden lg:hidden" role="dialog" aria-modal="true">
-        <div class="absolute inset-0 bg-slate-950/60" @click="mobileMenu = false"></div>
-        <div x-show="mobileMenu"
-            x-transition:enter="transform transition ease-out duration-300"
-            x-transition:enter-start="translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transform transition ease-in duration-300"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="translate-x-full"
-            class="absolute right-0 top-0 flex h-full w-80 max-w-[88vw] flex-col overflow-hidden rounded-l-[2rem] bg-white shadow-2xl will-change-transform">
+    <dialog id="mobile-menu" x-ref="mobileDialog" class="site-mobile-menu" aria-label="{{ __('ftherm.mobile.menu') }}"
+        @close="if (!$event.target.open) mobileMenu = false" @cancel.prevent="mobileMenu = false" @click.self="mobileMenu = false">
+        <div class="site-mobile-menu__panel">
             <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                 <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-12 w-auto">
-                <button type="button" @click="mobileMenu = false" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700" aria-label="Close menu">
+                <button type="button" @click="mobileMenu = false" class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-700" aria-label="{{ __('ftherm.mobile.close') }}">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -294,7 +280,7 @@
                     <a href="{{ route('about', ['locale' => current_locale()]) }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.about') }}</a>
                     <a href="{{ route('references.index', ['locale' => current_locale()]) }}" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.references') }}</a>
                     <a href="{{ route('home') }}#faq" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.faq') }}</a>
-                    <a href="{{ route('home') }}#contact" @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.contact') }}</a>
+                    <a href="{{ route('contact') }}" @if(request()->routeIs('contact')) aria-current="page" @endif @click="mobileMenu = false" class="site-mobile-nav-link block rounded-full px-3 py-3 font-bold text-slate-800 hover:bg-sky-50">{{ __('ftherm.nav.contact') }}</a>
                 </div>
                 <div class="mt-6 grid grid-cols-3 gap-2">
                     @foreach ($supportedLocales as $locale => $label)
@@ -313,14 +299,14 @@
                 </div>
             @endif
         </div>
-    </div>
+    </dialog>
 
     <main>
         @yield('content')
     </main>
 
     <footer class="site-footer">
-        <div class="footer-shell mx-auto flex flex-col items-center gap-4 px-4 py-2 sm:flex-row sm:justify-between sm:py-3">
+        <div class="footer-shell mx-auto flex flex-col items-center gap-4 px-4 py-2 xl:flex-row xl:justify-between sm:py-3">
             <a href="{{ route('home') }}" class="footer-logo-mark" aria-label="FTHERM">
                 <img src="{{ asset('images/logo.svg') }}" alt="FTHERM Logo" class="h-14 w-auto sm:h-16">
             </a>
@@ -329,6 +315,7 @@
                 @foreach ($localSeoLinks as $localLink)
                     <a href="{{ route($localLink['route'], ['locale' => $currentLocale]) }}" class="hover:text-white">{{ $localLink['label'] }}</a>
                 @endforeach
+                <a href="{{ route('contact') }}" class="hover:text-white">{{ __('ftherm.nav.contact') }}</a>
             </div>
 
             @if ($companyPhone || $companyEmail || $facebookUrl || $instagramUrl)
@@ -370,15 +357,13 @@
                 </div>
             @endif
         </div>
+        <div class="footer-shell mx-auto mt-6 px-4">
+            <x-company-details :dark="true" :exclude="['company_name', 'company_address']" />
+            <p class="border-t border-white/15 pt-4 text-center text-xs leading-6 text-sky-100">© {{ date('Y') }} FTHERM. {{ __('ftherm.footer.rights') }}</p>
+        </div>
     </footer>
 
-    @if ($companyPhone)
-        <a href="{{ $telHref }}" class="mobile-call-button fixed bottom-4 right-4 z-30 inline-flex items-center justify-center text-white md:hidden" aria-label="{{ __('ftherm.cta.call') }}">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11.04 11.04 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.72 21 3 14.28 3 6V5z" />
-            </svg>
-        </a>
-    @endif
+    @include('components.mobile-app-nav')
 
     @if (session('contact_success'))
         <script>

@@ -5,16 +5,22 @@ namespace App\Http\Middleware;
 use App\Models\PageView;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\Response;
 
 class TrackPageView
 {
     private const PUBLIC_ROUTES = [
-        'home', 'about', 'shop.index', 'shop.show', 'services.show',
+        'home', 'about', 'contact', 'shop.index', 'shop.show', 'services.show',
         'local-seo.air-conditioning', 'local-seo.heat-pumps',
         'references.index', 'references.show',
     ];
+
+    private const AUTOMATED_USER_AGENTS = '/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp|'
+        .'headless|lighthouse|pagespeed|pingdom|uptime|monitor|curl|wget|python|httpclient|'
+        .'http-client|go-http|libwww|scrapy|scraper|selenium|playwright|puppeteer|phantomjs|'
+        .'axios|node-fetch|undici|postman|insomnia|apachebench|^ab\//i';
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -59,7 +65,28 @@ class TrackPageView
             return false;
         }
 
-        return ! preg_match('/bot|crawl|spider|slurp|preview|facebookexternalhit|whatsapp/i', (string) $request->userAgent());
+        if (Auth::guard('admin')->check() || Auth::guard('worker')->check()) {
+            return false;
+        }
+
+        if ($request->ajax() || ! str_contains(strtolower((string) $response->headers->get('Content-Type')), 'text/html')) {
+            return false;
+        }
+
+        // Speculative loads have not been opened by a visitor yet.
+        $purpose = implode(' ', [
+            $request->headers->get('Purpose', ''),
+            $request->headers->get('Sec-Purpose', ''),
+            $request->headers->get('X-Purpose', ''),
+            $request->headers->get('X-Moz', ''),
+        ]);
+        if (preg_match('/prefetch|prerender|preview/i', $purpose)) {
+            return false;
+        }
+
+        $userAgent = trim((string) $request->userAgent());
+
+        return $userAgent !== '' && ! preg_match(self::AUTOMATED_USER_AGENTS, $userAgent);
     }
 
     private function device(string $userAgent): string

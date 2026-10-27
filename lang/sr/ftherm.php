@@ -17,6 +17,17 @@ return [
         'products' => 'Proizvodi',
     ],
 
+    'mobile' => [
+        'navigation' => 'Mobilna navigacija',
+        'home' => 'Početna',
+        'services' => 'Usluge',
+        'call' => 'Pozovi',
+        'quote' => 'Upit',
+        'projects' => 'Radovi',
+        'menu' => 'Meni',
+        'close' => 'Zatvori meni',
+    ],
+
     'cta' => [
         'quote' => 'Zatražite ponudu',
         'call' => 'Pozovite nas',
@@ -143,6 +154,10 @@ return [
     ],
 
     'contact' => [
+        'page_title' => 'Kontakt i podaci o firmi | FTHERM',
+        'page_heading' => 'Javite nam se',
+        'page_description' => 'Pozovite nas, pišite nam ili pošaljite upit za klimu, grejanje, vodoinstalacije i rashladnu tehniku. Ovde ćete pronaći i podatke o firmi FTHERM.',
+        'details_title' => 'Kontakt informacije',
         'title' => 'Zatražite ponudu',
         'subtitle' => 'Opišite radove koji su vam potrebni i javićemo se putem odabranog kontakta.',
         'name' => 'Ime',
@@ -175,6 +190,16 @@ return [
             'email' => 'Email',
             'any' => 'Bilo koji',
         ],
+    ],
+
+    'company' => [
+        'title' => 'Podaci o firmi',
+        'legal_name' => 'Poslovno ime',
+        'address' => 'Adresa',
+        'pib' => 'PIB',
+        'registration_number' => 'Matični broj',
+        'activity_code' => 'Šifra delatnosti',
+        'bank_account' => 'Tekući račun',
     ],
 
     'footer' => [

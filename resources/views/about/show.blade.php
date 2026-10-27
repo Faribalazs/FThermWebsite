@@ -29,7 +29,7 @@
                     <h1 class="about-title mt-5 text-4xl font-black leading-tight sm:text-6xl lg:text-7xl">{{ translate($aboutPage->title) }}</h1>
                     <p class="about-copy mt-7 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl">{{ translate($aboutPage->intro) }}</p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                        <a href="{{ route('home', ['locale' => current_locale()]) }}#contact" class="inline-flex justify-center rounded bg-[#DD2131] px-6 py-4 font-black text-white shadow-lg shadow-red-950/20 transition hover:bg-red-700">{{ __('ftherm.cta.quote') }}</a>
+                        <a href="{{ route('contact', ['locale' => current_locale()]) }}" class="inline-flex justify-center rounded bg-[#DD2131] px-6 py-4 font-black text-white shadow-lg shadow-red-950/20 transition hover:bg-red-700">{{ __('ftherm.cta.quote') }}</a>
                         <a href="{{ route('home', ['locale' => current_locale()]) }}#services" class="inline-flex justify-center rounded border border-white/25 bg-white/10 px-6 py-4 font-black text-white backdrop-blur transition hover:bg-white/16">{{ __('ftherm.cta.services') }}</a>
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                         <p class="about-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.final_cta.text') }}</p>
                     </div>
                     <div class="flex items-center md:justify-end">
-                        <a href="{{ route('home', ['locale' => current_locale()]) }}#contact" class="inline-flex rounded bg-[#09539A] px-7 py-4 font-black text-white shadow-lg shadow-sky-950/20 transition hover:bg-sky-700">{{ __('ftherm.cta.quote') }}</a>
+                        <a href="{{ route('contact', ['locale' => current_locale()]) }}" class="inline-flex rounded bg-[#09539A] px-7 py-4 font-black text-white shadow-lg shadow-sky-950/20 transition hover:bg-sky-700">{{ __('ftherm.cta.quote') }}</a>
                     </div>
                 </div>
             </div>

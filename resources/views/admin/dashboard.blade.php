@@ -83,44 +83,47 @@
         <div class="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="text-xs font-black uppercase tracking-wider text-primary-600">Analitika sajta</p>
-                <h2 class="mt-1 text-lg font-black text-gray-900 sm:text-xl">Posete i popularnost</h2>
+                <h2 class="mt-1 text-lg font-black text-gray-900 sm:text-xl">Pregledi i posetioci</h2>
             </div>
-            <p class="text-xs text-gray-500">Podaci bez botova · poslednjih 30 dana</p>
+            <p class="text-xs text-gray-500">Prepoznati automatski zahtevi se filtriraju · poslednjih 30 dana</p>
         </div>
 
         @if($analytics['available'])
             <div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
                 @foreach([
-                    ['label' => 'Danas', 'value' => $analytics['today'], 'color' => 'text-sky-600', 'bg' => 'from-sky-50 to-sky-100'],
-                    ['label' => 'Posete / 7 dana', 'value' => $analytics['seven_days'], 'color' => 'text-indigo-600', 'bg' => 'from-indigo-50 to-indigo-100'],
-                    ['label' => 'Posete / 30 dana', 'value' => $analytics['thirty_days'], 'color' => 'text-primary-600', 'bg' => 'from-primary-50 to-primary-100'],
-                    ['label' => 'Jedinstveni posetioci', 'value' => $analytics['unique_thirty_days'], 'color' => 'text-emerald-600', 'bg' => 'from-emerald-50 to-emerald-100'],
+                    ['label' => 'Pregledi danas', 'value' => $analytics['today'], 'color' => 'text-sky-600', 'bg' => 'from-sky-50 to-sky-100'],
+                    ['label' => 'Pregledi / 7 dana', 'value' => $analytics['seven_days'], 'color' => 'text-indigo-600', 'bg' => 'from-indigo-50 to-indigo-100'],
+                    ['label' => 'Pregledi / 30 dana', 'value' => $analytics['thirty_days'], 'color' => 'text-primary-600', 'bg' => 'from-primary-50 to-primary-100'],
+                    ['label' => 'Posetioci / 30 dana (procena)', 'value' => $analytics['unique_thirty_days'], 'color' => 'text-emerald-600', 'bg' => 'from-emerald-50 to-emerald-100'],
                 ] as $metric)
                     <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
                         <div class="mb-3 h-1.5 w-12 rounded-full bg-gradient-to-r {{ $metric['bg'] }}"></div>
-                        <p class="text-2xl font-black {{ $metric['color'] }} sm:text-3xl">{{ number_format($metric['value']) }}</p>
+                        <p class="text-2xl font-black {{ $metric['color'] }} sm:text-3xl">{{ number_format($metric['value'], 0, ',', '.') }}</p>
                         <p class="mt-1 text-[11px] font-bold text-gray-500 sm:text-xs">{{ $metric['label'] }}</p>
                     </div>
                 @endforeach
             </div>
+            <p class="mb-4 text-xs leading-5 text-gray-500">Jedan posetilac može napraviti više pregleda. Broj posetilaca je procena. Vremenska zona: {{ $analytics['timezone'] }}; današnji dan je u toku.</p>
 
             <div class="mb-4 grid gap-4 xl:grid-cols-[1.35fr_0.65fr]">
                 <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-6">
                     <div class="mb-5 flex items-center justify-between gap-3">
                         <div>
-                            <h3 class="font-black text-gray-900">Posete poslednjih 7 dana</h3>
+                            <h3 class="font-black text-gray-900">Pregledi poslednjih 7 dana</h3>
                             <p class="mt-0.5 text-xs text-gray-500">Dnevni broj pregleda javnih stranica</p>
                         </div>
-                        <span class="rounded-full px-2.5 py-1 text-xs font-black {{ $analytics['growth'] >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' }}">
-                            {{ $analytics['growth'] >= 0 ? '+' : '' }}{{ $analytics['growth'] }}%
-                        </span>
+                        @if($analytics['weekly_growth'] !== null)
+                            <span class="rounded-full px-2.5 py-1 text-xs font-black {{ $analytics['weekly_growth'] >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700' }}" title="U odnosu na prethodnih 7 dana, do istog vremena">
+                                {{ $analytics['weekly_growth'] > 0 ? '+' : '' }}{{ number_format($analytics['weekly_growth'], 1, ',', '.') }}% / 7 dana
+                            </span>
+                        @endif
                     </div>
                     @php $trendMax = max(1, $analytics['trend']->max('total')); @endphp
-                    <div class="flex h-44 items-end gap-2 sm:gap-4" aria-label="Grafikon poseta">
+                    <div class="flex h-44 items-end gap-2 sm:gap-4" aria-label="Grafikon pregleda stranica">
                         @foreach($analytics['trend'] as $day)
                             <div class="flex min-w-0 flex-1 flex-col items-center justify-end gap-2">
-                                <span class="text-[10px] font-black text-gray-600">{{ $day['total'] }}</span>
-                                <div class="w-full max-w-10 rounded-t-lg bg-gradient-to-t from-primary-600 to-sky-400 transition-all" style="height: {{ max(5, round(($day['total'] / $trendMax) * 112)) }}px"></div>
+                                <span class="text-[10px] font-black text-gray-600">{{ number_format($day['total'], 0, ',', '.') }}</span>
+                                <div class="w-full max-w-10 rounded-t-lg bg-gradient-to-t from-primary-600 to-sky-400 transition-all" style="height: {{ round(($day['total'] / $trendMax) * 112, 2) }}px"></div>
                                 <span class="text-[9px] font-bold text-gray-400 sm:text-[10px]">{{ $day['date'] }}</span>
                             </div>
                         @endforeach
@@ -129,14 +132,19 @@
 
                 <div class="grid grid-cols-2 gap-3 xl:grid-cols-1">
                     <div class="rounded-2xl border border-gray-100 bg-gradient-to-br from-slate-900 to-slate-800 p-4 text-white shadow-sm sm:p-5">
-                        <p class="text-xs font-bold text-slate-300">Promena poseta</p>
-                        <p class="mt-2 text-2xl font-black {{ $analytics['growth'] >= 0 ? 'text-green-300' : 'text-red-300' }}">{{ $analytics['growth'] >= 0 ? '+' : '' }}{{ $analytics['growth'] }}%</p>
-                        <p class="mt-1 text-[10px] leading-4 text-slate-400">u odnosu na prethodnih 30 dana</p>
+                        <p class="text-xs font-bold text-slate-300">Promena pregleda / 30 dana</p>
+                        @if($analytics['growth'] !== null)
+                            <p class="mt-2 text-2xl font-black {{ $analytics['growth'] >= 0 ? 'text-green-300' : 'text-red-300' }}">{{ $analytics['growth'] > 0 ? '+' : '' }}{{ number_format($analytics['growth'], 1, ',', '.') }}%</p>
+                            <p class="mt-1 text-[10px] leading-4 text-slate-400">u odnosu na prethodnih 30 dana, do istog vremena</p>
+                        @else
+                            <p class="mt-2 text-2xl font-black text-slate-300">—</p>
+                            <p class="mt-1 text-[10px] leading-4 text-slate-400">Nema pregleda u prethodnom periodu za poređenje.</p>
+                        @endif
                     </div>
                     <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
-                        <p class="text-xs font-bold text-gray-500">Konverzija u upite</p>
-                        <p class="mt-2 text-2xl font-black text-purple-600">{{ $analytics['conversion'] }}%</p>
-                        <p class="mt-1 text-[10px] leading-4 text-gray-400">upiti / jedinstveni posetioci</p>
+                        <p class="text-xs font-bold text-gray-500">Upiti na 100 posetilaca</p>
+                        <p class="mt-2 text-2xl font-black text-purple-600">{{ $analytics['conversion'] !== null ? number_format($analytics['conversion'], 1, ',', '.') : '—' }}</p>
+                        <p class="mt-1 text-[10px] leading-4 text-gray-400">Poslednjih 30 dana · jedan posetilac može poslati više upita</p>
                     </div>
                 </div>
             </div>
@@ -148,7 +156,7 @@
                         @forelse($analytics['popular_pages'] as $page)
                             <div class="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
                                 <span class="min-w-0 truncate text-xs font-bold text-gray-700" title="{{ $page->path }}">{{ $page->path }}</span>
-                                <span class="flex-shrink-0 rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-black text-primary-700">{{ number_format($page->total) }}</span>
+                                <span class="flex-shrink-0 rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-black text-primary-700">{{ number_format($page->total, 0, ',', '.') }}</span>
                             </div>
                         @empty
                             <p class="p-5 text-sm text-gray-400">Još nema podataka.</p>
@@ -169,7 +177,7 @@
                                     @php $label = $item->{$group['key']}; @endphp
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="min-w-0 truncate text-xs font-bold capitalize text-gray-700">{{ $label }}</span>
-                                        <span class="text-xs font-black text-gray-900">{{ number_format($item->total) }}</span>
+                                        <span class="text-xs font-black text-gray-900">{{ number_format($item->total, 0, ',', '.') }}</span>
                                     </div>
                                 @empty
                                     <span class="text-xs text-gray-400">Nema podataka</span>

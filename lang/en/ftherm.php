@@ -17,6 +17,17 @@ return [
         'products' => 'Products',
     ],
 
+    'mobile' => [
+        'navigation' => 'Mobile navigation',
+        'home' => 'Home',
+        'services' => 'Services',
+        'call' => 'Call',
+        'quote' => 'Quote',
+        'projects' => 'Projects',
+        'menu' => 'Menu',
+        'close' => 'Close menu',
+    ],
+
     'cta' => [
         'quote' => 'Request a quote',
         'call' => 'Call now',
@@ -143,6 +154,10 @@ return [
     ],
 
     'contact' => [
+        'page_title' => 'Contact and company details | FTHERM',
+        'page_heading' => 'Get in touch',
+        'page_description' => 'Call, email or send an inquiry about air conditioning, heating, plumbing and refrigeration. You can also find FTHERM company details here.',
+        'details_title' => 'Contact information',
         'title' => 'Request a quote',
         'subtitle' => 'Describe the work you need and we will respond through your preferred contact method.',
         'name' => 'Name',
@@ -175,6 +190,16 @@ return [
             'email' => 'Email',
             'any' => 'Either',
         ],
+    ],
+
+    'company' => [
+        'title' => 'Company details',
+        'legal_name' => 'Registered company name',
+        'address' => 'Address',
+        'pib' => 'Tax ID (PIB)',
+        'registration_number' => 'Registration number',
+        'activity_code' => 'Business activity code',
+        'bank_account' => 'Bank account',
     ],
 
     'footer' => [

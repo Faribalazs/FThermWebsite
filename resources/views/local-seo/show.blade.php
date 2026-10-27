@@ -162,7 +162,7 @@
                         <h2 class="mt-4 text-3xl font-black text-white sm:text-5xl">{{ __('ftherm.services.next_step_title') }}</h2>
                         <p class="mt-5 text-lg leading-8 text-sky-100">{{ __('ftherm.services.next_step_text') }}</p>
                         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-                            <a href="{{ route('home', ['locale' => current_locale()]) }}#contact"
+                            <a href="{{ route('contact', ['locale' => current_locale()]) }}"
                                 class="service-btn service-btn--red">{{ __('ftherm.cta.quote') }}</a>
                             @if ($companyPhone)
                                 <a href="{{ $telHref }}" class="service-btn service-btn--ghost">{{ $companyPhone }}</a>

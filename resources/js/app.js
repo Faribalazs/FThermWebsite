@@ -2,6 +2,7 @@ import './bootstrap';
 import './worker-work-order-assistant';
 
 import Alpine from 'alpinejs';
+import registerPublicNavigation from './public-navigation';
 import Swal from 'sweetalert2';
 import flatpickr from 'flatpickr';
 
@@ -9,6 +10,7 @@ window.Alpine = Alpine;
 window.Swal = Swal;
 window.flatpickr = flatpickr;
 
+registerPublicNavigation(Alpine);
 Alpine.start();
 
 // Initialize Flatpickr on all date picker inputs

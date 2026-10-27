@@ -59,6 +59,8 @@ Route::prefix('{locale}')
         Route::get('/services/{service:slug}', [ServicePageController::class, 'show'])->name('services.show');
         Route::get('/klime-subotica', [LocalSeoController::class, 'airConditioning'])->name('local-seo.air-conditioning');
         Route::get('/toplotne-pumpe-subotica', [LocalSeoController::class, 'heatPumps'])->name('local-seo.heat-pumps');
+        Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+        Route::get('/kontakt', fn (string $locale) => redirect()->route('contact', ['locale' => $locale], 301));
         Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
         Route::get('/references', [GalleryController::class, 'index'])->name('references.index');
         Route::get('/references/{slug}', [GalleryController::class, 'show'])->name('references.show');

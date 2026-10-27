@@ -5,8 +5,10 @@
 @import './frontend/_about.scss';
 @import './frontend/_services.scss';
 @import './frontend/_local-seo.scss';
+@import './frontend/_contact.scss';
 @import './frontend/_references-index.scss';
 @import './frontend/_references-show.scss';
+@import './frontend/_mobile-app.scss';
 @import 'flatpickr/dist/flatpickr.min.css';
 @import 'sweetalert2/dist/sweetalert2.min.css';
 

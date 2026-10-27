@@ -17,6 +17,17 @@ return [
         'products' => 'Termékek',
     ],
 
+    'mobile' => [
+        'navigation' => 'Mobil navigáció',
+        'home' => 'Főoldal',
+        'services' => 'Megoldások',
+        'call' => 'Hívás',
+        'quote' => 'Ajánlat',
+        'projects' => 'Munkáink',
+        'menu' => 'Menü',
+        'close' => 'Menü bezárása',
+    ],
+
     'cta' => [
         'quote' => 'Ajánlatot kérek',
         'call' => 'Hívás most',
@@ -143,6 +154,10 @@ return [
     ],
 
     'contact' => [
+        'page_title' => 'Kapcsolat és cégadatok | FTHERM',
+        'page_heading' => 'Lépjen kapcsolatba velünk',
+        'page_description' => 'Hívjon minket, írjon e-mailt, vagy kérjen ajánlatot klímára, fűtésre, vízszerelésre és hűtéstechnikára. Itt megtalálja az FTHERM cégadatait is.',
+        'details_title' => 'Elérhetőségeink',
         'title' => 'Ajánlatkérés és kapcsolat',
         'subtitle' => 'Írja le, milyen munkára van szüksége, és a megadott elérhetőségen jelentkezünk.',
         'name' => 'Név',
@@ -175,6 +190,16 @@ return [
             'email' => 'Email',
             'any' => 'Bármelyik',
         ],
+    ],
+
+    'company' => [
+        'title' => 'Cégadatok',
+        'legal_name' => 'Bejegyzett cégnév',
+        'address' => 'Cím',
+        'pib' => 'Adószám (PIB)',
+        'registration_number' => 'Törzsszám',
+        'activity_code' => 'Tevékenységi kód',
+        'bank_account' => 'Bankszámlaszám',
     ],
 
     'footer' => [

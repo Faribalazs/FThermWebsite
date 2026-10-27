@@ -29,7 +29,7 @@ class SeoController extends Controller
             }
         };
 
-        $staticPaths = ['', '/about', '/references'];
+        $staticPaths = ['', '/about', '/references', '/contact'];
         if (shop_enabled()) {
             $staticPaths[] = '/shop';
         }
