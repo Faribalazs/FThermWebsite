@@ -171,7 +171,6 @@
         &.mobile-keyboard-open .mobile-app-call { display: none; }
 
         .contact-page__hero { padding-top: 48px; }
-        .hero-swiper .swiper-slide > .relative { padding-block: 48px; }
         .service-hero__inner, .references-hero__inner, .reference-detail-hero__inner { padding-block: 48px 64px; }
         .about-hero { padding-top: 48px; }
     }
@@ -192,7 +191,7 @@
         .site-mobile-nav-link { min-height: 48px; border-radius: 12px; font-size: 14px; }
 
         .contact-page__hero { padding: 28px 0 30px; border-radius: 0 0 24px 24px; }
-        .contact-page__hero h1 { margin-top: 12px; font-size: 32px; line-height: 1.15; }
+        .contact-page__hero h1 { font-size: 32px; line-height: 1.15; }
         .contact-page__hero p:last-child { margin-top: 14px; font-size: 14px; line-height: 1.7; }
         .contact-page__content { padding-block: 24px 36px; gap: 28px; }
         .contact-page__content h2 { font-size: 20px; }
@@ -207,21 +206,6 @@
         .quote-form input:not([type="hidden"]), .quote-form textarea, .quote-form select { border-radius: 12px; font-size: 16px; }
         .quote-form button[type="submit"] { min-height: 52px; border-radius: 12px; }
 
-        .hero-premium {
-            min-height: 500px;
-            min-height: clamp(450px, calc(100svh - var(--mobile-nav-height)), 620px);
-            border-radius: 0;
-            background: var(--ft-blue);
-        }
-        .hero-swiper {
-            border-radius: 0 0 24px 24px;
-            clip-path: inset(0 round 0 0 24px 24px);
-            background: var(--ft-navy);
-        }
-        .hero-swiper .swiper-slide > .relative { padding-block: 36px; }
-        .hero-title { font-size: clamp(30px, 8.5vw, 40px); line-height: 1.12; }
-        .hero-copy { font-size: 15px; line-height: 1.7; margin-top: 16px; }
-        .hero-premium .section-kicker { font-size: 10px; margin-bottom: 16px; }
         .ft-btn, .service-btn { min-height: 48px; border-radius: 12px; }
         .ftherm-home .premium-section { padding-block: 36px; }
         .service-card, .about-value-card, .about-panel, .reference-card { border-radius: 18px; }

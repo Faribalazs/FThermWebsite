@@ -47,28 +47,6 @@
             filter: saturate(1.08) contrast(1.05);
         }
 
-        .about-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.65rem;
-            font-size: 0.8rem;
-            font-weight: 900;
-            letter-spacing: 0;
-            text-transform: uppercase;
-            color: #bdefff;
-        }
-
-        .about-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ft-red);
-        }
-
-        .about-kicker--dark {
-            color: var(--ft-blue);
-        }
-
         .about-title {
             text-wrap: balance;
             text-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);

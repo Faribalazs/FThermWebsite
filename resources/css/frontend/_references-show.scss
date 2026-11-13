@@ -68,25 +68,8 @@
             padding-block: clamp(9rem, 16vw, 12rem) clamp(4rem, 8vw, 6.5rem);
         }
 
-        .reference-detail-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            color: #bdefff;
-            font-size: 0.82rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .reference-detail-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ref-red);
-        }
-
         .reference-detail-title {
-            margin-top: 1rem;
+            margin-top: 0;
             max-width: 920px;
             font-size: clamp(2.35rem, 6vw, 5rem);
             font-weight: 950;

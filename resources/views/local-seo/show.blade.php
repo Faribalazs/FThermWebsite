@@ -68,8 +68,7 @@
             <div class="service-hero__overlay"></div>
             <div class="service-container service-hero__inner">
                 <div>
-                    <p class="service-kicker">{{ $page['eyebrow'] }}</p>
-                    <h1 class="service-title mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
+                    <h1 class="service-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
                         {{ $page['heading'] }}
                     </h1>
                     <p class="service-hero-copy mt-6 text-base leading-8 sm:text-lg">{{ $page['intro'] }}</p>
@@ -109,8 +108,7 @@
         <section class="local-seo-content-section py-16 md:py-24">
             <div class="service-container">
                 <div class="max-w-3xl">
-                    <p class="service-section-kicker">{{ $page['eyebrow'] }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ $sectionCopy['process'] }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ $sectionCopy['process'] }}</h2>
                     <p class="mt-5 text-lg leading-8 text-slate-600">{{ $sectionCopy['process_intro'] }}</p>
                 </div>
 
@@ -131,8 +129,7 @@
         <section class="local-seo-faq-section py-16 md:py-24">
             <div class="service-container grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
                 <div class="lg:sticky lg:top-32">
-                    <p class="service-section-kicker">{{ $page['eyebrow'] }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.nav.faq') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.nav.faq') }}</h2>
                     <p class="mt-5 max-w-xl text-lg leading-8 text-slate-600">{{ $sectionCopy['faq_intro'] }}</p>
                 </div>
 
@@ -158,8 +155,7 @@
             <div class="service-container">
                 <div class="local-seo-cta-card">
                     <div class="relative z-10 max-w-3xl">
-                        <p class="service-kicker">{{ __('ftherm.services.next_step_eyebrow') }}</p>
-                        <h2 class="mt-4 text-3xl font-black text-white sm:text-5xl">{{ __('ftherm.services.next_step_title') }}</h2>
+                        <h2 class="text-3xl font-black text-white sm:text-5xl">{{ __('ftherm.services.next_step_title') }}</h2>
                         <p class="mt-5 text-lg leading-8 text-sky-100">{{ __('ftherm.services.next_step_text') }}</p>
                         <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                             <a href="{{ route('contact', ['locale' => current_locale()]) }}"

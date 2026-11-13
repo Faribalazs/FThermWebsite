@@ -25,8 +25,7 @@
             <img src="{{ $heroImage }}" alt="{{ translate($aboutPage->hero_image_alt) }}" class="about-hero__image absolute inset-0 h-full w-full object-cover" width="1672" height="941" loading="eager">
             <div class="relative z-10 mx-auto flex min-h-[inherit] max-w-[1440px] flex-col justify-center px-4 pb-16 lg:px-10">
                 <div class="max-w-3xl about-reveal" data-about-reveal>
-                    <p class="about-kicker">{{ translate($aboutPage->eyebrow) }}</p>
-                    <h1 class="about-title mt-5 text-4xl font-black leading-tight sm:text-6xl lg:text-7xl">{{ translate($aboutPage->title) }}</h1>
+                    <h1 class="about-title text-4xl font-black leading-tight sm:text-6xl lg:text-7xl">{{ translate($aboutPage->title) }}</h1>
                     <p class="about-copy mt-7 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl">{{ translate($aboutPage->intro) }}</p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
                         <a href="{{ route('contact', ['locale' => current_locale()]) }}" class="inline-flex justify-center rounded bg-[#DD2131] px-6 py-4 font-black text-white shadow-lg shadow-red-950/20 transition hover:bg-red-700">{{ __('ftherm.cta.quote') }}</a>
@@ -48,8 +47,7 @@
         <section class="py-16 md:py-24">
             <div class="mx-auto grid max-w-[1440px] gap-10 px-4 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
                 <div class="about-reveal flex flex-col justify-center" data-about-reveal>
-                    <p class="about-kicker about-kicker--dark">{{ translate($aboutPage->eyebrow) }}</p>
-                    <h2 class="mt-4 text-3xl font-black text-slate-950 sm:text-5xl">{{ translate($aboutPage->secondary_title) }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ translate($aboutPage->secondary_title) }}</h2>
                     <div class="about-richtext about-copy mt-7 text-lg leading-8 text-slate-700">
                         {!! translate($aboutPage->body) !!}
                     </div>
@@ -63,8 +61,7 @@
         <section class="bg-slate-950 py-16 text-white md:py-24">
             <div class="mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="about-reveal max-w-3xl" data-about-reveal>
-                    <p class="about-kicker">{{ __('ftherm.nav.about') }}</p>
-                    <h2 class="mt-4 text-3xl font-black sm:text-5xl">{{ translate($aboutPage->values_title) }}</h2>
+                    <h2 class="text-3xl font-black sm:text-5xl">{{ translate($aboutPage->values_title) }}</h2>
                     <p class="about-copy mt-5 text-lg leading-8 text-slate-300">{{ translate($aboutPage->secondary_body) }}</p>
                 </div>
 
@@ -84,8 +81,7 @@
             <div class="mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="about-panel about-reveal grid gap-8 overflow-hidden bg-white p-6 md:grid-cols-[1.1fr_0.9fr] md:p-10" data-about-reveal>
                     <div>
-                        <p class="about-kicker about-kicker--dark">{{ __('ftherm.nav.about') }}</p>
-                        <h2 class="mt-4 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.final_cta.title') }}</h2>
+                        <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.final_cta.title') }}</h2>
                         <p class="about-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.final_cta.text') }}</p>
                     </div>
                     <div class="flex items-center md:justify-end">

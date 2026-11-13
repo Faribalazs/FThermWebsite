@@ -14,8 +14,7 @@
     <div class="contact-page">
         <section class="contact-page__hero">
             <div class="mx-auto max-w-[1280px] px-4 lg:px-10">
-                <p class="text-xs font-black uppercase tracking-[0.2em] text-sky-200">FTHERM · {{ __('ftherm.nav.contact') }}</p>
-                <h1 class="mt-4 text-4xl font-black leading-tight sm:text-6xl">{{ __('ftherm.contact.page_heading') }}</h1>
+                <h1 class="text-4xl font-black leading-tight sm:text-6xl">{{ __('ftherm.contact.page_heading') }}</h1>
                 <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{{ __('ftherm.contact.page_description') }}</p>
             </div>
         </section>

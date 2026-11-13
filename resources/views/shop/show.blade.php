@@ -77,9 +77,6 @@
 
         <!-- Product Details -->
         <div>
-            @if($product->category)
-            <p class="text-xs text-primary-600 font-bold uppercase tracking-wider mb-3">{{ translate($product->category->name) }}</p>
-            @endif
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{{ translate($product->name) }}</h1>
 
             @if($product->price)

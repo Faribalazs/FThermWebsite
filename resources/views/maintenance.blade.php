@@ -40,17 +40,6 @@
                 </div>
             </div>
 
-            <!-- Badge -->
-            <div class="anim-reveal d1 mb-5">
-                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold uppercase tracking-widest">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-500 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-600"></span>
-                    </span>
-                    Održavanje u toku
-                </span>
-            </div>
-
             <!-- Heading -->
             <h1 class="anim-reveal d2 text-3xl sm:text-4xl font-extrabold text-industrial-900 tracking-tight mb-3">
                 Sajt je u izradi

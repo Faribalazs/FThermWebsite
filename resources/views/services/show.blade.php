@@ -61,8 +61,7 @@
             <div class="service-hero__overlay"></div>
             <div class="service-container service-hero__inner">
                 <div>
-                    <p class="service-kicker">{{ __('ftherm.services.eyebrow') }}</p>
-                    <h1 class="service-title mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
+                    <h1 class="service-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
                         {{ $title }}</h1>
                     <p class="service-hero-copy mt-6 text-base leading-8 sm:text-lg">{{ $description }}</p>
                     <div class="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -77,8 +76,7 @@
         <section class="service-description-section py-16 md:py-24">
             <div class="service-container">
                 <div class="service-description-card p-5 sm:p-8 lg:p-10">
-                    <p class="service-section-kicker">{{ __('ftherm.services.next_step_eyebrow') }}</p>
-                    <p class="service-lead mt-5">{{ $description }}</p>
+                    <p class="service-lead">{{ $description }}</p>
                     <article class="service-body mt-8">
                         {!! $contentHtml !!}
                     </article>
@@ -90,8 +88,7 @@
             <section class="service-related-section pb-16 md:pb-24">
                 <div class="service-container">
                     <div class="mb-8 max-w-3xl">
-                        <p class="service-section-kicker">{{ __('ftherm.services.all_services') }}</p>
-                        <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">
+                        <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">
                             {{ __('ftherm.services.related') }}</h2>
                     </div>
                     <div class="service-related-swiper swiper">
@@ -146,8 +143,7 @@
         <section id="contact" class="contact-section py-16 md:py-24">
             <div class="service-container grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
                 <div>
-                    <p class="service-section-kicker">{{ __('ftherm.nav.contact') }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.contact.title') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.contact.title') }}</h2>
                     <p class="mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.contact.subtitle') }}</p>
 
                     <div class="mt-8 grid gap-4">

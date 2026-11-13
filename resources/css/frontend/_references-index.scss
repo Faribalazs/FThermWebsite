@@ -72,25 +72,8 @@
             max-width: 760px;
         }
 
-        .references-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            color: #bdefff;
-            font-size: 0.82rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .references-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ref-red);
-        }
-
         .references-title {
-            margin-top: 1rem;
+            margin-top: 0;
             max-width: 820px;
             font-size: clamp(2.6rem, 7vw, 5.9rem);
             font-weight: 950;

@@ -55,9 +55,6 @@
                     </div>
                     @endif
                     <div class="p-5">
-                        @if($product->category)
-                        <p class="text-xs text-primary-600 font-bold uppercase tracking-wider mb-2">{{ translate($product->category->name) }}</p>
-                        @endif
                         <h3 class="text-base font-bold text-gray-900 mb-2 group-hover:text-primary-700 transition-colors line-clamp-2">{{ translate($product->name) }}</h3>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-2 leading-relaxed">{{ translate($product->description) }}</p>
                         @if($product->price)

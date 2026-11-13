@@ -41,8 +41,7 @@
             <div class="service-hero__overlay"></div>
             <div class="service-container service-hero__inner">
                 <div class="max-w-3xl">
-                    <p class="service-kicker">{{ $copy['eyebrow'] }}</p>
-                    <h1 class="service-title mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+                    <h1 class="service-title text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
                         {{ $copy['heading'] }}
                     </h1>
                     <p class="service-hero-copy mt-6 text-base leading-8 sm:text-lg">{{ $copy['text'] }}</p>

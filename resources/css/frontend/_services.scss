@@ -69,40 +69,6 @@
             padding-block: clamp(9rem, 16vw, 12rem) clamp(4rem, 8vw, 7rem);
         }
 
-        .service-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.55rem;
-            color: #bdefff;
-            font-size: 0.82rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .service-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ft-red);
-        }
-
-        .service-section-kicker {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--ft-blue);
-            font-size: 0.82rem;
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .service-section-kicker::before {
-            content: "";
-            width: 2rem;
-            height: 2px;
-            background: var(--ft-red);
-        }
-
         .service-title {
             max-width: 920px;
             text-wrap: balance;

@@ -22,7 +22,6 @@
             @endif
             <div class="reference-detail-container reference-detail-hero__inner">
                 <div>
-                    <p class="reference-detail-kicker">{{ __('frontend.gallery_badge') }}</p>
                     <h1 class="reference-detail-title">{{ $albumTitle }}</h1>
                     @if ($albumDescription)
                         <p class="reference-detail-lead">{{ $albumDescription }}</p>

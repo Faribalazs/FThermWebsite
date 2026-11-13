@@ -61,26 +61,23 @@
                             $slideDescription = translate($slide->description) ?: __('ftherm.hero.subheadline');
                             $slideButton = translate($slide->button_text) ?: __('ftherm.cta.quote');
                         @endphp
-                        <div class="swiper-slide relative">
-                            <div class="absolute inset-0">
-                                <img src="{{ $slideImage }}" alt="{{ $slideTitle }}"
-                                    class="hero-premium__image h-full w-full object-cover opacity-100" width="1800"
-                                    height="1013" fetchpriority="{{ $loop->first ? 'high' : 'auto' }}"
-                                    loading="{{ $loop->first ? 'eager' : 'lazy' }}">
-                                <div class="hero-premium__overlay absolute inset-0"></div>
-                            </div>
-                            <div
-                                class="relative z-10 mx-auto flex min-h-[inherit] max-w-[1440px] items-center px-4 py-20 md:py-28 lg:px-10">
-                                <div class="motion-reveal max-w-3xl" data-reveal>
-                                    <p class="section-kicker section-kicker--light mb-5">{{ __('ftherm.hero.eyebrow') }}</p>
+                        <div class="swiper-slide">
+                            <div class="hero-premium__inner">
+                                <div class="hero-premium__media">
+                                    <img src="{{ $slideImage }}" alt="{{ $slideTitle }}"
+                                        class="hero-premium__image" width="1800"
+                                        height="1013" fetchpriority="{{ $loop->first ? 'high' : 'auto' }}"
+                                        loading="{{ $loop->first ? 'eager' : 'lazy' }}">
+                                </div>
+                                <div class="hero-premium__content">
                                     @if ($loop->first)
-                                        <h1 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">{{ $slideTitle }}</h1>
+                                        <h1 class="hero-title">{{ $slideTitle }}</h1>
                                     @else
-                                        <h2 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">{{ $slideTitle }}</h2>
+                                        <h2 class="hero-title">{{ $slideTitle }}</h2>
                                     @endif
-                                    <p class="hero-copy mt-6 max-w-2xl text-base leading-8 text-slate-200 sm:text-lg">
+                                    <p class="hero-copy">
                                         {{ $slideDescription }}</p>
-                                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                                    <div class="hero-premium__actions">
                                         @if ($slide->button_link)
                                             <a href="{{ $slide->button_link }}"
                                                 class="ft-btn ft-btn-red inline-flex items-center justify-center px-6 py-4 font-black text-white">{{ $slideButton }}</a>
@@ -92,24 +89,20 @@
                             </div>
                         </div>
                     @empty
-                        <div class="swiper-slide relative">
-                            <div class="absolute inset-0">
-                                <img src="{{ asset('images/ftherm/slider/ac-installation-hero.webp') }}"
-                                    alt="{{ __('ftherm.hero.image_alt') }}"
-                                    class="hero-premium__image h-full w-full object-cover opacity-100" width="1800"
-                                    height="1013" fetchpriority="high">
-                                <div class="hero-premium__overlay absolute inset-0"></div>
-                            </div>
-                            <div
-                                class="relative z-10 mx-auto flex min-h-[inherit] max-w-[1440px] items-center px-4 py-20 md:py-28 lg:px-10">
-                                <div class="motion-reveal max-w-3xl" data-reveal>
-                                    <p class="section-kicker section-kicker--light mb-5">{{ __('ftherm.hero.eyebrow') }}
-                                    </p>
-                                    <h1 class="hero-title text-4xl font-black leading-tight sm:text-5xl lg:text-7xl">
+                        <div class="swiper-slide">
+                            <div class="hero-premium__inner">
+                                <div class="hero-premium__media">
+                                    <img src="{{ asset('images/ftherm/slider/ac-installation-hero.webp') }}"
+                                        alt="{{ __('ftherm.hero.image_alt') }}"
+                                        class="hero-premium__image" width="1800"
+                                        height="1013" fetchpriority="high">
+                                </div>
+                                <div class="hero-premium__content">
+                                    <h1 class="hero-title">
                                         {{ __('ftherm.hero.headline') }}</h1>
-                                    <p class="hero-copy mt-6 max-w-2xl text-base leading-8 text-slate-200 sm:text-lg">
+                                    <p class="hero-copy">
                                         {{ __('ftherm.hero.subheadline') }}</p>
-                                    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+                                    <div class="hero-premium__actions">
                                         <a href="#contact"
                                             class="ft-btn ft-btn-red inline-flex items-center justify-center px-6 py-4 font-black text-white">{{ __('ftherm.cta.quote') }}</a>
                                         <a href="#services"
@@ -120,21 +113,25 @@
                         </div>
                     @endforelse
                 </div>
-                <div class="hero-pagination swiper-pagination !bottom-8"></div>
-                <div class="absolute bottom-8 right-4 z-20 hidden gap-3 lg:flex lg:right-10">
-                    <button type="button" class="hero-arrow hero-prev inline-flex items-center justify-center"
-                        aria-label="Previous slide">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button type="button" class="hero-arrow hero-next inline-flex items-center justify-center"
-                        aria-label="Next slide">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                </div>
+                @if ($slides->count() > 1)
+                    <div class="hero-controls">
+                        <div class="hero-pagination swiper-pagination"></div>
+                        <div class="hero-navigation">
+                            <button type="button" class="hero-arrow hero-prev inline-flex items-center justify-center"
+                                aria-label="Previous slide">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <button type="button" class="hero-arrow hero-next inline-flex items-center justify-center"
+                                aria-label="Next slide">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                @endif
             </div>
         </section>
 
@@ -142,8 +139,7 @@
             <div class="mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
                     <div class="motion-reveal max-w-3xl" data-reveal>
-                        <p class="section-kicker section-kicker--light">{{ translate($trustSection->eyebrow) }}</p>
-                        <h2 class="mt-4 text-3xl font-black leading-tight text-white sm:text-5xl">
+                        <h2 class="text-3xl font-black leading-tight text-white sm:text-5xl">
                             {{ translate($trustSection->title) }}</h2>
                         <p class="trust-showcase__intro mt-6 max-w-2xl pl-5 text-base leading-8 sm:text-lg">
                             {{ translate($trustSection->intro) }}</p>
@@ -185,8 +181,7 @@
         <section id="services" class="premium-section bg-white pb-16 md:pb-24">
             <div class="mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="motion-reveal max-w-3xl" data-reveal>
-                    <p class="section-kicker">{{ __('ftherm.services.eyebrow') }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.services.title') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.services.title') }}</h2>
                     <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.services.intro') }}</p>
                 </div>
 
@@ -268,8 +263,7 @@
                         loading="lazy">
                 </div>
                 <div class="seasonal-content motion-reveal flex flex-col justify-center" data-reveal style="--delay: 120ms">
-                    <p class="section-kicker">{{ __('ftherm.seasonal.eyebrow') }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.seasonal.title') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.seasonal.title') }}</h2>
                     <p class="balanced-copy mt-5 text-base leading-8 text-slate-600 sm:text-lg">{{ __('ftherm.seasonal.text') }}</p>
                     <ul class="seasonal-benefits mt-7 grid gap-3 sm:grid-cols-2">
                         @foreach (__('ftherm.seasonal.bullets') as $bullet)
@@ -414,8 +408,7 @@
         <section id="faq" class="faq-section premium-section py-16 md:py-24">
             <div class="faq-layout mx-auto max-w-[1440px] px-4 lg:px-10">
                 <div class="faq-intro motion-reveal" data-reveal>
-                    <p class="section-kicker">{{ __('ftherm.faq.eyebrow') }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.faq.title') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.faq.title') }}</h2>
                     <p class="mt-5 max-w-lg text-base leading-8 text-slate-600 sm:text-lg">{{ __('ftherm.faq.intro') }}</p>
                     <a href="#contact" class="faq-contact-link mt-7 inline-flex items-center gap-3 font-black">
                         <span>{{ __('ftherm.faq.contact') }}</span>
@@ -458,8 +451,7 @@
         <section id="contact" class="contact-section premium-section py-16 md:py-24">
             <div class="mx-auto grid max-w-[1440px] gap-8 px-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-10">
                 <div class="motion-reveal" data-reveal>
-                    <p class="section-kicker">{{ __('ftherm.nav.contact') }}</p>
-                    <h2 class="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.contact.title') }}</h2>
+                    <h2 class="text-3xl font-black text-slate-950 sm:text-5xl">{{ __('ftherm.contact.title') }}</h2>
                     <p class="balanced-copy mt-5 text-lg leading-8 text-slate-600">{{ __('ftherm.contact.subtitle') }}</p>
 
                     <div class="mt-8 grid gap-4">
@@ -554,14 +546,15 @@
             const loaderMinimumMs = 1800;
 
             if (window.Swiper && document.querySelector('.hero-swiper')) {
+                const hasMultipleSlides = document.querySelectorAll('.hero-swiper .swiper-slide').length > 1;
                 new Swiper('.hero-swiper', {
-                    loop: true,
+                    loop: hasMultipleSlides,
                     speed: reduceMotion ? 0 : 950,
                     effect: 'fade',
                     fadeEffect: {
                         crossFade: true
                     },
-                    autoplay: reduceMotion ? false : {
+                    autoplay: reduceMotion || !hasMultipleSlides ? false : {
                         delay: 5400,
                         disableOnInteraction: false
                     },

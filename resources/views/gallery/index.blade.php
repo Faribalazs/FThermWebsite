@@ -17,7 +17,6 @@
             <div class="references-hero__shade"></div>
             <div class="references-container references-hero__inner">
                 <div class="references-copy">
-                    <p class="references-kicker">{{ __('frontend.gallery_badge') }}</p>
                     <h1 class="references-title">{{ __('frontend.gallery_title') }}</h1>
                     <p class="references-lead">{{ __('frontend.gallery_subtitle') }}</p>
                     <div class="references-stats" aria-label="{{ __('frontend.gallery_title') }}">
